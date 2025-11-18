@@ -11,6 +11,7 @@ no_fitness_termination = False
 activation_default      = tanh
 activation_mutate_rate  = 0.1
 activation_options      = tanh
+single_structural_mutation = False
 
 # node aggregation options
 aggregation_default     = sum
