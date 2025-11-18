@@ -12,6 +12,7 @@ activation_default      = tanh
 activation_mutate_rate  = 0.1
 activation_options      = tanh
 single_structural_mutation = False
+structural_mutation_surer = true
 
 # node aggregation options
 aggregation_default     = sum
