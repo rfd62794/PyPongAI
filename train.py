@@ -1,4 +1,5 @@
 # train.py
+import patch_neat
 import os
 import neat
 import pickle

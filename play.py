@@ -1,4 +1,5 @@
 # play.py
+import patch_neat
 import pygame
 import pickle
 import neat
