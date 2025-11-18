@@ -1,4 +1,5 @@
 # test_train.py
+import patch_neat
 import neat
 import os
 import ai_module
