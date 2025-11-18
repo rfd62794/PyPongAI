@@ -47,8 +47,8 @@ node_delete_prob        = 0.2
 
 # network parameters
 num_hidden              = 1
-num_inputs              = 5  # paddle_y, ball_x, ball_y, ball_vel_x, ball_vel_y
-num_outputs             = 3  # UP, DOWN, STAY
+num_inputs              = 5
+num_outputs             = 3
 
 # weight options
 weight_init_mean        = 0.0
