@@ -235,14 +235,18 @@ class LeagueState(BaseState):
             if event.key == pygame.K_ESCAPE:
                 self.manager.change_state("menu")
     
-    def update(self):
+    def update(self, dt):
         """Called every frame"""
-        if self.mode == "RUNNING" and self.match_queue:
-            # Run next match
-            self.run_next_match()
-            
-            # Process events to keep UI responsive
-            pygame.event.pump()
+        if self.mode == "RUNNING":
+            if self.current_match and not self.current_match["finished"]:
+                # Update current match
+                self.update_match()
+            elif self.match_queue:
+                # Start next match
+                self.start_next_match()
+            elif self.current_match and self.current_match["finished"]:
+                # Wait a moment before next match (so user can see result)
+                pass
     
     def draw(self, screen):
         screen.fill(config.BLACK)
@@ -292,21 +296,58 @@ class LeagueState(BaseState):
             screen.blit(start_text, start_rect)
     
     def draw_running(self, screen):
-        """Draw tournament progress"""
-        title = self.font.render("Tournament in Progress", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 50))
+        """Draw tournament progress with visual match"""
+        screen.fill(config.BLACK)
         
-        progress = self.small_font.render(
-            f"Match {self.completed_matches} / {self.total_matches}",
-            True, config.WHITE
-        )
-        screen.blit(progress, (config.SCREEN_WIDTH//2 - progress.get_width()//2, 120))
+        # Draw the actual game if a match is active
+        if self.current_match and not self.current_match["finished"]:
+            # Draw the game
+            self.current_match["game"].draw(screen)
+            
+            # Overlay match info at top
+            info_bg = pygame.Rect(0, 0, config.SCREEN_WIDTH, 80)
+            pygame.draw.rect(screen, (0, 0, 0, 180), info_bg)
+            
+            # Model names
+            model1_text = self.tiny_font.render(self.current_match["model1"][:30], True, config.WHITE)
+            model2_text = self.tiny_font.render(self.current_match["model2"][:30], True, config.WHITE)
+            screen.blit(model1_text, (10, 10))
+            screen.blit(model2_text, (config.SCREEN_WIDTH - model2_text.get_width() - 10, 10))
+            
+            # Progress
+            progress_text = self.tiny_font.render(
+                f"Match {self.completed_matches + 1} / {self.total_matches}",
+                True, config.WHITE
+            )
+            screen.blit(progress_text, (config.SCREEN_WIDTH//2 - progress_text.get_width()//2, 10))
+            
+            # Score display (larger)
+            score_text = self.small_font.render(
+                f"{self.current_match['game'].score_left} - {self.current_match['game'].score_right}",
+                True, config.WHITE
+            )
+            screen.blit(score_text, (config.SCREEN_WIDTH//2 - score_text.get_width()//2, 40))
+            
+        elif self.current_match and self.current_match["finished"]:
+            # Show result screen briefly
+            result_text = self.font.render("Match Complete!", True, config.WHITE)
+            screen.blit(result_text, (config.SCREEN_WIDTH//2 - result_text.get_width()//2, 200))
+            
+            winner_name = self.current_match["model1"] if self.current_match["winner"] == 1 else self.current_match["model2"]
+            winner_text = self.small_font.render(f"Winner: {winner_name[:40]}", True, (100, 255, 100))
+            screen.blit(winner_text, (config.SCREEN_WIDTH//2 - winner_text.get_width()//2, 270))
+            
+            score_text = self.small_font.render(
+                f"{self.current_match['score1']} - {self.current_match['score2']}",
+                True, config.WHITE
+            )
+            screen.blit(score_text, (config.SCREEN_WIDTH//2 - score_text.get_width()//2, 320))
         
-        # Progress bar
-        bar_width = 600
-        bar_height = 30
-        bar_x = config.SCREEN_WIDTH//2 - bar_width//2
-        bar_y = 170
+        # Progress bar at bottom
+        bar_width = config.SCREEN_WIDTH - 40
+        bar_height = 20
+        bar_x = 20
+        bar_y = config.SCREEN_HEIGHT - 60
         
         pygame.draw.rect(screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height))
         if self.total_matches > 0:
@@ -314,36 +355,11 @@ class LeagueState(BaseState):
             pygame.draw.rect(screen, (50, 150, 50), (bar_x, bar_y, progress_width, bar_height))
         pygame.draw.rect(screen, config.WHITE, (bar_x, bar_y, bar_width, bar_height), 2)
         
-        # Current match info
-        if self.current_match:
-            y_offset = 230
-            match_text = self.tiny_font.render("Last Match:", True, config.GRAY)
-            screen.blit(match_text, (config.SCREEN_WIDTH//2 - match_text.get_width()//2, y_offset))
-            
-            model1_text = self.tiny_font.render(
-                f"{self.current_match['model1']}: {self.current_match['score1']}",
-                True, (100, 255, 100) if self.current_match['winner'] == 1 else config.WHITE
-            )
-            screen.blit(model1_text, (config.SCREEN_WIDTH//2 - model1_text.get_width()//2, y_offset + 30))
-            
-            vs_text = self.tiny_font.render("vs", True, config.GRAY)
-            screen.blit(vs_text, (config.SCREEN_WIDTH//2 - vs_text.get_width()//2, y_offset + 60))
-            
-            model2_text = self.tiny_font.render(
-                f"{self.current_match['model2']}: {self.current_match['score2']}",
-                True, (100, 255, 100) if self.current_match['winner'] == 2 else config.WHITE
-            )
-            screen.blit(model2_text, (config.SCREEN_WIDTH//2 - model2_text.get_width()//2, y_offset + 90))
-        
-        # Cancel button
-        mx, my = pygame.mouse.get_pos()
-        color = (150, 50, 50) if self.cancel_button.collidepoint((mx, my)) else (100, 30, 30)
-        pygame.draw.rect(screen, color, self.cancel_button)
-        pygame.draw.rect(screen, config.WHITE, self.cancel_button, 2)
-        
-        cancel_text = self.small_font.render("Cancel Tournament", True, config.WHITE)
-        cancel_rect = cancel_text.get_rect(center=self.cancel_button.center)
-        screen.blit(cancel_text, cancel_rect)
+        progress_pct = self.tiny_font.render(
+            f"{int((self.completed_matches / self.total_matches) * 100)}%" if self.total_matches > 0 else "0%",
+            True, config.WHITE
+        )
+        screen.blit(progress_pct, (config.SCREEN_WIDTH//2 - progress_pct.get_width()//2, bar_y - 25))
     
     def draw_results(self, screen):
         """Draw tournament results"""
