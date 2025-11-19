@@ -33,8 +33,7 @@ class MenuState(BaseState):
                 if self.btn_play.collidepoint((mx, my)):
                     self.manager.change_state("lobby")
                 elif self.btn_train.collidepoint((mx, my)):
-                    # Placeholder for TrainState
-                    print("Train State not implemented yet")
+                    self.manager.change_state("train")
                 elif self.btn_manage.collidepoint((mx, my)):
                     # Placeholder for ModelState
                     print("Model State not implemented yet")
