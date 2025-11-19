@@ -60,37 +60,6 @@ class Dashboard:
                         "file": os.path.basename(f),
                         "frames": len(df),
                         "max_score_left": df['score_left'].max(),
-                        "max_score_right": df['score_right'].max(),
-                        "avg_ball_speed": df['ball_vel_x'].abs().mean()
-                    })
-            except:
-                pass
-        matches.sort(key=lambda x: x["file"], reverse=True) # Newest first
-        return matches
-
-    def load_human_stats(self):
-        files = glob.glob(os.path.join(config.LOGS_HUMAN_DIR, "*.csv"))
-        total_frames = 0
-        actions = {}
-        for f in files:
-            try:
-                df = pd.read_csv(f)
-                total_frames += len(df)
-                counts = df['human_action'].value_counts().to_dict()
-                for k, v in counts.items():
-                    actions[k] = actions.get(k, 0) + v
-            except:
-                pass
-        return {"total_frames": total_frames, "actions": actions}
-
-    def draw_tabs(self):
-        tab_width = config.SCREEN_WIDTH // len(self.tabs)
-        for i, tab in enumerate(self.tabs):
-            rect = pygame.Rect(i * tab_width, 0, tab_width, 50)
-            color = TAB_ACTIVE_COLOR if tab == self.active_tab else TAB_COLOR
-            pygame.draw.rect(screen, color, rect)
-            pygame.draw.rect(screen, config.WHITE, rect, 2)
-            
             text = font.render(tab, True, TEXT_COLOR)
             text_rect = text.get_rect(center=rect.center)
             screen.blit(text, text_rect)
