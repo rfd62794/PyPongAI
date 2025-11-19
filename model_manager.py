@@ -17,6 +17,35 @@ def get_fitness_from_filename(filename):
     except (IndexError, ValueError):
         return 0
 
+def get_best_model():
+    """
+    Returns the path to the best model based on fitness score.
+    Returns None if no models are found.
+    """
+    models = scan_models()
+    if not models:
+        return None
+    
+    # Sort by fitness descending
+    models.sort(key=lambda x: get_fitness_from_filename(os.path.basename(x)), reverse=True)
+    return models[0]
+
+def delete_models(model_paths):
+    """
+    Safely deletes a list of model files.
+    Returns the number of successfully deleted files.
+    """
+    deleted_count = 0
+    for path in model_paths:
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+                deleted_count += 1
+                print(f"Deleted: {os.path.basename(path)}")
+        except Exception as e:
+            print(f"Error deleting {path}: {e}")
+    return deleted_count
+
 def scan_models():
     models = []
     # Scan main model dir
