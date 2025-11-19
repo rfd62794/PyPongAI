@@ -8,6 +8,7 @@ import ai_module
 import game_engine
 import sys
 from states.base import BaseState
+from model_manager import get_best_model, get_fitness_from_filename
 
 class UIProgressReporter(neat.reporting.BaseReporter):
     def __init__(self, screen):
@@ -163,6 +164,7 @@ class TrainState(BaseState):
         self.per_page = 5
         self.mode = "SELECTION" # SELECTION or TRAINING
         self.visual_mode = True # Default to visual
+        self.use_best_seed = True # Default to using best model as seed
 
     def enter(self, **kwargs):
         self.mode = "SELECTION"
@@ -187,12 +189,33 @@ class TrainState(BaseState):
             except:
                 return 0
         self.models.sort(key=get_fitness, reverse=True)
+    
+    def get_best_model_path(self):
+        """Get the best model path using the utility function"""
+        return get_best_model()
 
     def start_training(self, seed_genome=None):
         self.mode = "TRAINING"
         # Render initial loading screen
         self.manager.screen.fill(config.BLACK)
-        text = self.font.render("Initializing Training...", True, config.WHITE)
+        
+        # If no seed provided and use_best_seed is True, load best model
+        if seed_genome is None and self.use_best_seed:
+            best_path = self.get_best_model_path()
+            if best_path:
+                try:
+                    with open(best_path, "rb") as f:
+                        seed_genome = pickle.load(f)
+                    print(f"Auto-loaded best model as seed: {os.path.basename(best_path)}")
+                    text = self.font.render(f"Loading Best Model: {os.path.basename(best_path)[:30]}...", True, config.WHITE)
+                except Exception as e:
+                    print(f"Failed to load best model: {e}")
+                    text = self.font.render("Initializing Training...", True, config.WHITE)
+            else:
+                text = self.font.render("Initializing Training...", True, config.WHITE)
+        else:
+            text = self.font.render("Initializing Training...", True, config.WHITE)
+        
         self.manager.screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
         pygame.display.flip()
         
@@ -239,10 +262,8 @@ class TrainState(BaseState):
                     self.manager.change_state("menu")
                     return
 
-                # Visual Toggle
-                toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 60, 240, 40)
-                if toggle_rect.collidepoint((mx, my)):
-                    self.visual_mode = not self.visual_mode
+                if self.btn_league.collidepoint((mx, my)):
+                    self.use_best_seed = not self.use_best_seed
                     return
 
                 # Model Selection
