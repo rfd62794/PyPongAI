@@ -64,6 +64,9 @@ def run_training(seed_genomes=None):
     
     # Custom Reporter for Validation
     class ValidationReporter(neat.reporting.BaseReporter):
+        def start_generation(self, generation):
+            self.generation = generation
+
         def end_generation(self, config, population, species_set):
             # Find best genome
             best_genome = None
