@@ -3,12 +3,7 @@ import shutil
 import argparse
 import config
 
-TIERS = {
-    "God": 20,         # Top 20
-    "Master": 50,      # Top 21-50
-    "Challenger": 100, # Top 51-100
-    "Archive": None    # The rest
-}
+
 
 def get_fitness_from_filename(filename):
     try:
@@ -37,14 +32,31 @@ def scan_models():
                 models.append(os.path.join(checkpoint_dir, f))
                 
     # Scan existing tiers to allow re-organizing
-    for tier in TIERS.keys():
-        tier_dir = os.path.join(config.MODEL_DIR, "tiers", tier)
-        if os.path.exists(tier_dir):
-            for f in os.listdir(tier_dir):
+    tiers_root = os.path.join(config.MODEL_DIR, "tiers")
+    if os.path.exists(tiers_root):
+        for root, dirs, files in os.walk(tiers_root):
+            for f in files:
                 if f.endswith(".pkl"):
-                    models.append(os.path.join(tier_dir, f))
+                    models.append(os.path.join(root, f))
 
     return models
+
+def get_tier_name(fitness):
+    if fitness < 500:
+        step = 50
+        start = (fitness // step) * step
+        end = start + step
+        return f"Fitness_{start}_{end}"
+    elif fitness < 1000:
+        step = 100
+        start = (fitness // step) * step
+        end = start + step
+        return f"Fitness_{start}_{end}"
+    else:
+        step = 200
+        start = (fitness // step) * step
+        end = start + step
+        return f"Fitness_{start}_{end}"
 
 def organize_models(dry_run=False):
     models = scan_models()
@@ -54,21 +66,15 @@ def organize_models(dry_run=False):
     
     print(f"Found {len(models)} models.")
     
-    tier_counts = {k: 0 for k in TIERS.keys()}
+    tier_counts = {}
     
     for i, model_path in enumerate(models):
         filename = os.path.basename(model_path)
-        rank = i + 1
+        fitness = get_fitness_from_filename(filename)
         
-        target_tier = "Archive"
-        if rank <= TIERS["God"]:
-            target_tier = "God"
-        elif rank <= TIERS["Master"]:
-            target_tier = "Master"
-        elif rank <= TIERS["Challenger"]:
-            target_tier = "Challenger"
+        target_tier = get_tier_name(fitness)
             
-        tier_counts[target_tier] += 1
+        tier_counts[target_tier] = tier_counts.get(target_tier, 0) + 1
         
         if not dry_run:
             target_dir = os.path.join(config.MODEL_DIR, "tiers", target_tier)
@@ -80,13 +86,13 @@ def organize_models(dry_run=False):
                 shutil.move(model_path, target_path)
                 print(f"Moved {filename} -> {target_tier}")
         else:
-            print(f"[Dry Run] Would move {filename} -> {target_tier} (Fitness: {get_fitness_from_filename(filename)})")
+            print(f"[Dry Run] Would move {filename} -> {target_tier} (Fitness: {fitness})")
 
     if not dry_run:
         print("\nOrganization Complete.")
         print("Summary:")
-        for tier, count in tier_counts.items():
-            print(f"  {tier}: {count}")
+        for tier in sorted(tier_counts.keys()):
+            print(f"  {tier}: {tier_counts[tier]}")
 
 def clean_archive():
     archive_dir = os.path.join(config.MODEL_DIR, "tiers", "Archive")
