@@ -209,13 +209,19 @@ def show_start_menu():
             if pygame.mouse.get_pressed()[0] and rect.collidepoint((mx, my)):
                 selected_model_path = model_path
                 running = False
-                pygame.time.wait(200) # Debounce
-
         # Navigation
         if len(models) > per_page:
             nav_text = f"Page {page + 1} / {(len(models) - 1) // per_page + 1} (Arrows to change)"
             nav_surf = small_font.render(nav_text, True, config.WHITE)
             screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
+
+        # Back Button
+        back_rect = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
+        pygame.draw.rect(screen, (150, 50, 50), back_rect)
+        pygame.draw.rect(screen, config.WHITE, back_rect, 2)
+        back_text = font.render("Back", True, config.WHITE)
+        back_text_rect = back_text.get_rect(center=back_rect.center)
+        screen.blit(back_text, back_text_rect)
 
         pygame.display.flip()
         
@@ -223,6 +229,12 @@ def show_start_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return None
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_rect.collidepoint(event.pos):
+                    pygame.quit()
+                    return None
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_n:
                     running = False # No seed
