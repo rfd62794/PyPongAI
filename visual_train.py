@@ -32,7 +32,16 @@ class VisualReporter(neat.reporting.BaseReporter):
         if best_genome:
             print(f"Generation {self.generation} Best Fitness: {best_fitness}")
             self.save_checkpoint(best_genome)
-            self.visualize_best(best_genome)
+            
+            # Find second best for visualization opponent
+            second_best = None
+            second_fitness = -float('inf')
+            for g in population.values():
+                if g.fitness is not None and g.fitness > second_fitness and g != best_genome:
+                    second_fitness = g.fitness
+                    second_best = g
+            
+            self.visualize_match(best_genome, second_best if second_best else best_genome)
 
     def save_checkpoint(self, genome):
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -42,21 +51,22 @@ class VisualReporter(neat.reporting.BaseReporter):
             pickle.dump(genome, f)
         print(f"Saved checkpoint: {filename}")
 
-    def visualize_best(self, genome):
-        print("Visualizing best genome... (Press SPACE to skip)")
+    def visualize_match(self, genome1, genome2):
+        print("Visualizing Best vs Second Best... (Press SPACE to skip)")
         
         # Setup Game
         pygame.init()
         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-        pygame.display.set_caption(f"Generation {self.generation} - Best Genome Visualization")
+        pygame.display.set_caption(f"Generation {self.generation} - Best (Left) vs 2nd Best (Right)")
         clock = pygame.time.Clock()
         game = game_engine.Game()
         
-        # Create Network
-        net = neat.nn.FeedForwardNetwork.create(genome, self.config_neat)
+        # Create Networks
+        net1 = neat.nn.FeedForwardNetwork.create(genome1, self.config_neat)
+        net2 = neat.nn.FeedForwardNetwork.create(genome2, self.config_neat)
         
         running = True
-        # Run for a short match (e.g., first to 3 points) or until skipped
+        # Run for a match to 5 points
         while running:
             clock.tick(config.FPS)
             
@@ -68,28 +78,35 @@ class VisualReporter(neat.reporting.BaseReporter):
                     if event.key == pygame.K_SPACE:
                         running = False
             
-            # AI (Left)
             state = game.get_state()
-            inputs = (
-                state["paddle_left_y"],
-                state["ball_x"],
-                state["ball_y"],
-                state["ball_vel_x"],
-                state["ball_vel_y"],
-                state["paddle_left_y"] - state["ball_y"],
+            
+            # AI 1 (Left)
+            inputs1 = (
+                state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
                 1.0 if state["ball_vel_x"] < 0 else 0.0
             )
-            output = net.activate(inputs)
-            action_idx = output.index(max(output))
-            left_move = "UP" if action_idx == 0 else "DOWN" if action_idx == 1 else None
+            out1 = net1.activate(inputs1)
+            act1 = out1.index(max(out1))
+            left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
             
-            # Rule-Based AI (Right) - Opponent
-            # We need a dummy paddle object for the rule based AI function
-            # But the function expects a paddle object with .rect.y
-            # Let's just implement simple tracking here or use the module
-            # The ai_module.get_rule_based_move expects (game_state, paddle)
-            # We can reconstruct a lightweight paddle obj or just use the game's paddle
-            right_move = ai_module.get_rule_based_move(state, "right")
+            # AI 2 (Right)
+            inputs2 = (
+                state["paddle_right_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                1.0 if state["ball_vel_x"] > 0 else 0.0
+            )
+            out2 = net2.activate(inputs2)
+            act2 = out2.index(max(out2))
+            right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
             
             # Update
             score_data = game.update(left_move, right_move)
@@ -104,13 +121,11 @@ class VisualReporter(neat.reporting.BaseReporter):
             
             pygame.display.flip()
             
-            # Check end condition (quick match to 3)
-            if game.score_left >= 3 or game.score_right >= 3:
+            # Check end condition
+            if game.score_left >= 5 or game.score_right >= 5:
                 running = False
                 
-        pygame.display.quit() # Close window but keep pygame init? No, safer to quit display
-        # pygame.quit() # Don't call full quit, might break things if re-init? 
-        # Actually pygame.quit() is fine if we re-init next time.
+        pygame.display.quit()
 
 def run_visual_training(seed_genome=None):
     local_dir = os.path.dirname(__file__)
@@ -135,7 +150,7 @@ def run_visual_training(seed_genome=None):
     p.add_reporter(neat.StatisticsReporter())
     p.add_reporter(VisualReporter(config_neat))
     
-    winner = p.run(ai_module.eval_genomes, 50)
+    winner = p.run(ai_module.eval_genomes_self_play, 50)
     
     # Save final winner
     with open(os.path.join(config.MODEL_DIR, "visual_winner.pkl"), "wb") as f:

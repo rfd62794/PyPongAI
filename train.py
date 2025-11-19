@@ -62,20 +62,85 @@ def run_training(seed_genomes=None):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     
-    # Run for 50 generations
-    print("Starting training...")
-    winner = p.run(ai_module.eval_genomes, 50)
+    # Custom Reporter for Validation
+    class ValidationReporter(neat.reporting.BaseReporter):
+        def end_generation(self, config, population, species_set):
+            # Find best genome
+            best_genome = None
+            best_fitness = -float('inf')
+            for g in population.values():
+                if g.fitness is not None and g.fitness > best_fitness:
+                    best_fitness = g.fitness
+                    best_genome = g
+            
+            if best_genome:
+                avg_rally, win_rate = ai_module.validate_genome(best_genome, config)
+                print(f"   [Validation] Best Genome vs Rule-Based: Avg Rally={avg_rally:.2f}, Win Rate={win_rate:.2f}")
+                
+                # Log to CSV
+                with open(os.path.join(config_neat.stats_path_csv), 'a', newline='') as f:
+                    writer = csv.writer(f)
+                    # We need generation number. BaseReporter doesn't store it easily unless we track it.
+                    # But we can append to the file created below.
+                    pass
 
-    # Save training stats
+    p.add_reporter(ValidationReporter())
+    
+    # Run for 50 generations
+    # Run for 50 generations
+    print("Starting training (Self-Play Mode)...")
+    
+    # Setup CSV logging first
     import csv
     stats_filename = f"training_stats_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     stats_path = os.path.join(config.LOGS_TRAINING_DIR, stats_filename)
+    config_neat.stats_path_csv = stats_path # Hack to pass path to reporter
     
     with open(stats_path, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(["generation", "max_fitness", "avg_fitness", "std_dev"])
-        for i, (max_f, avg_f, std) in enumerate(zip(stats.get_fitness_stat(max), stats.get_fitness_mean(), stats.get_fitness_stdev())):
-            writer.writerow([i, max_f, avg_f, std])
+        writer.writerow(["generation", "max_fitness", "avg_fitness", "std_dev", "val_avg_rally", "val_win_rate"])
+
+    # We need to override the reporter to write to this CSV
+    class CSVReporter(neat.reporting.BaseReporter):
+        def __init__(self, csv_path):
+            self.csv_path = csv_path
+            self.generation = 0
+        
+        def start_generation(self, generation):
+            self.generation = generation
+            
+        def end_generation(self, config, population, species_set):
+            # Get stats from the stats reporter? 
+            # It's easier to just calculate here or grab from stats object if accessible.
+            # Let's just calculate simple stats
+            fitnesses = [g.fitness for g in population.values() if g.fitness is not None]
+            max_f = max(fitnesses) if fitnesses else 0
+            avg_f = sum(fitnesses) / len(fitnesses) if fitnesses else 0
+            import statistics
+            std = statistics.stdev(fitnesses) if len(fitnesses) > 1 else 0
+            
+            # Validation
+            best_genome = None
+            best_fitness = -float('inf')
+            for g in population.values():
+                if g.fitness is not None and g.fitness > best_fitness:
+                    best_fitness = g.fitness
+                    best_genome = g
+            
+            val_rally = 0
+            val_win = 0
+            if best_genome:
+                val_rally, val_win = ai_module.validate_genome(best_genome, config)
+                print(f"   [Validation] Best Genome vs Rule-Based: Avg Rally={val_rally:.2f}, Win Rate={val_win:.2f}")
+
+            with open(self.csv_path, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([self.generation, max_f, avg_f, std, val_rally, val_win])
+
+    p.add_reporter(CSVReporter(stats_path))
+
+    winner = p.run(ai_module.eval_genomes_self_play, 50)
+
     print(f"Training stats saved to {stats_path}")
 
     # Save the winner
