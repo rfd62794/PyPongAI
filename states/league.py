@@ -211,6 +211,33 @@ class LeagueState(BaseState):
             match["frame_count"] >= match["max_frames"]):
             self.finish_match()
     
+    def check_for_shutout(self, match):
+        """Check if the match was a shutout (5-0) and delete the loser if enabled"""
+        if not self.delete_shutouts:
+            return
+            
+        loser_path = None
+        score_diff = abs(match["score1"] - match["score2"])
+        
+        # Check for 5-0 (assuming target score is 5)
+        if score_diff >= 5 and (match["score1"] == 0 or match["score2"] == 0):
+            if match["score1"] == 0:
+                loser_path = match["model1_path"]
+            elif match["score2"] == 0:
+                loser_path = match["model2_path"]
+                
+        if loser_path and loser_path not in self.deleted_models:
+            # Verify it's not already deleted
+            if os.path.exists(loser_path):
+                delete_models([loser_path])
+                self.deleted_models.append(loser_path)
+                self.shutout_deletions += 1
+                self.deletion_reasons[loser_path] = "Shutout (5-0 loss)"
+                print(f"Deleted {os.path.basename(loser_path)} due to shutout")
+                
+                # Remove from future matches in queue
+                self.match_queue = [m for m in self.match_queue if m[0] != loser_path and m[1] != loser_path]
+
     def finish_match(self):
         """Finish the current match and record results"""
         if not self.current_match:
@@ -219,6 +246,10 @@ class LeagueState(BaseState):
         match = self.current_match
         model1_path = match["model1_path"]
         model2_path = match["model2_path"]
+        
+        match["finished"] = True
+        match["score1"] = match["game"].score_left
+        match["score2"] = match["game"].score_right
         
         # Record results
         if match["game"].score_left > match["game"].score_right:
@@ -229,16 +260,26 @@ class LeagueState(BaseState):
             self.model_stats[model2_path]["wins"] += 1
             self.model_stats[model1_path]["losses"] += 1
             match["winner"] = 2
+            
+        # Update detailed stats
+        self.model_stats[model1_path]["matches_played"] += 1
+        self.model_stats[model1_path]["points_scored"] += match["score1"]
+        self.model_stats[model1_path]["points_conceded"] += match["score2"]
+        
+        self.model_stats[model2_path]["matches_played"] += 1
+        self.model_stats[model2_path]["points_scored"] += match["score2"]
+        self.model_stats[model2_path]["points_conceded"] += match["score1"]
         
         # Update scores
         for model_path in self.models:
-            stats = self.model_stats[model_path]
-            stats["score"] = stats["wins"] - stats["losses"]
+            if model_path in self.model_stats:
+                stats = self.model_stats[model_path]
+                stats["score"] = stats["wins"] - stats["losses"]
         
         self.completed_matches += 1
-        match["finished"] = True
-        match["score1"] = match["game"].score_left
-        match["score2"] = match["game"].score_right
+        
+        # Check for shutout deletion
+        self.check_for_shutout(match)
     
     def finish_tournament(self):
         """Process tournament results and delete underperforming models"""
