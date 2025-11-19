@@ -86,7 +86,7 @@ class VisualReporter(neat.reporting.BaseReporter):
             # Let's just implement simple tracking here or use the module
             # The ai_module.get_rule_based_move expects (game_state, paddle)
             # We can reconstruct a lightweight paddle obj or just use the game's paddle
-            right_move = ai_module.get_rule_based_move(state, game.right_paddle)
+            right_move = ai_module.get_rule_based_move(state, "right")
             
             # Update
             score_data = game.update(left_move, right_move)
@@ -122,7 +122,7 @@ def run_visual_training():
     p.add_reporter(neat.StatisticsReporter())
     p.add_reporter(VisualReporter(config_neat))
     
-    winner = p.run(ai_module.eval_genomes, 1)
+    winner = p.run(ai_module.eval_genomes, 50)
     
     # Save final winner
     with open(os.path.join(config.MODEL_DIR, "visual_winner.pkl"), "wb") as f:
