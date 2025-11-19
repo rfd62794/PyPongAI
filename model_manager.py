@@ -30,6 +30,8 @@ def get_best_model():
     models.sort(key=lambda x: get_fitness_from_filename(os.path.basename(x)), reverse=True)
     return models[0]
 
+import elo_manager
+
 def delete_models(model_paths):
     """
     Safely deletes a list of model files.
@@ -42,6 +44,9 @@ def delete_models(model_paths):
                 os.remove(path)
                 deleted_count += 1
                 print(f"Deleted: {os.path.basename(path)}")
+                
+                # Remove ELO entry
+                elo_manager.remove_elo(os.path.basename(path))
         except Exception as e:
             print(f"Error deleting {path}: {e}")
     return deleted_count

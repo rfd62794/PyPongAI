@@ -5,81 +5,52 @@ import pickle
 import config
 import game_engine
 import sys
+import math
 from states.base import BaseState
-from model_manager import scan_models, get_fitness_from_filename, delete_models
+from model_manager import get_fitness_from_filename, delete_models
+import elo_manager
 
 class MatchAnalyzer:
     def __init__(self):
-        self.p1_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": [], "avg_reaction": 0}
-        self.p2_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": [], "avg_reaction": 0}
-        self.rally_lengths = []
-        self.current_rally = 0
-        self.last_ball_vel_x = 0
-        self.last_paddle1_y = 0
-        self.last_paddle2_y = 0
-        
-        # Reaction time tracking
-        self.ball_bounce_frame = -1  # Frame when ball last bounced/changed direction
-        self.ball_heading_to = 0 # 1 for P1 (Left), 2 for P2 (Right)
-        self.p1_reacted = True
-        self.p2_reacted = True
+        self.stats = {
+            "left": {"hits": 0, "distance": 0, "reaction_frames": [], "last_ball_vel_x": 0},
+            "right": {"hits": 0, "distance": 0, "reaction_frames": [], "last_ball_vel_x": 0}
+        }
+        self.rally_length = 0
+        self.rallies = []
+        self.frame_count = 0
         
     def update(self, game_state):
-        # Track paddle distance
-        self.p1_stats["distance"] += abs(game_state["paddle_left_y"] - self.last_paddle1_y)
-        self.p2_stats["distance"] += abs(game_state["paddle_right_y"] - self.last_paddle2_y)
+        self.frame_count += 1
+        ball_vel_x = game_state["ball_vel_x"]
         
-        # Detect Paddle Movement (Reaction)
-        if not self.p1_reacted and self.ball_heading_to == 1:
-            if abs(game_state["paddle_left_y"] - self.last_paddle1_y) > 0.5: # Threshold for movement
-                reaction_time = self.current_frame_count - self.ball_bounce_frame
-                self.p1_stats["reaction_frames"].append(reaction_time)
-                self.p1_reacted = True
-                
-        if not self.p2_reacted and self.ball_heading_to == 2:
-            if abs(game_state["paddle_right_y"] - self.last_paddle2_y) > 0.5:
-                reaction_time = self.current_frame_count - self.ball_bounce_frame
-                self.p2_stats["reaction_frames"].append(reaction_time)
-                self.p2_reacted = True
-
-        self.last_paddle1_y = game_state["paddle_left_y"]
-        self.last_paddle2_y = game_state["paddle_right_y"]
-        
-        # Track rally & Ball Direction Changes
-        # Note: We need frame count passed in or tracked internally. 
-        # Let's assume update is called every frame. We'll track internal frame count.
-        if not hasattr(self, 'current_frame_count'):
-            self.current_frame_count = 0
-        self.current_frame_count += 1
-        
-        if game_state["ball_vel_x"] * self.last_ball_vel_x < 0:
-            # Velocity flipped direction (Bounce or Hit)
-            self.current_rally += 1
-            self.ball_bounce_frame = self.current_frame_count
+        # Track hits (direction change)
+        if ball_vel_x > 0 and self.stats["left"]["last_ball_vel_x"] < 0:
+            self.stats["left"]["hits"] += 1
+            self.record_reaction("left")
+        elif ball_vel_x < 0 and self.stats["right"]["last_ball_vel_x"] > 0:
+            self.stats["right"]["hits"] += 1
+            self.record_reaction("right")
             
-            if game_state["ball_vel_x"] < 0:
-                # Heading to Left (P1)
-                self.ball_heading_to = 1
-                self.p1_reacted = False # Reset reaction flag
-                # If it was heading to P2 and flipped, P2 hit it.
-                if self.last_ball_vel_x > 0:
-                    self.p2_stats["hits"] += 1
-            else:
-                # Heading to Right (P2)
-                self.ball_heading_to = 2
-                self.p2_reacted = False
-                # If it was heading to P1 and flipped, P1 hit it.
-                if self.last_ball_vel_x < 0:
-                    self.p1_stats["hits"] += 1
-                
-        self.last_ball_vel_x = game_state["ball_vel_x"]
+        self.stats["left"]["last_ball_vel_x"] = ball_vel_x
+        self.stats["right"]["last_ball_vel_x"] = ball_vel_x
+        
+    def record_reaction(self, side):
+        # Placeholder for reaction time logic
+        pass
 
-    def get_averages(self):
-        # Calculate averages
-        if self.p1_stats["reaction_frames"]:
-            self.p1_stats["avg_reaction"] = sum(self.p1_stats["reaction_frames"]) / len(self.p1_stats["reaction_frames"])
-        if self.p2_stats["reaction_frames"]:
-            self.p2_stats["avg_reaction"] = sum(self.p2_stats["reaction_frames"]) / len(self.p2_stats["reaction_frames"])
+    def get_stats(self):
+        return {
+            "left": {
+                "hits": self.stats["left"]["hits"],
+                "avg_reaction": 0 
+            },
+            "right": {
+                "hits": self.stats["right"]["hits"],
+                "avg_reaction": 0
+            },
+            "rallies": self.rallies
+        }
 
 class LeagueState(BaseState):
     def __init__(self, manager):
@@ -88,522 +59,530 @@ class LeagueState(BaseState):
         self.small_font = pygame.font.Font(None, 30)
         self.tiny_font = pygame.font.Font(None, 24)
         
-        self.mode = "SETUP"  # SETUP, RUNNING, RESULTS
+        self.mode = "SETUP"  # SETUP, RUNNING, RESULTS, DASHBOARD
         self.models = []
-        self.model_stats = {}  # {path: {"wins": 0, "losses": 0, "fitness": 0}}
+        self.model_stats = {}  # {path: {"wins": 0, "losses": 0, "fitness": 0, "elo": 1200, ...}}
         self.current_match = None
         self.match_queue = []
         self.completed_matches = 0
         self.total_matches = 0
         
-        # Tournament Enhancement Settings
+        # New Settings
         self.show_visuals = config.TOURNAMENT_VISUAL_DEFAULT
         self.min_fitness_threshold = config.TOURNAMENT_MIN_FITNESS_DEFAULT
         self.similarity_threshold = config.TOURNAMENT_SIMILARITY_THRESHOLD
-        self.delete_shutouts = config.TOURNAMENT_DELETE_SHUTOUTS
         
         # Deletion Tracking
         self.deleted_models = []
-        self.deletion_reasons = {}
-        self.prefilter_deletions = 0
+        self.deletion_reasons = {} # {path: reason}
         self.shutout_deletions = 0
-        self.similarity_deletions = 0
         
+        # Dashboard Button
+        self.dashboard_button = pygame.Rect(config.SCREEN_WIDTH - 220, config.SCREEN_HEIGHT - 60, 200, 40)
+
         # UI
         self.start_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 400, 300, 50)
         self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
-        self.cancel_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 50)
-        self.visual_toggle_button = pygame.Rect(config.SCREEN_WIDTH - 220, 10, 100, 40)
-        self.dashboard_button = pygame.Rect(config.SCREEN_WIDTH//2 - 100, 600, 200, 40)
         
-        # Sliders for setup
-        self.min_fitness_slider_rect = pygame.Rect(150, 300, 500, 20)
-        self.similarity_slider_rect = pygame.Rect(150, 360, 500, 20)
-        self.dragging_min_fitness = False
+        # Sliders
+        self.fitness_slider = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 200, 300, 20)
+        self.similarity_slider = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 300, 300, 20)
+        self.dragging_fitness = False
         self.dragging_similarity = False
-        
+
     def enter(self, **kwargs):
         self.mode = "SETUP"
         self.scan_models_for_league()
         
     def scan_models_for_league(self):
-        """Scan all models and prepare for tournament"""
-        all_models = scan_models()
-        
-        # Filter out any models we don't want (could add exclusions here)
-        self.models = all_models
-        
-        # Initialize stats
+        self.models = []
         self.model_stats = {}
-        for model_path in self.models:
-            fitness = get_fitness_from_filename(os.path.basename(model_path))
-            self.model_stats[model_path] = {
-                "wins": 0,
-                "losses": 0,
-                "fitness": fitness,
-                "score": 0,  # Will be calculated as wins - losses
-                "points_scored": 0,
-                "points_conceded": 0,
-                "matches_played": 0,
-                # New Analytics
-                "elo": config.ELO_INITIAL_RATING,
-                "hits": 0,
-                "misses": 0,
-                "rallies": [],
-                "distance_moved": 0,
-                "total_reaction_time": 0,
-                "reaction_count": 0
-            }
-    
-    def pre_filter_models(self):
-        """Filter out models below the minimum fitness threshold"""
-        if self.min_fitness_threshold <= 0:
-            return
-            
-        to_delete = []
-        survivors = []
         
+        # Load ELOs
+        elo_ratings = elo_manager.load_elo_ratings()
+        
+        for root, dirs, files in os.walk(config.MODEL_DIR):
+            for file in files:
+                if file.endswith(".pkl"):
+                    full_path = os.path.join(root, file)
+                    fitness = get_fitness_from_filename(file)
+                    self.models.append(full_path)
+                    
+                    # Get stored ELO or default
+                    stored_elo = elo_ratings.get(file, config.ELO_INITIAL_RATING)
+                    
+                    self.model_stats[full_path] = {
+                        "wins": 0,
+                        "losses": 0,
+                        "fitness": fitness,
+                        "points_scored": 0,
+                        "points_conceded": 0,
+                        "elo": stored_elo,
+                        "hits": 0,
+                        "misses": 0,
+                        "rallies": [],
+                        "distance_moved": 0,
+                        "total_reaction_time": 0,
+                        "reaction_count": 0
+                    }
+        
+        # Sort by fitness initially for display
+        self.models.sort(key=lambda x: self.model_stats[x]["fitness"], reverse=True)
+
+    def pre_filter_models(self):
+        """Filter models based on minimum fitness threshold."""
+        filtered_models = []
         for model_path in self.models:
-            stats = self.model_stats.get(model_path)
-            if stats and stats["fitness"] < self.min_fitness_threshold:
-                to_delete.append(model_path)
+            fitness = self.model_stats[model_path]["fitness"]
+            if fitness >= self.min_fitness_threshold:
+                filtered_models.append(model_path)
             else:
-                survivors.append(model_path)
-                
-        if to_delete:
-            count = delete_models(to_delete)
-            self.prefilter_deletions = count
-            self.deleted_models.extend(to_delete)
-            for path in to_delete:
-                self.deletion_reasons[path] = f"Pre-filter: Fitness {self.model_stats[path]['fitness']} < {self.min_fitness_threshold}"
-                if path in self.model_stats:
-                    del self.model_stats[path]
-            
-            print(f"Pre-filtered {count} models below fitness {self.min_fitness_threshold}")
-            self.models = survivors
+                self.deleted_models.append(model_path)
+                self.deletion_reasons[model_path] = f"Low Fitness (< {self.min_fitness_threshold})"
+        
+        self.models = filtered_models
+        print(f"Pre-filtered: {len(self.models)} models remaining.")
 
     def start_tournament(self):
-        """Initialize and start the round-robin tournament"""
-        # Pre-filter models based on fitness
         self.pre_filter_models()
         
         if len(self.models) < 2:
             print("Not enough models for a tournament!")
             return
-            
+
         self.mode = "RUNNING"
-        
-        # Create match queue (round-robin: each model plays every other model once)
+        self.completed_matches = 0
         self.match_queue = []
+        
+        # Create Round Robin Schedule
         for i in range(len(self.models)):
             for j in range(i + 1, len(self.models)):
                 self.match_queue.append((self.models[i], self.models[j]))
         
-        self.total_matches = len(self.match_queue)
-        self.completed_matches = 0
-        self.current_match = None
+        import random
+        random.shuffle(self.match_queue)
         
-        # Load NEAT config
+        self.total_matches = len(self.match_queue)
+        
+        # Setup NEAT config
         local_dir = os.path.dirname(os.path.dirname(__file__))
         config_path = os.path.join(local_dir, 'neat_config.txt')
         self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                                       neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                                       config_path)
-    
+                                  neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                                  config_path)
+                                  
+        self.start_next_match()
+
     def start_next_match(self):
-        """Initialize the next match"""
         if not self.match_queue:
             self.finish_tournament()
             return
+            
+        p1_path, p2_path = self.match_queue.pop(0)
         
-        # Get next match
-        model1_path, model2_path = self.match_queue.pop(0)
-        
-        # Load models
-        with open(model1_path, "rb") as f:
-            genome1 = pickle.load(f)
-        with open(model2_path, "rb") as f:
-            genome2 = pickle.load(f)
-        
-        # Create networks
-        net1 = neat.nn.FeedForwardNetwork.create(genome1, self.config_neat)
-        net2 = neat.nn.FeedForwardNetwork.create(genome2, self.config_neat)
-        
-        # Initialize match state
+        # Check if models still exist (might have been deleted)
+        if p1_path in self.deleted_models or p2_path in self.deleted_models:
+            self.start_next_match()
+            return
+
         self.current_match = {
-            "model1_path": model1_path,
-            "model2_path": model2_path,
-            "model1": os.path.basename(model1_path),
-            "model2": os.path.basename(model2_path),
-            "net1": net1,
-            "net2": net2,
+            "p1": p1_path,
+            "p2": p2_path,
             "game": game_engine.Game(),
-            "frame_count": 0,
-            "max_frames": 10000,
-            "target_score": 5,
-            "finished": False
+            "net1": None,
+            "net2": None
         }
         
-        # Initialize Analyzer
+        # Initialize Match Analyzer
         self.analyzer = MatchAnalyzer()
-    
-    def update_match(self):
-        """Update the current match by one frame"""
-        if not self.current_match or self.current_match["finished"]:
-            return
         
-        match = self.current_match
-        match["frame_count"] += 1
-        
-        state = match["game"].get_state()
-        
-        # Update Analyzer
-        if hasattr(self, 'analyzer'):
-            self.analyzer.update(state)
-        
-        # Player 1 (Left)
-        inputs1 = (
-            state["paddle_left_y"] / config.SCREEN_HEIGHT,
-            state["ball_x"] / config.SCREEN_WIDTH,
-            state["ball_y"] / config.SCREEN_HEIGHT,
-            state["ball_vel_x"] / config.BALL_MAX_SPEED,
-            state["ball_vel_y"] / config.BALL_MAX_SPEED,
-            (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-            1.0 if state["ball_vel_x"] < 0 else 0.0,
-            state["paddle_right_y"] / config.SCREEN_HEIGHT
-        )
-        out1 = match["net1"].activate(inputs1)
-        act1 = out1.index(max(out1))
-        move1 = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
-        
-        # Player 2 (Right)
-        inputs2 = (
-            state["paddle_right_y"] / config.SCREEN_HEIGHT,
-            state["ball_x"] / config.SCREEN_WIDTH,
-            state["ball_y"] / config.SCREEN_HEIGHT,
-            state["ball_vel_x"] / config.BALL_MAX_SPEED,
-            state["ball_vel_y"] / config.BALL_MAX_SPEED,
-            (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-            1.0 if state["ball_vel_x"] > 0 else 0.0,
-            state["paddle_left_y"] / config.SCREEN_HEIGHT
-        )
-        out2 = match["net2"].activate(inputs2)
-        act2 = out2.index(max(out2))
-        move2 = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
-        
-        # Update game
-        match["game"].update(move1, move2)
-        
-        # Check for rally end (score change)
-        # We can compare scores to detect points
-        # But game_engine doesn't expose 'just_scored' easily. 
-        # We can check if score changed.
-        # For now, analyzer tracks hits/misses via velocity flips.
-        
-        # Check for winner
-        if (match["game"].score_left >= match["target_score"] or 
-            match["game"].score_right >= match["target_score"] or
-            match["frame_count"] >= match["max_frames"]):
-            self.finish_match()
-    
-    def calculate_elo_change(self, rating_a, rating_b, actual_score):
-        """Calculate ELO rating change"""
-        expected_score = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
-        change = config.ELO_K_FACTOR * (actual_score - expected_score)
-        return change
-    
-    def check_for_shutout(self, match):
-        """Check if the match was a shutout (5-0) and delete the loser if enabled"""
-        if not self.delete_shutouts:
-            return
+        # Load Genomes
+        try:
+            with open(p1_path, "rb") as f:
+                g1 = pickle.load(f)
+            with open(p2_path, "rb") as f:
+                g2 = pickle.load(f)
+                
+            self.current_match["net1"] = neat.nn.FeedForwardNetwork.create(g1, self.config_neat)
+            self.current_match["net2"] = neat.nn.FeedForwardNetwork.create(g2, self.config_neat)
             
-        loser_path = None
-        score_diff = abs(match["score1"] - match["score2"])
+        except Exception as e:
+            print(f"Error loading models: {e}")
+            self.start_next_match()
+
+    def calculate_elo_change(self, rating_a, rating_b, score_a, score_b):
+        """Calculates ELO change based on match outcome."""
+        expected_a = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
         
-        # Check for 5-0 (assuming target score is 5)
-        if score_diff >= 5 and (match["score1"] == 0 or match["score2"] == 0):
-            if match["score1"] == 0:
-                loser_path = match["model1_path"]
-            elif match["score2"] == 0:
-                loser_path = match["model2_path"]
+        if score_a > score_b:
+            actual_a = 1
+        else:
+            actual_a = 0
+            
+        change = config.ELO_K_FACTOR * (actual_a - expected_a)
+        return change
+
+    def check_for_shutout(self, loser_path, loser_score, winner_score):
+        """Checks if the loss was a shutout (0 points) and deletes if enabled."""
+        if config.TOURNAMENT_DELETE_SHUTOUTS and loser_score == 0 and winner_score >= 5:
+            print(f"Shutout detected! Deleting {os.path.basename(loser_path)}")
+            self.deleted_models.append(loser_path)
+            self.deletion_reasons[loser_path] = "Shutout Loss (0 points)"
+            self.shutout_deletions += 1
+            
+            if loser_path in self.models:
+                self.models.remove(loser_path)
                 
-        if loser_path and loser_path not in self.deleted_models:
-            # Verify it's not already deleted
-            if os.path.exists(loser_path):
-                delete_models([loser_path])
-                self.deleted_models.append(loser_path)
-                self.shutout_deletions += 1
-                self.deletion_reasons[loser_path] = "Shutout (5-0 loss)"
-                print(f"Deleted {os.path.basename(loser_path)} due to shutout")
-                
-                # Remove from future matches in queue
-                self.match_queue = [m for m in self.match_queue if m[0] != loser_path and m[1] != loser_path]
+            delete_models([loser_path])
+            elo_manager.remove_elo(os.path.basename(loser_path))
 
     def finish_match(self):
-        """Finish the current match and record results"""
-        if not self.current_match:
-            return
-        
         match = self.current_match
-        model1_path = match["model1_path"]
-        model2_path = match["model2_path"]
+        score1 = match["game"].score_left
+        score2 = match["game"].score_right
         
-        match["finished"] = True
-        match["score1"] = match["game"].score_left
-        match["score2"] = match["game"].score_right
+        p1 = match["p1"]
+        p2 = match["p2"]
         
-        # Record results
-        if match["game"].score_left > match["game"].score_right:
-            self.model_stats[model1_path]["wins"] += 1
-            self.model_stats[model2_path]["losses"] += 1
-            match["winner"] = 1
-            actual_score_1 = 1
+        # Update Stats
+        self.model_stats[p1]["points_scored"] += score1
+        self.model_stats[p1]["points_conceded"] += score2
+        self.model_stats[p2]["points_scored"] += score2
+        self.model_stats[p2]["points_conceded"] += score1
+        
+        # ELO Update
+        elo1 = self.model_stats[p1]["elo"]
+        elo2 = self.model_stats[p2]["elo"]
+        
+        change = self.calculate_elo_change(elo1, elo2, score1, score2)
+        
+        self.model_stats[p1]["elo"] += change
+        self.model_stats[p2]["elo"] -= change
+        
+        # Save ELOs immediately
+        elo_updates = {
+            os.path.basename(p1): self.model_stats[p1]["elo"],
+            os.path.basename(p2): self.model_stats[p2]["elo"]
+        }
+        elo_manager.update_bulk_elo(elo_updates)
+        
+        # Record Win/Loss
+        if score1 > score2:
+            self.model_stats[p1]["wins"] += 1
+            self.model_stats[p2]["losses"] += 1
+            self.check_for_shutout(p2, score2, score1)
         else:
-            self.model_stats[model2_path]["wins"] += 1
-            self.model_stats[model1_path]["losses"] += 1
-            match["winner"] = 2
-            actual_score_1 = 0
+            self.model_stats[p2]["wins"] += 1
+            self.model_stats[p1]["losses"] += 1
+            self.check_for_shutout(p1, score1, score2)
             
-        # Update detailed stats
-        self.model_stats[model1_path]["matches_played"] += 1
-        self.model_stats[model1_path]["points_scored"] += match["score1"]
-        self.model_stats[model1_path]["points_conceded"] += match["score2"]
+        # Consolidate Analyzer Stats
+        stats = self.analyzer.get_stats()
         
-        self.model_stats[model2_path]["matches_played"] += 1
-        self.model_stats[model2_path]["points_scored"] += match["score2"]
-        self.model_stats[model2_path]["points_conceded"] += match["score1"]
-        
-        # Update Analytics from Analyzer
-        if hasattr(self, 'analyzer'):
-            self.analyzer.get_averages()
-            
-            # P1
-            self.model_stats[model1_path]["hits"] += self.analyzer.p1_stats["hits"]
-            self.model_stats[model1_path]["distance_moved"] += self.analyzer.p1_stats["distance"]
-            if self.analyzer.p1_stats["reaction_frames"]:
-                self.model_stats[model1_path]["total_reaction_time"] += sum(self.analyzer.p1_stats["reaction_frames"])
-                self.model_stats[model1_path]["reaction_count"] += len(self.analyzer.p1_stats["reaction_frames"])
-            
-            # P2
-            self.model_stats[model2_path]["hits"] += self.analyzer.p2_stats["hits"]
-            self.model_stats[model2_path]["distance_moved"] += self.analyzer.p2_stats["distance"]
-            if self.analyzer.p2_stats["reaction_frames"]:
-                self.model_stats[model2_path]["total_reaction_time"] += sum(self.analyzer.p2_stats["reaction_frames"])
-                self.model_stats[model2_path]["reaction_count"] += len(self.analyzer.p2_stats["reaction_frames"])
-            
-            # Rallies (assign to both? or just track globally? assigning to both for now)
-            self.model_stats[model1_path]["rallies"].extend(self.analyzer.rally_lengths)
-            self.model_stats[model2_path]["rallies"].extend(self.analyzer.rally_lengths)
-            
-        # Update ELO
-        elo1 = self.model_stats[model1_path]["elo"]
-        elo2 = self.model_stats[model2_path]["elo"]
-        
-        change = self.calculate_elo_change(elo1, elo2, actual_score_1)
-        
-        self.model_stats[model1_path]["elo"] += change
-        self.model_stats[model2_path]["elo"] -= change
-        
-        # Update scores (wins - losses)
-        for model_path in self.models:
-            if model_path in self.model_stats:
-                stats = self.model_stats[model_path]
-                stats["score"] = stats["wins"] - stats["losses"]
+        self.model_stats[p1]["hits"] += stats["left"]["hits"]
+        self.model_stats[p2]["hits"] += stats["right"]["hits"]
         
         self.completed_matches += 1
-        
-        # Check for shutout deletion
-        self.check_for_shutout(match)
-    
+        self.start_next_match()
+
     def prune_similar_models(self):
-        """Prune models that have very similar fitness scores"""
-        if self.similarity_threshold <= 0:
-            return
+        """Prunes models that are too similar in fitness."""
+        fitness_groups = {}
+        for model in self.models:
+            fit = self.model_stats[model]["fitness"]
+            key = round(fit / self.similarity_threshold) * self.similarity_threshold
+            if key not in fitness_groups:
+                fitness_groups[key] = []
+            fitness_groups[key].append(model)
             
-        # Sort by fitness to easily find clusters
-        sorted_models = sorted(
-            self.models,
-            key=lambda x: self.model_stats[x]["fitness"],
-            reverse=True
-        )
-        
-        to_delete = []
-        processed = set()
-        
-        for i in range(len(sorted_models)):
-            if sorted_models[i] in processed:
-                continue
+        for key, group in fitness_groups.items():
+            if len(group) > 1:
+                group.sort(key=lambda x: self.model_stats[x]["elo"], reverse=True)
+                keep = group[0]
+                remove = group[1:]
                 
-            current = sorted_models[i]
-            cluster = [current]
-            processed.add(current)
-            
-            # Find all similar models
-            for j in range(i + 1, len(sorted_models)):
-                candidate = sorted_models[j]
-                if candidate in processed:
-                    continue
-                    
-                diff = abs(self.model_stats[current]["fitness"] - self.model_stats[candidate]["fitness"])
-                if diff <= self.similarity_threshold:
-                    cluster.append(candidate)
-                    processed.add(candidate)
-                else:
-                    # Since sorted by fitness, if diff exceeds threshold, all subsequent will too
-                    break
-            
-            # If cluster has more than 1, keep only the best tournament performer
-            if len(cluster) > 1:
-                # Sort cluster by tournament score (descending)
-                cluster.sort(key=lambda x: self.model_stats[x]["score"], reverse=True)
-                
-                # Keep the first one (best score), delete the rest
-                survivor = cluster[0]
-                victims = cluster[1:]
-                
-                to_delete.extend(victims)
-                
-        if to_delete:
-            count = delete_models(to_delete)
-            self.similarity_deletions = count
-            self.deleted_models.extend(to_delete)
-            for path in to_delete:
-                self.deletion_reasons[path] = f"Similarity Pruning (Threshold {self.similarity_threshold})"
-            
-            print(f"Pruned {count} similar models")
-            
-            # Update survivors
-            self.models = [m for m in self.models if m not in to_delete]
+                for m in remove:
+                    self.deleted_models.append(m)
+                    self.deletion_reasons[m] = f"Similarity Pruning (Group {key})"
+                    if m in self.models:
+                        self.models.remove(m)
+                    delete_models([m])
+                    elo_manager.remove_elo(os.path.basename(m))
 
     def finish_tournament(self):
-        """Process tournament results and delete underperforming models"""
         self.mode = "RESULTS"
-        
-        # First, prune similar models
         self.prune_similar_models()
         
-        # Rank models by score (wins - losses), then by fitness
-        ranked_models = sorted(
-            self.models,
-            key=lambda x: (self.model_stats[x]["score"], self.model_stats[x]["fitness"]),
-            reverse=True
-        )
+        # Final Ranking
+        self.models.sort(key=lambda x: self.model_stats[x]["elo"], reverse=True)
         
         # Keep top 10
-        top_10 = ranked_models[:10]
-        to_delete = ranked_models[10:]
+        top_10 = self.models[:10]
         
-        # Delete underperforming models
-        if to_delete:
-            deleted_count = delete_models(to_delete)
-            print(f"Deleted {deleted_count} underperforming models")
-            self.deleted_models.extend(to_delete)
-            for path in to_delete:
-                self.deletion_reasons[path] = "Not in Top 10"
-        
-        # Update models list to only include survivors
+        for m in self.models[10:]:
+            self.deleted_models.append(m)
+            self.deletion_reasons[m] = "Not in Top 10"
+            delete_models([m])
+            elo_manager.remove_elo(os.path.basename(m))
+            
         self.models = top_10
-    
+
     def handle_input(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mx, my = event.pos
-            
-            if self.back_button.collidepoint((mx, my)):
-                self.manager.change_state("menu")
-                return
-                
-            # Visual toggle (always available)
-            if self.visual_toggle_button.collidepoint((mx, my)):
-                self.show_visuals = not self.show_visuals
-            
-            if self.mode == "SETUP":
-                if self.start_button.collidepoint((mx, my)):
+        if self.mode == "SETUP":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.start_button.collidepoint(event.pos):
                     self.start_tournament()
-                    
-                # Sliders
-                if self.min_fitness_slider_rect.collidepoint((mx, my)):
-                    self.dragging_min_fitness = True
-                if self.similarity_slider_rect.collidepoint((mx, my)):
-                    self.dragging_similarity = True
-            
-            elif self.mode == "RUNNING":
-                if self.cancel_button.collidepoint((mx, my)):
-                    self.mode = "SETUP"
-                    self.match_queue = []
-            
-            elif self.mode == "RESULTS":
-                if self.dashboard_button.collidepoint((mx, my)):
-                    self.mode = "DASHBOARD"
-            
-            elif self.mode == "DASHBOARD":
-                # Back button is handled at top
-                pass
+                elif self.back_button.collidepoint(event.pos):
+                    self.manager.change_state("menu")
                 
-        elif event.type == pygame.MOUSEBUTTONUP:
-            self.dragging_min_fitness = False
-            self.dragging_similarity = False
-            
-        elif event.type == pygame.MOUSEMOTION:
-            mx, my = event.pos
-            if self.mode == "SETUP":
-                if self.dragging_min_fitness:
-                    # 0 to 1000 range
-                    val = (mx - self.min_fitness_slider_rect.x) / self.min_fitness_slider_rect.width
-                    val = max(0, min(1, val))
-                    self.min_fitness_threshold = int(val * 1000)
+                # Sliders
+                if self.fitness_slider.collidepoint(event.pos):
+                    self.dragging_fitness = True
+                if self.similarity_slider.collidepoint(event.pos):
+                    self.dragging_similarity = True
                     
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.dragging_fitness = False
+                self.dragging_similarity = False
+                
+            elif event.type == pygame.MOUSEMOTION:
+                if self.dragging_fitness:
+                    rel_x = event.pos[0] - self.fitness_slider.x
+                    pct = max(0, min(1, rel_x / self.fitness_slider.width))
+                    self.min_fitness_threshold = int(100 + pct * 400) # 100-500
                 if self.dragging_similarity:
-                    # 0 to 100 range
-                    val = (mx - self.similarity_slider_rect.x) / self.similarity_slider_rect.width
-                    val = max(0, min(1, val))
-                    self.similarity_threshold = int(val * 100)
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                self.manager.change_state("menu")
-    
+                    rel_x = event.pos[0] - self.similarity_slider.x
+                    pct = max(0, min(1, rel_x / self.similarity_slider.width))
+                    self.similarity_threshold = int(5 + pct * 45) # 5-50
+
+        elif self.mode == "RUNNING":
+            # Visual Toggle
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 150, 10, 140, 40)
+                if toggle_rect.collidepoint(event.pos):
+                    self.show_visuals = not self.show_visuals
+            
+            # Speed up if visuals off
+            if not self.show_visuals:
+                for _ in range(10):
+                    if self.current_match:
+                        self.update(0)
+
+        elif self.mode == "RESULTS":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.back_button.collidepoint(event.pos):
+                    self.manager.change_state("menu")
+                elif self.dashboard_button.collidepoint(event.pos):
+                    self.mode = "DASHBOARD"
+
+        elif self.mode == "DASHBOARD":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.back_button.collidepoint(event.pos):
+                    self.mode = "RESULTS"
+
     def update(self, dt):
-        """Called every frame"""
         if self.mode == "RUNNING":
-            if self.current_match and not self.current_match["finished"]:
-                # Update current match
-                if self.show_visuals:
-                    self.update_match()
-                else:
-                    # Speed up! Run multiple updates per frame
-                    for _ in range(100):  # Run 100 steps per frame
-                        if self.current_match["finished"]:
-                            break
-                        self.update_match()
-                        
-            elif self.current_match and self.current_match["finished"]:
-                # Wait a moment before next match (so user can see result)
-                # If visuals are off, skip the wait
-                if not self.show_visuals:
-                    self.current_match = None  # Clear it so next update loop picks up next match immediately
+            if self.current_match:
+                game = self.current_match["game"]
+                net1 = self.current_match["net1"]
+                net2 = self.current_match["net2"]
+                
+                state = game.get_state()
+                
+                # Update Analyzer
+                self.analyzer.update(state)
+                
+                # AI 1 (Left)
+                inputs1 = (
+                    state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                    state["ball_x"] / config.SCREEN_WIDTH,
+                    state["ball_y"] / config.SCREEN_HEIGHT,
+                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                    (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                    1.0 if state["ball_vel_x"] < 0 else 0.0,
+                    state["paddle_right_y"] / config.SCREEN_HEIGHT
+                )
+                out1 = net1.activate(inputs1)
+                act1 = out1.index(max(out1))
+                left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+                
+                # AI 2 (Right)
+                inputs2 = (
+                    state["paddle_right_y"] / config.SCREEN_HEIGHT,
+                    state["ball_x"] / config.SCREEN_WIDTH,
+                    state["ball_y"] / config.SCREEN_HEIGHT,
+                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                    (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                    1.0 if state["ball_vel_x"] > 0 else 0.0,
+                    state["paddle_left_y"] / config.SCREEN_HEIGHT
+                )
+                out2 = net2.activate(inputs2)
+                act2 = out2.index(max(out2))
+                right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+                
+                game.update(left_move, right_move)
+                
+                if game.score_left >= config.MAX_SCORE or game.score_right >= config.MAX_SCORE:
+                    self.finish_match()
             else:
-                # No active match (and not waiting), start next match
-                # start_next_match will handle empty queue by calling finish_tournament
                 self.start_next_match()
-    
-    def draw(self, screen):
+
+    def draw_setup(self, screen):
         screen.fill(config.BLACK)
+        title = self.font.render("Tournament Setup", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 50))
         
-        # Back button (always visible)
-        pygame.draw.rect(screen, (150, 50, 50), self.back_button)
-        pygame.draw.rect(screen, config.WHITE, self.back_button, 2)
+        # Sliders
+        pygame.draw.rect(screen, config.GRAY, self.fitness_slider)
+        pygame.draw.rect(screen, config.WHITE, (self.fitness_slider.x + (self.min_fitness_threshold - 100)/400 * self.fitness_slider.width - 5, self.fitness_slider.y - 5, 10, 30))
+        fit_text = self.small_font.render(f"Min Fitness: {self.min_fitness_threshold}", True, config.WHITE)
+        screen.blit(fit_text, (self.fitness_slider.x, self.fitness_slider.y - 30))
+        
+        pygame.draw.rect(screen, config.GRAY, self.similarity_slider)
+        pygame.draw.rect(screen, config.WHITE, (self.similarity_slider.x + (self.similarity_threshold - 5)/45 * self.similarity_slider.width - 5, self.similarity_slider.y - 5, 10, 30))
+        sim_text = self.small_font.render(f"Similarity Threshold: {self.similarity_threshold}", True, config.WHITE)
+        screen.blit(sim_text, (self.similarity_slider.x, self.similarity_slider.y - 30))
+        
+        # Warning
+        count = 0
+        for m in self.models:
+            if self.model_stats[m]["fitness"] >= self.min_fitness_threshold:
+                count += 1
+        warn_text = self.small_font.render(f"Models Qualified: {count} / {len(self.models)}", True, config.YELLOW if count > 0 else config.RED)
+        screen.blit(warn_text, (config.SCREEN_WIDTH//2 - warn_text.get_width()//2, 350))
+
+        # Start Button
+        pygame.draw.rect(screen, (0, 100, 0), self.start_button)
+        start_text = self.font.render("Start Tournament", True, config.WHITE)
+        screen.blit(start_text, (self.start_button.centerx - start_text.get_width()//2, self.start_button.centery - start_text.get_height()//2))
+        
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
         back_text = self.small_font.render("Back", True, config.WHITE)
-        back_rect = back_text.get_rect(center=self.back_button.center)
-        screen.blit(back_text, back_rect)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+
+    def draw_running(self, screen):
+        if self.show_visuals:
+            if self.current_match:
+                self.current_match["game"].draw(screen)
+        else:
+            screen.fill(config.BLACK)
+            text = self.font.render("Tournament Running (Fast Mode)...", True, config.WHITE)
+            screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
         
-        # Visual toggle button
-        color = (50, 150, 50) if self.show_visuals else (150, 50, 50)
-        pygame.draw.rect(screen, color, self.visual_toggle_button)
-        pygame.draw.rect(screen, config.WHITE, self.visual_toggle_button, 2)
-        vis_text = self.tiny_font.render("Visuals: ON" if self.show_visuals else "Visuals: OFF", True, config.WHITE)
-        vis_rect = vis_text.get_rect(center=self.visual_toggle_button.center)
-        screen.blit(vis_text, vis_rect)
+        # Overlay Info
+        info = f"Match {self.completed_matches + 1} / {self.total_matches}"
+        info_surf = self.small_font.render(info, True, config.WHITE)
+        screen.blit(info_surf, (10, 10))
         
+        # Deletion Counter
+        del_text = f"Deleted: {len(self.deleted_models)}"
+        del_surf = self.small_font.render(del_text, True, config.RED)
+        screen.blit(del_surf, (10, 40))
+        
+        # Visual Toggle Button
+        toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 150, 10, 140, 40)
+        color = (0, 100, 0) if self.show_visuals else (100, 0, 0)
+        pygame.draw.rect(screen, color, toggle_rect)
+        toggle_text = self.small_font.render("Visuals: " + ("ON" if self.show_visuals else "OFF"), True, config.WHITE)
+        screen.blit(toggle_text, (toggle_rect.centerx - toggle_text.get_width()//2, toggle_rect.centery - toggle_text.get_height()//2))
+
+    def draw_results(self, screen):
+        screen.fill(config.BLACK)
+        title = self.font.render("Tournament Results", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
+        
+        # Survivor Stats
+        y = 100
+        header = self.small_font.render("Rank | Model | ELO | W-L | Fit", True, config.GRAY)
+        screen.blit(header, (50, y))
+        y += 30
+        
+        for i, model in enumerate(self.models[:10]): # Top 10
+            stats = self.model_stats[model]
+            name = os.path.basename(model)
+            text = f"{i+1}. {name[:15]}... | {int(stats['elo'])} | {stats['wins']}-{stats['losses']} | {stats['fitness']}"
+            surf = self.small_font.render(text, True, config.WHITE)
+            screen.blit(surf, (50, y))
+            y += 30
+            
+        # Deletion Stats
+        y = 100
+        x = config.SCREEN_WIDTH // 2 + 50
+        header2 = self.small_font.render("Deletion Statistics", True, config.GRAY)
+        screen.blit(header2, (x, y))
+        y += 30
+        
+        stats_text = [
+            f"Total Deleted: {len(self.deleted_models)}",
+            f"Shutouts (5-0): {self.shutout_deletions}",
+            f"Low Fitness: {list(self.deletion_reasons.values()).count(f'Low Fitness (< {self.min_fitness_threshold})')}"
+        ]
+        
+        for line in stats_text:
+            surf = self.small_font.render(line, True, config.RED)
+            screen.blit(surf, (x, y))
+            y += 30
+
+        # Dashboard Button
+        pygame.draw.rect(screen, (0, 0, 150), self.dashboard_button)
+        dash_text = self.small_font.render("Analytics Dashboard", True, config.WHITE)
+        screen.blit(dash_text, (self.dashboard_button.centerx - dash_text.get_width()//2, self.dashboard_button.centery - dash_text.get_height()//2))
+
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
+        back_text = self.small_font.render("Back", True, config.WHITE)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+
+    def draw_dashboard(self, screen):
+        screen.fill(config.BLACK)
+        title = self.font.render("Analytics Dashboard", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 20))
+        
+        # Headers
+        headers = ["Rank", "Model", "ELO", "Win %", "React (fr)", "Eff (px/pt)"]
+        x_offsets = [50, 120, 350, 450, 550, 700]
+        
+        for i, h in enumerate(headers):
+            surf = self.small_font.render(h, True, config.GRAY)
+            screen.blit(surf, (x_offsets[i], 70))
+            
+        # Data
+        y = 110
+        for i, model in enumerate(self.models[:15]): # Show top 15
+            stats = self.model_stats[model]
+            name = os.path.basename(model)
+            
+            total_games = stats["wins"] + stats["losses"]
+            win_pct = f"{stats['wins']/total_games*100:.1f}%" if total_games > 0 else "0%"
+            
+            avg_react = f"{stats['total_reaction_time']/stats['reaction_count']:.1f}" if stats['reaction_count'] > 0 else "-"
+            
+            eff = f"{stats['distance_moved']/stats['points_scored']:.1f}" if stats['points_scored'] > 0 else "-"
+            
+            row_data = [
+                str(i+1),
+                name[:20],
+                str(int(stats["elo"])),
+                win_pct,
+                avg_react,
+                eff
+            ]
+            
+            for j, data in enumerate(row_data):
+                surf = self.small_font.render(data, True, config.WHITE)
+                screen.blit(surf, (x_offsets[j], y))
+            
+            y += 30
+
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
+        back_text = self.small_font.render("Back", True, config.WHITE)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+
+    def draw(self, screen):
         if self.mode == "SETUP":
             self.draw_setup(screen)
         elif self.mode == "RUNNING":
@@ -612,201 +591,3 @@ class LeagueState(BaseState):
             self.draw_results(screen)
         elif self.mode == "DASHBOARD":
             self.draw_dashboard(screen)
-    
-    def draw_setup(self, screen):
-        """Draw setup screen"""
-        title = self.font.render("League Mode", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 50))
-        
-        info = self.small_font.render(f"Found {len(self.models)} models", True, config.WHITE)
-        screen.blit(info, (config.SCREEN_WIDTH//2 - info.get_width()//2, 100))
-        
-        # Sliders
-        # Min Fitness
-        pygame.draw.rect(screen, (50, 50, 50), self.min_fitness_slider_rect)
-        fill_w = int((self.min_fitness_threshold / 1000) * self.min_fitness_slider_rect.width)
-        pygame.draw.rect(screen, (100, 100, 200), (self.min_fitness_slider_rect.x, self.min_fitness_slider_rect.y, fill_w, self.min_fitness_slider_rect.height))
-        pygame.draw.rect(screen, config.WHITE, self.min_fitness_slider_rect, 2)
-        
-        fit_label = self.tiny_font.render(f"Min Fitness Filter: {self.min_fitness_threshold}", True, config.WHITE)
-        screen.blit(fit_label, (self.min_fitness_slider_rect.x, self.min_fitness_slider_rect.y - 25))
-        
-        # Similarity
-        pygame.draw.rect(screen, (50, 50, 50), self.similarity_slider_rect)
-        fill_w = int((self.similarity_threshold / 100) * self.similarity_slider_rect.width)
-        pygame.draw.rect(screen, (200, 100, 200), (self.similarity_slider_rect.x, self.similarity_slider_rect.y, fill_w, self.similarity_slider_rect.height))
-        pygame.draw.rect(screen, config.WHITE, self.similarity_slider_rect, 2)
-        
-        sim_label = self.tiny_font.render(f"Similarity Pruning Threshold: {self.similarity_threshold}", True, config.WHITE)
-        screen.blit(sim_label, (self.similarity_slider_rect.x, self.similarity_slider_rect.y - 25))
-        
-        # Warnings
-        if len(self.models) < 2:
-            warning = self.small_font.render("Need at least 2 models to run tournament!", True, (255, 100, 100))
-            screen.blit(warning, (config.SCREEN_WIDTH//2 - warning.get_width()//2, 420))
-        else:
-            # Calculate estimated survivors
-            pre_filter_count = sum(1 for m in self.models if self.model_stats[m]["fitness"] < self.min_fitness_threshold)
-            est_survivors = len(self.models) - pre_filter_count
-            
-            desc1 = self.tiny_font.render(f"Pre-filter will remove {pre_filter_count} models.", True, (255, 200, 100))
-            desc2 = self.tiny_font.render("Shutout (5-0) losers will be deleted immediately.", True, (255, 150, 150))
-            desc3 = self.tiny_font.render("Similar models will be pruned after tournament.", True, (200, 100, 255))
-            
-            screen.blit(desc1, (config.SCREEN_WIDTH//2 - desc1.get_width()//2, 400))
-            screen.blit(desc2, (config.SCREEN_WIDTH//2 - desc2.get_width()//2, 425))
-            screen.blit(desc3, (config.SCREEN_WIDTH//2 - desc3.get_width()//2, 450))
-            
-            # Start button
-            mx, my = pygame.mouse.get_pos()
-            color = (100, 100, 100) if self.start_button.collidepoint((mx, my)) else (50, 50, 50)
-            pygame.draw.rect(screen, color, self.start_button)
-            pygame.draw.rect(screen, config.WHITE, self.start_button, 2)
-            
-            start_text = self.small_font.render("Start Tournament", True, config.WHITE)
-            start_rect = start_text.get_rect(center=self.start_button.center)
-            screen.blit(start_text, start_rect)
-    
-    def draw_running(self, screen):
-        """Draw tournament progress with visual match"""
-        screen.fill(config.BLACK)
-        
-        # Draw the actual game if a match is active
-        if self.current_match and not self.current_match["finished"]:
-            if self.show_visuals:
-                # Draw the game
-                self.current_match["game"].draw(screen)
-            else:
-                # Minimal UI when visuals off
-                msg = self.font.render("Simulating Matches...", True, config.WHITE)
-                screen.blit(msg, (config.SCREEN_WIDTH//2 - msg.get_width()//2, config.SCREEN_HEIGHT//2 - 50))
-                
-                speed_msg = self.small_font.render("(Visuals OFF - High Speed)", True, (100, 255, 100))
-                screen.blit(speed_msg, (config.SCREEN_WIDTH//2 - speed_msg.get_width()//2, config.SCREEN_HEIGHT//2 + 20))
-            
-            # Info overlay
-            info_text = f"Match {self.completed_matches + 1}/{self.total_matches}"
-            info_surf = self.small_font.render(info_text, True, config.WHITE)
-            screen.blit(info_surf, (10, 10))
-            
-            vs_text = f"{self.current_match['model1'][:15]} vs {self.current_match['model2'][:15]}"
-            vs_surf = self.small_font.render(vs_text, True, config.WHITE)
-            screen.blit(vs_surf, (config.SCREEN_WIDTH//2 - vs_surf.get_width()//2, 10))
-            
-            # Deletion stats in corner
-            del_text = f"Shutouts: {self.shutout_deletions}"
-            del_surf = self.tiny_font.render(del_text, True, (255, 100, 100))
-            screen.blit(del_surf, (config.SCREEN_WIDTH - 150, 60))
-            
-        else:
-            # Between matches
-            msg = self.font.render("Preparing next match...", True, config.WHITE)
-            screen.blit(msg, (config.SCREEN_WIDTH//2 - msg.get_width()//2, config.SCREEN_HEIGHT//2))
-    
-    def draw_results(self, screen):
-        """Draw tournament results"""
-        title = self.font.render("Tournament Complete!", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
-        
-        # Stats summary
-        summary = f"Survivors: {len(self.models)} | Deleted: {len(self.deleted_models)}"
-        summary_surf = self.small_font.render(summary, True, config.WHITE)
-        screen.blit(summary_surf, (config.SCREEN_WIDTH//2 - summary_surf.get_width()//2, 80))
-        
-        # Deletion breakdown
-        breakdown = f"Pre-filter: {self.prefilter_deletions} | Shutouts: {self.shutout_deletions} | Similarity: {self.similarity_deletions}"
-        breakdown_surf = self.tiny_font.render(breakdown, True, (255, 150, 150))
-        screen.blit(breakdown_surf, (config.SCREEN_WIDTH//2 - breakdown_surf.get_width()//2, 110))
-        
-        subtitle = self.small_font.render("Top Survivors (Ranked by Score & ELO)", True, (100, 255, 100))
-        screen.blit(subtitle, (config.SCREEN_WIDTH//2 - subtitle.get_width()//2, 140))
-        
-        # Display top 10
-        y_offset = 180
-        for i, model_path in enumerate(self.models[:10]):
-            stats = self.model_stats[model_path]
-            rank_text = f"{i+1}. {os.path.basename(model_path)[:20]}"
-            
-            # Enhanced stats display
-            avg_score = 0
-            if stats['matches_played'] > 0:
-                avg_score = (stats['points_scored'] - stats['points_conceded']) / stats['matches_played']
-            
-            # Calculate Accuracy
-            total_hits = stats['hits']
-            # Misses aren't explicitly tracked well yet, but we can use points conceded as a proxy for misses? 
-            # Or just show total hits.
-            
-            stats_text = f"ELO:{int(stats['elo'])} W:{stats['wins']} L:{stats['losses']} Diff:{avg_score:.1f} Hits:{stats['hits']}"
-            
-            rank_surf = self.tiny_font.render(rank_text, True, config.WHITE)
-            stats_surf = self.tiny_font.render(stats_text, True, config.GRAY)
-            
-            screen.blit(rank_surf, (50, y_offset))
-            screen.blit(stats_surf, (config.SCREEN_WIDTH - 450, y_offset))
-            
-            y_offset += 30
-        
-        # Instructions
-        instruction = self.small_font.render("Press ESC or click Back to return to menu", True, config.GRAY)
-        screen.blit(instruction, (config.SCREEN_WIDTH//2 - instruction.get_width()//2, config.SCREEN_HEIGHT - 80))
-        
-        # Dashboard Button
-        pygame.draw.rect(screen, (50, 100, 150), self.dashboard_button)
-        pygame.draw.rect(screen, config.WHITE, self.dashboard_button, 2)
-        dash_text = self.small_font.render("Analytics Dashboard", True, config.WHITE)
-        dash_rect = dash_text.get_rect(center=self.dashboard_button.center)
-        screen.blit(dash_text, dash_rect)
-
-    def draw_dashboard(self, screen):
-        """Draw analytics dashboard"""
-        title = self.font.render("Analytics Dashboard", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
-        
-        # Header
-        headers = ["Rank", "Model", "ELO", "Win%", "React(f)", "Eff(px/pt)"]
-        x_offsets = [50, 120, 350, 450, 550, 680]
-        
-        for i, h in enumerate(headers):
-            text = self.small_font.render(h, True, (100, 200, 255))
-            screen.blit(text, (x_offsets[i], 80))
-            
-        # Rows
-        y = 120
-        # Sort by ELO for dashboard
-        sorted_models = sorted(self.models, key=lambda x: self.model_stats[x]["elo"], reverse=True)
-        
-        for i, model_path in enumerate(sorted_models[:15]): # Show top 15
-            stats = self.model_stats[model_path]
-            
-            # Calculate metrics
-            win_rate = 0
-            if stats["matches_played"] > 0:
-                win_rate = (stats["wins"] / stats["matches_played"]) * 100
-                
-            avg_reaction = 0
-            if stats["reaction_count"] > 0:
-                avg_reaction = stats["total_reaction_time"] / stats["reaction_count"]
-                
-            efficiency = 0
-            if stats["points_scored"] > 0:
-                efficiency = stats["distance_moved"] / stats["points_scored"]
-            
-            # Draw row
-            row_data = [
-                f"{i+1}",
-                os.path.basename(model_path)[:15],
-                f"{int(stats['elo'])}",
-                f"{win_rate:.1f}%",
-                f"{avg_reaction:.1f}",
-                f"{int(efficiency)}"
-            ]
-            
-            for j, data in enumerate(row_data):
-                color = config.WHITE
-                if j == 0: color = (255, 255, 0) # Rank
-                
-                text = self.tiny_font.render(data, True, color)
-                screen.blit(text, (x_offsets[j], y))
-            
-            y += 30
