@@ -207,11 +207,14 @@ def eval_genomes_competitive(genomes, config_neat):
     for _, genome in genome_list:
         genome.fitness = genome.fitness / matches_per_genome if matches_per_genome > 0 else 0
 
-def validate_genome(genome, config_neat):
+def validate_genome(genome, config_neat, generation=0, record_matches=True):
     """
     Validates a genome by playing a match against the Rule-Based AI.
     Returns: (avg_rally_length, win_rate)
     """
+    from match_recorder import MatchRecorder
+    import match_database
+    
     net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
     
     total_rallies = 0
@@ -219,7 +222,7 @@ def validate_genome(genome, config_neat):
     wins = 0
     num_games = 5 # Play 5 validation games
     
-    for _ in range(num_games):
+    for game_idx in range(num_games):
         game = game_engine.Game()
         run = True
         frame_count = 0
@@ -227,9 +230,27 @@ def validate_genome(genome, config_neat):
         
         current_rally = 0
         
+        # Initialize recorder if enabled
+        recorder = None
+        if record_matches:
+            metadata = {
+                "generation": generation,
+                "fitness": genome.fitness if hasattr(genome, 'fitness') and genome.fitness else 0
+            }
+            recorder = MatchRecorder(
+                f"gen{generation}_trainee",
+                "rule_based_ai",
+                match_type="training_validation",
+                metadata=metadata
+            )
+        
         while run and frame_count < max_frames:
             frame_count += 1
             state = game.get_state()
+            
+            # Record frame
+            if recorder:
+                recorder.record_frame(state)
             
             # AI plays Left
             inputs = (
@@ -259,14 +280,15 @@ def validate_genome(genome, config_neat):
                 if score_data.get("scored"):
                     if score_data.get("scored") == "left":
                         wins += 1
-                    # End game after 1 point for validation speed? 
-                    # Or play to a score? Let's play single point games for validation stats to be granular
-                    # But user wants 9 points.
-                    # Let's simulate a full game to 9 points? That might take too long for validation every gen.
-                    # Let's stick to single point episodes for validation efficiency, but average over 5 episodes.
                     run = False
         
         total_rallies += current_rally
+        
+        # Save and index recording
+        if recorder:
+            match_metadata = recorder.save()
+            if match_metadata:
+                match_database.index_match(match_metadata)
 
     avg_rally = total_hits / num_games
     win_rate = wins / num_games
