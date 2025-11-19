@@ -11,6 +11,7 @@ import neat
 import pickle
 import ai_module
 import config
+import datetime
 
 def run_training(seed_genomes=None):
     """
@@ -78,7 +79,6 @@ def run_training(seed_genomes=None):
     print(f"Training stats saved to {stats_path}")
 
     # Save the winner
-    import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     fitness_score = int(winner.fitness) if winner.fitness else 0
     model_filename = f"model_{timestamp}_fitness{fitness_score}.pkl"
