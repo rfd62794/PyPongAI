@@ -75,8 +75,8 @@ class LeagueState(BaseState):
                                        neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                        config_path)
     
-    def run_next_match(self):
-        """Run the next match in the queue"""
+    def start_next_match(self):
+        """Initialize the next match"""
         if not self.match_queue:
             self.finish_tournament()
             return
@@ -94,60 +94,88 @@ class LeagueState(BaseState):
         net1 = neat.nn.FeedForwardNetwork.create(genome1, self.config_neat)
         net2 = neat.nn.FeedForwardNetwork.create(genome2, self.config_neat)
         
-        # Play match
-        game = game_engine.Game()
-        frame_count = 0
-        max_frames = 10000  # Prevent infinite games
-        target_score = 5  # First to 5 wins
+        # Initialize match state
+        self.current_match = {
+            "model1_path": model1_path,
+            "model2_path": model2_path,
+            "model1": os.path.basename(model1_path),
+            "model2": os.path.basename(model2_path),
+            "net1": net1,
+            "net2": net2,
+            "game": game_engine.Game(),
+            "frame_count": 0,
+            "max_frames": 10000,
+            "target_score": 5,
+            "finished": False
+        }
+    
+    def update_match(self):
+        """Update the current match by one frame"""
+        if not self.current_match or self.current_match["finished"]:
+            return
         
-        while frame_count < max_frames:
-            frame_count += 1
-            state = game.get_state()
-            
-            # Player 1 (Left)
-            inputs1 = (
-                state["paddle_left_y"] / config.SCREEN_HEIGHT,
-                state["ball_x"] / config.SCREEN_WIDTH,
-                state["ball_y"] / config.SCREEN_HEIGHT,
-                state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] < 0 else 0.0,
-                state["paddle_right_y"] / config.SCREEN_HEIGHT
-            )
-            out1 = net1.activate(inputs1)
-            act1 = out1.index(max(out1))
-            move1 = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
-            
-            # Player 2 (Right)
-            inputs2 = (
-                state["paddle_right_y"] / config.SCREEN_HEIGHT,
-                state["ball_x"] / config.SCREEN_WIDTH,
-                state["ball_y"] / config.SCREEN_HEIGHT,
-                state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] > 0 else 0.0,
-                state["paddle_left_y"] / config.SCREEN_HEIGHT
-            )
-            out2 = net2.activate(inputs2)
-            act2 = out2.index(max(out2))
-            move2 = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
-            
-            # Update game
-            game.update(move1, move2)
-            
-            # Check for winner
-            if game.score_left >= target_score or game.score_right >= target_score:
-                break
+        match = self.current_match
+        match["frame_count"] += 1
+        
+        state = match["game"].get_state()
+        
+        # Player 1 (Left)
+        inputs1 = (
+            state["paddle_left_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] < 0 else 0.0,
+            state["paddle_right_y"] / config.SCREEN_HEIGHT
+        )
+        out1 = match["net1"].activate(inputs1)
+        act1 = out1.index(max(out1))
+        move1 = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+        
+        # Player 2 (Right)
+        inputs2 = (
+            state["paddle_right_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] > 0 else 0.0,
+            state["paddle_left_y"] / config.SCREEN_HEIGHT
+        )
+        out2 = match["net2"].activate(inputs2)
+        act2 = out2.index(max(out2))
+        move2 = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+        
+        # Update game
+        match["game"].update(move1, move2)
+        
+        # Check for winner
+        if (match["game"].score_left >= match["target_score"] or 
+            match["game"].score_right >= match["target_score"] or
+            match["frame_count"] >= match["max_frames"]):
+            self.finish_match()
+    
+    def finish_match(self):
+        """Finish the current match and record results"""
+        if not self.current_match:
+            return
+        
+        match = self.current_match
+        model1_path = match["model1_path"]
+        model2_path = match["model2_path"]
         
         # Record results
-        if game.score_left > game.score_right:
+        if match["game"].score_left > match["game"].score_right:
             self.model_stats[model1_path]["wins"] += 1
             self.model_stats[model2_path]["losses"] += 1
+            match["winner"] = 1
         else:
             self.model_stats[model2_path]["wins"] += 1
             self.model_stats[model1_path]["losses"] += 1
+            match["winner"] = 2
         
         # Update scores
         for model_path in self.models:
@@ -155,15 +183,9 @@ class LeagueState(BaseState):
             stats["score"] = stats["wins"] - stats["losses"]
         
         self.completed_matches += 1
-        
-        # Store current match info for display
-        self.current_match = {
-            "model1": os.path.basename(model1_path),
-            "model2": os.path.basename(model2_path),
-            "score1": game.score_left,
-            "score2": game.score_right,
-            "winner": 1 if game.score_left > game.score_right else 2
-        }
+        match["finished"] = True
+        match["score1"] = match["game"].score_left
+        match["score2"] = match["game"].score_right
     
     def finish_tournament(self):
         """Process tournament results and delete underperforming models"""
