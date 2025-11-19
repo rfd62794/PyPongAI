@@ -9,6 +9,50 @@ import game_engine
 import sys
 from states.base import BaseState
 
+class UIProgressReporter(neat.reporting.BaseReporter):
+    def __init__(self, screen):
+        self.screen = screen
+        self.generation = 0
+        self.font = pygame.font.Font(None, 36)
+        self.checkpoint_dir = os.path.join(config.MODEL_DIR, "checkpoints")
+        os.makedirs(self.checkpoint_dir, exist_ok=True)
+
+    def start_generation(self, generation):
+        self.generation = generation
+        print(f"--- Starting Generation {generation} ---")
+        
+        self.screen.fill(config.BLACK)
+        text = self.font.render(f"Training Generation {generation} (Fast Mode)...", True, config.WHITE)
+        self.screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
+        
+        sub = self.font.render("Check console for details.", True, config.GRAY)
+        self.screen.blit(sub, (config.SCREEN_WIDTH//2 - sub.get_width()//2, config.SCREEN_HEIGHT//2 + 40))
+        
+        pygame.display.flip()
+        pygame.event.pump()
+
+    def end_generation(self, config, population, species_set):
+        # Find best genome to save checkpoint
+        best_genome = None
+        best_fitness = -float('inf')
+        for g in population.values():
+            if g.fitness is not None and g.fitness > best_fitness:
+                best_fitness = g.fitness
+                best_genome = g
+        
+        if best_genome:
+            print(f"Generation {self.generation} Best Fitness: {best_fitness}")
+            self.save_checkpoint(best_genome)
+            
+        pygame.event.pump()
+
+    def save_checkpoint(self, genome):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"gen_{self.generation}_fit_{int(genome.fitness)}.pkl"
+        filepath = os.path.join(self.checkpoint_dir, filename)
+        with open(filepath, "wb") as f:
+            pickle.dump(genome, f)
+
 class VisualReporter(neat.reporting.BaseReporter):
     def __init__(self, config_neat, screen):
         self.config_neat = config_neat
@@ -117,6 +161,7 @@ class TrainState(BaseState):
         self.page = 0
         self.per_page = 5
         self.mode = "SELECTION" # SELECTION or TRAINING
+        self.visual_mode = True # Default to visual
 
     def enter(self, **kwargs):
         self.mode = "SELECTION"
@@ -168,7 +213,11 @@ class TrainState(BaseState):
             
         p.add_reporter(neat.StdOutReporter(True))
         p.add_reporter(neat.StatisticsReporter())
-        p.add_reporter(VisualReporter(config_neat, self.manager.screen))
+        
+        if self.visual_mode:
+            p.add_reporter(VisualReporter(config_neat, self.manager.screen))
+        else:
+            p.add_reporter(UIProgressReporter(self.manager.screen))
         
         winner = p.run(ai_module.eval_genomes, 50)
         
@@ -187,6 +236,12 @@ class TrainState(BaseState):
                 back_rect = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
                 if back_rect.collidepoint((mx, my)):
                     self.manager.change_state("menu")
+                    return
+
+                # Visual Toggle
+                toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 60, 240, 40)
+                if toggle_rect.collidepoint((mx, my)):
+                    self.visual_mode = not self.visual_mode
                     return
 
                 # Model Selection
@@ -224,6 +279,17 @@ class TrainState(BaseState):
             screen.blit(sub, (config.SCREEN_WIDTH//2 - sub.get_width()//2, 70))
             
             mx, my = pygame.mouse.get_pos()
+            
+            # Visual Toggle
+            toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 60, 240, 40)
+            color = (50, 150, 50) if self.visual_mode else (150, 50, 50)
+            pygame.draw.rect(screen, color, toggle_rect)
+            pygame.draw.rect(screen, config.WHITE, toggle_rect, 2)
+            
+            toggle_text = f"Visual Mode: {'ON' if self.visual_mode else 'OFF'}"
+            text_surf = self.small_font.render(toggle_text, True, config.WHITE)
+            text_rect = text_surf.get_rect(center=toggle_rect.center)
+            screen.blit(text_surf, text_rect)
             
             start_idx = self.page * self.per_page
             end_idx = min(start_idx + self.per_page, len(self.models))
