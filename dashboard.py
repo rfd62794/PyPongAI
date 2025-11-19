@@ -195,6 +195,7 @@ class Dashboard:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    sys.exit(100)
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
@@ -225,7 +226,10 @@ if __name__ == "__main__":
         dash.run()
     except KeyboardInterrupt:
         print("\n[!] Dashboard interrupted.")
-        pygame.quit()
+        sys.exit(100)
+    except SystemExit as e:
+        if e.code == 100:
+            sys.exit(100)
     except Exception as e:
         print(f"\n[!] Error: {e}")
         pygame.quit()

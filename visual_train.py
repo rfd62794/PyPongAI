@@ -62,7 +62,8 @@ class VisualReporter(neat.reporting.BaseReporter):
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False # Just stop visualization, not training
+                    running = False
+                    sys.exit(100)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         running = False
@@ -228,7 +229,7 @@ def show_start_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return None
+                sys.exit(100)
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_rect.collidepoint(event.pos):
@@ -260,7 +261,10 @@ if __name__ == "__main__":
         run_visual_training(seed_genome)
     except KeyboardInterrupt:
         print("\n[!] Interrupted by user. Exiting...")
-        pygame.quit()
+        sys.exit(100)
+    except SystemExit as e:
+        if e.code == 100:
+            sys.exit(100)
     except Exception as e:
         print(f"\n[!] An error occurred: {e}")
         pygame.quit()

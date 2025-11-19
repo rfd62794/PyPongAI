@@ -101,7 +101,7 @@ def play_game():
             if event.type == pygame.QUIT:
                 menu_running = False
                 pygame.quit()
-                return
+                sys.exit(100)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if btn_challenge.collidepoint((mx, my)):
@@ -116,7 +116,7 @@ def play_game():
                         menu_running = False
                     elif btn_quit.collidepoint((mx, my)):
                         pygame.quit()
-                        return
+                        sys.exit(100)
 
     if not selected_model_path:
         pygame.quit()
@@ -146,6 +146,7 @@ def play_game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    sys.exit(100)
 
             # Human Input (Right Paddle)
             keys = pygame.key.get_pressed()
@@ -185,7 +186,10 @@ def play_game():
                 screen.blit(text_go, (config.SCREEN_WIDTH//2 - text_go.get_width()//2, config.SCREEN_HEIGHT//2))
     except KeyboardInterrupt:
         print("\n[!] Game interrupted by user.")
-        pygame.quit()
+        sys.exit(100)
+    except SystemExit as e:
+        if e.code == 100:
+            sys.exit(100)
     except Exception as e:
         print(f"\n[!] An error occurred: {e}")
         pygame.quit()
