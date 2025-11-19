@@ -129,10 +129,12 @@ class Game:
         # Draw Scores
         if pygame.font.get_init():
             font = pygame.font.Font(None, 74)
-            text_left = font.render(str(self.score_left), 1, config.WHITE)
-            screen.blit(text_left, (config.SCREEN_WIDTH // 4, 10))
-            text_right = font.render(str(self.score_right), 1, config.WHITE)
-            screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4, 10))
+            if str(self.score_left):
+                text_left = font.render(str(self.score_left), 1, config.WHITE)
+                screen.blit(text_left, (config.SCREEN_WIDTH // 4, 10))
+            if str(self.score_right):
+                text_right = font.render(str(self.score_right), 1, config.WHITE)
+                screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4, 10))
         
         self.left_paddle.draw(screen)
         self.right_paddle.draw(screen)
