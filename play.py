@@ -189,7 +189,15 @@ def play_game():
                 if game_over:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_r:
-                            # Rematch
+                            # Rematch - RELOAD RIVAL
+                            # Fetch the new rival path (it was updated in update_match_result)
+                            new_rival_path = rival_sys.get_rival_model()
+                            if new_rival_path and os.path.exists(new_rival_path):
+                                print(f"Rematch: Loading new rival {os.path.basename(new_rival_path)}")
+                                with open(new_rival_path, "rb") as f:
+                                    genome = pickle.load(f)
+                                net = neat.nn.FeedForwardNetwork.create(genome, neat_config)
+                            
                             game = Game()
                             recorder = GameRecorder() # New recording
                             game_over = False
@@ -252,10 +260,20 @@ def play_game():
                 
                 if game_state and game_state.get("game_over"):
                     final_score_human = game.score_right
+                    final_score_ai = game.score_left
+                    won = final_score_human > final_score_ai
                     
-                    # Update Rival Stats
+                    # Update Best Score
                     if rival_sys.update_score(final_score_human):
                         print(f"New Personal Best! {final_score_human}")
+                        
+                    # Update Rival Difficulty (DDA)
+                    # Only if we are playing against a Rival (check selected_model_path vs rival_path)
+                    # Or we can just always update if we want the "Rival" system to track general performance
+                    # Let's update if we launched via "Challenge Rival" OR if we want to track it generally.
+                    # For now, let's always update the "Rival Fitness" based on performance, 
+                    # so the "Challenge Rival" button is always accurate to current form.
+                    rival_sys.update_match_result(final_score_human, final_score_ai, won)
                     
                     # Save Recording
                     recorder.save_recording()
@@ -281,7 +299,12 @@ def play_game():
                 score_surf = font.render(f"{game.score_left} - {game.score_right}", True, config.WHITE)
                 screen.blit(score_surf, (config.SCREEN_WIDTH//2 - score_surf.get_width()//2, 220))
                 
-                info_surf = small_font.render("Press R to Rematch, M for Menu, Q to Quit", True, config.GRAY)
+                # Show new rival fitness
+                new_fit = rival_sys.stats.get("rival_fitness", "?")
+                fit_surf = small_font.render(f"New Rival Rating: {new_fit}", True, config.WHITE)
+                screen.blit(fit_surf, (config.SCREEN_WIDTH//2 - fit_surf.get_width()//2, 280))
+                
+                info_surf = small_font.render("Press R to Rematch (New Rival), M for Menu, Q to Quit", True, config.GRAY)
                 screen.blit(info_surf, (config.SCREEN_WIDTH//2 - info_surf.get_width()//2, 400))
             
             pygame.display.flip()
