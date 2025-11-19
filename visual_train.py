@@ -8,13 +8,15 @@ import game_engine
 import ai_module
 import config
 import datetime
+from model_manager import get_best_model
 
 class VisualReporter(neat.reporting.BaseReporter):
-    def __init__(self, config_neat):
+    def __init__(self, config_neat, champion_genome=None):
         self.config_neat = config_neat
         self.generation = 0
         self.checkpoint_dir = os.path.join(config.MODEL_DIR, "checkpoints")
         os.makedirs(self.checkpoint_dir, exist_ok=True)
+        self.champion_genome = champion_genome  # Best existing model to compete against
 
     def start_generation(self, generation):
         self.generation = generation
@@ -33,15 +35,19 @@ class VisualReporter(neat.reporting.BaseReporter):
             print(f"Generation {self.generation} Best Fitness: {best_fitness}")
             self.save_checkpoint(best_genome)
             
-            # Find second best for visualization opponent
-            second_best = None
-            second_fitness = -float('inf')
-            for g in population.values():
-                if g.fitness is not None and g.fitness > second_fitness and g != best_genome:
-                    second_fitness = g.fitness
-                    second_best = g
+            # Visualize against champion if available, otherwise against second best
+            opponent = self.champion_genome if self.champion_genome else None
+            if not opponent:
+                # Find second best for visualization opponent
+                second_best = None
+                second_fitness = -float('inf')
+                for g in population.values():
+                    if g.fitness is not None and g.fitness > second_fitness and g != best_genome:
+                        second_fitness = g.fitness
+                        second_best = g
+                opponent = second_best if second_best else best_genome
             
-            self.visualize_match(best_genome, second_best if second_best else best_genome)
+            self.visualize_match(best_genome, opponent)
 
     def save_checkpoint(self, genome):
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -52,12 +58,13 @@ class VisualReporter(neat.reporting.BaseReporter):
         print(f"Saved checkpoint: {filename}")
 
     def visualize_match(self, genome1, genome2):
-        print("Visualizing Best vs Second Best... (Press SPACE to skip)")
+        opponent_label = "Champion" if genome2 == self.champion_genome else "2nd Best"
+        print(f"Visualizing Best vs {opponent_label}... (Press SPACE to skip)")
         
         # Setup Game
         pygame.init()
         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-        pygame.display.set_caption(f"Generation {self.generation} - Best (Left) vs 2nd Best (Right)")
+        pygame.display.set_caption(f"Generation {self.generation} - Best (Left) vs {opponent_label} (Right)")
         clock = pygame.time.Clock()
         game = game_engine.Game()
         
@@ -139,6 +146,19 @@ def run_visual_training(seed_genome=None):
                               
     p = neat.Population(config_neat)
     
+    # Load best existing model as champion
+    champion_genome = None
+    best_model_path = get_best_model()
+    if best_model_path:
+        try:
+            with open(best_model_path, "rb") as f:
+                champion_genome = pickle.load(f)
+            print(f"Loaded champion model: {os.path.basename(best_model_path)}")
+            # Add to Hall of Fame
+            ai_module.HALL_OF_FAME = [champion_genome]
+        except Exception as e:
+            print(f"Failed to load champion model: {e}")
+    
     if seed_genome:
         print("Seeding population with selected model...")
         # Seed the first genome
@@ -150,7 +170,7 @@ def run_visual_training(seed_genome=None):
         
     p.add_reporter(neat.StdOutReporter(True))
     p.add_reporter(neat.StatisticsReporter())
-    p.add_reporter(VisualReporter(config_neat))
+    p.add_reporter(VisualReporter(config_neat, champion_genome))
     
     winner = p.run(ai_module.eval_genomes_self_play, 50)
     
