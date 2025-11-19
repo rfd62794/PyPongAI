@@ -5,6 +5,7 @@ Welcome to the PyPongAI documentation.
 ## Contents
 - [Training Guide](training.md): How to train the AI, including Self-Play and Validation details.
 - [Architecture Design](manus_SDD.md): System Design Document (Legacy).
+- [System Analysis](system_analysis.md): Analysis of the current system and recommendations for improvement.
 
 ## Quick Start
 1. **Train**: `python train.py`
