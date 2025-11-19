@@ -6,6 +6,7 @@ from states.menu import MenuState
 from states.game import GameState
 from states.lobby import LobbyState
 from states.train import TrainState
+from states.models import ModelState
 
 def main():
     pygame.init()
@@ -19,6 +20,7 @@ def main():
     manager.register_state("lobby", LobbyState(manager))
     manager.register_state("game", GameState(manager))
     manager.register_state("train", TrainState(manager))
+    manager.register_state("models", ModelState(manager))
     
     # Start with Menu
     manager.change_state("menu")
