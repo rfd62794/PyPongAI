@@ -122,4 +122,9 @@ def main():
         parser.print_help()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n[!] Operation interrupted by user.")
+    except Exception as e:
+        print(f"\n[!] An error occurred: {e}")

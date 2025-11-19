@@ -237,11 +237,18 @@ def show_start_menu():
     return selected_model_path
 
 if __name__ == "__main__":
-    seed_path = show_start_menu()
-    seed_genome = None
-    if seed_path:
-        print(f"Loading seed: {seed_path}")
-        with open(seed_path, "rb") as f:
-            seed_genome = pickle.load(f)
-            
-    run_visual_training(seed_genome)
+    try:
+        seed_path = show_start_menu()
+        seed_genome = None
+        if seed_path:
+            print(f"Loading seed: {seed_path}")
+            with open(seed_path, "rb") as f:
+                seed_genome = pickle.load(f)
+                
+        run_visual_training(seed_genome)
+    except KeyboardInterrupt:
+        print("\n[!] Interrupted by user. Exiting...")
+        pygame.quit()
+    except Exception as e:
+        print(f"\n[!] An error occurred: {e}")
+        pygame.quit()

@@ -196,4 +196,11 @@ def play_game():
     pygame.quit()
 
 if __name__ == "__main__":
-    play_game()
+    try:
+        play_game()
+    except KeyboardInterrupt:
+        print("\n[!] Game interrupted by user.")
+        pygame.quit()
+    except Exception as e:
+        print(f"\n[!] An error occurred: {e}")
+        pygame.quit()

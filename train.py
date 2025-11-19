@@ -80,26 +80,31 @@ def run_training(seed_genomes=None):
         pickle.dump(winner, f)
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--seed", help="Path to a specific model file to seed with")
-    parser.add_argument("--seed_dir", help="Directory containing models to seed with")
-    args = parser.parse_args()
-    
-    seeds = []
-    if args.seed:
-        if os.path.exists(args.seed):
-            with open(args.seed, "rb") as f:
-                seeds.append(pickle.load(f))
-    
-    if args.seed_dir:
-        if os.path.exists(args.seed_dir):
-            for f in os.listdir(args.seed_dir):
-                if f.endswith(".pkl"):
-                    try:
-                        with open(os.path.join(args.seed_dir, f), "rb") as file:
-                            seeds.append(pickle.load(file))
-                    except:
-                        pass
+    try:
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--seed", help="Path to a specific model file to seed with")
+        parser.add_argument("--seed_dir", help="Directory containing models to seed with")
+        args = parser.parse_args()
+        
+        seeds = []
+        if args.seed:
+            if os.path.exists(args.seed):
+                with open(args.seed, "rb") as f:
+                    seeds.append(pickle.load(f))
+        
+        if args.seed_dir:
+            if os.path.exists(args.seed_dir):
+                for f in os.listdir(args.seed_dir):
+                    if f.endswith(".pkl"):
+                        try:
+                            with open(os.path.join(args.seed_dir, f), "rb") as file:
+                                seeds.append(pickle.load(file))
+                        except:
+                            pass
 
-    run_training(seed_genomes=seeds if seeds else None)
+        run_training(seed_genomes=seeds if seeds else None)
+    except KeyboardInterrupt:
+        print("\n[!] Training interrupted by user.")
+    except Exception as e:
+        print(f"\n[!] An error occurred: {e}")

@@ -57,4 +57,9 @@ def generate_report():
     print(f"\nTotal Models Saved: {len(models)}")
 
 if __name__ == "__main__":
-    generate_report()
+    try:
+        generate_report()
+    except KeyboardInterrupt:
+        print("\n[!] Dashboard interrupted by user.")
+    except Exception as e:
+        print(f"\n[!] An error occurred: {e}")
