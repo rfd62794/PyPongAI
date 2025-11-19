@@ -51,7 +51,8 @@ def eval_genomes(genomes, config_neat):
                 state["ball_vel_x"] / config.BALL_MAX_SPEED,
                 state["ball_vel_y"] / config.BALL_MAX_SPEED,
                 (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] < 0 else 0.0
+                1.0 if state["ball_vel_x"] < 0 else 0.0,
+                state["paddle_right_y"] / config.SCREEN_HEIGHT
             )
             
             # Get network output
@@ -145,7 +146,8 @@ def eval_genomes_competitive(genomes, config_neat):
                     state["ball_vel_x"] / config.BALL_MAX_SPEED,
                     state["ball_vel_y"] / config.BALL_MAX_SPEED,
                     (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] < 0 else 0.0
+                    1.0 if state["ball_vel_x"] < 0 else 0.0,
+                    state["paddle_right_y"] / config.SCREEN_HEIGHT
                 )
                 output_left = net_left.activate(inputs_left)
                 action_idx_left = output_left.index(max(output_left))
@@ -164,7 +166,8 @@ def eval_genomes_competitive(genomes, config_neat):
                     state["ball_vel_x"] / config.BALL_MAX_SPEED,
                     state["ball_vel_y"] / config.BALL_MAX_SPEED,
                     (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] > 0 else 0.0  # Incoming from right perspective
+                    1.0 if state["ball_vel_x"] > 0 else 0.0,  # Incoming from right perspective
+                    state["paddle_left_y"] / config.SCREEN_HEIGHT
                 )
                 output_right = net_right.activate(inputs_right)
                 action_idx_right = output_right.index(max(output_right))
@@ -268,6 +271,9 @@ def validate_genome(genome, config_neat):
     win_rate = wins / num_games
     return avg_rally, win_rate
 
+# Hall of Fame Storage
+HALL_OF_FAME = []
+
 def eval_genomes_self_play(genomes, config_neat):
     """
     Self-Play Fitness Function.
@@ -277,12 +283,22 @@ def eval_genomes_self_play(genomes, config_neat):
     for _, genome in genome_list:
         genome.fitness = 0
     
+    # Update Hall of Fame (Save best from previous generation if available)
+    # Note: This function is called every generation.
+    # We need a way to know if we should add to HOF.
+    # A simple way is to add the best genome of the *current* population to HOF at the END of eval?
+    # Or pass it in. 
+    # Actually, we can just add the best of the *previous* generation if we had access.
+    # But here we are evaluating.
+    # Let's just add to HOF periodically based on a global counter or similar?
+    # Or better: The training loop handles HOF additions. 
+    # But we need HOF *inside* here to play against.
+    # Let's assume HALL_OF_FAME is populated externally or we populate it here with a random sample of high fitness?
+    # Issue: We don't know fitness yet.
+    # Solution: We will rely on the training loop to populate HALL_OF_FAME.
+    
     # Randomize list
     random.shuffle(genome_list)
-    
-    # Pair up adjacent genomes (1 vs 2, 3 vs 4, etc.)
-    # If odd, last one plays first one? Or random.
-    # Better: Each genome plays 2 matches against random opponents.
     
     matches_per_genome = 2
     
@@ -291,9 +307,20 @@ def eval_genomes_self_play(genomes, config_neat):
         random.shuffle(genome_list)
         
         # Pair (0,1), (2,3)...
-        for j in range(0, len(genome_list) - 1, 2):
+        for j in range(0, len(genome_list), 2):
+            if j+1 >= len(genome_list):
+                break
+                
             g1_id, g1 = genome_list[j]
-            g2_id, g2 = genome_list[j+1]
+            
+            # 20% chance to play against Hall of Fame if available
+            use_hof = False
+            if HALL_OF_FAME and random.random() < 0.2:
+                use_hof = True
+                g2 = random.choice(HALL_OF_FAME)
+                # g2 is a genome object. We don't update its fitness.
+            else:
+                g2_id, g2 = genome_list[j+1]
             
             net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
             net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
@@ -301,11 +328,7 @@ def eval_genomes_self_play(genomes, config_neat):
             game = game_engine.Game()
             run = True
             frame_count = 0
-            max_frames = 10000 # Allow longer games
-            
-            # Play to 3 points for training speed (user said 9, but for training 50 genomes * 2 matches * 9 points might be too slow? Let's try 3 first, or 5).
-            # User asked for 9. Let's do 5 for training efficiency, 9 for final testing?
-            # Let's compromise at 5 for now to keep training loop reasonable.
+            max_frames = 10000 
             target_score = 5 
             
             while run and frame_count < max_frames:
@@ -320,7 +343,8 @@ def eval_genomes_self_play(genomes, config_neat):
                     state["ball_vel_x"] / config.BALL_MAX_SPEED,
                     state["ball_vel_y"] / config.BALL_MAX_SPEED,
                     (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] < 0 else 0.0
+                    1.0 if state["ball_vel_x"] < 0 else 0.0,
+                    state["paddle_right_y"] / config.SCREEN_HEIGHT
                 )
                 out1 = net1.activate(inputs1)
                 act1 = out1.index(max(out1))
@@ -334,7 +358,8 @@ def eval_genomes_self_play(genomes, config_neat):
                     state["ball_vel_x"] / config.BALL_MAX_SPEED,
                     state["ball_vel_y"] / config.BALL_MAX_SPEED,
                     (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] > 0 else 0.0 # Incoming from right
+                    1.0 if state["ball_vel_x"] > 0 else 0.0, # Incoming from right
+                    state["paddle_left_y"] / config.SCREEN_HEIGHT
                 )
                 out2 = net2.activate(inputs2)
                 act2 = out2.index(max(out2))
@@ -343,23 +368,24 @@ def eval_genomes_self_play(genomes, config_neat):
                 score_data = game.update(move1, move2)
                 
                 # Fitness Rewards
-                # 1. Survival (small)
                 g1.fitness += 0.01
-                g2.fitness += 0.01
+                if not use_hof:
+                    g2.fitness += 0.01
                 
                 if score_data:
-                    # 2. Volley Reward (Primary Metric)
                     if score_data.get("hit_left"):
                         g1.fitness += 1.0
                     if score_data.get("hit_right"):
-                        g2.fitness += 1.0
+                        if not use_hof:
+                            g2.fitness += 1.0
                         
-                    # 3. Scoring/Winning
                     if score_data.get("scored") == "left":
                         g1.fitness += 5.0
-                        g2.fitness -= 2.0
+                        if not use_hof:
+                            g2.fitness -= 2.0
                     elif score_data.get("scored") == "right":
-                        g2.fitness += 5.0
+                        if not use_hof:
+                            g2.fitness += 5.0
                         g1.fitness -= 2.0
                         
                 if game.score_left >= target_score or game.score_right >= target_score:
