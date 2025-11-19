@@ -576,14 +576,15 @@ class LeagueState(BaseState):
                             break
                         self.update_match()
                         
-            elif self.match_queue:
-                # Start next match
-                self.start_next_match()
             elif self.current_match and self.current_match["finished"]:
                 # Wait a moment before next match (so user can see result)
                 # If visuals are off, skip the wait
                 if not self.show_visuals:
                     self.current_match = None  # Clear it so next update loop picks up next match immediately
+            else:
+                # No active match (and not waiting), start next match
+                # start_next_match will handle empty queue by calling finish_tournament
+                self.start_next_match()
     
     def draw(self, screen):
         screen.fill(config.BLACK)
