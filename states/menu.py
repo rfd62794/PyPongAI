@@ -37,8 +37,7 @@ class MenuState(BaseState):
                 elif self.btn_manage.collidepoint((mx, my)):
                     self.manager.change_state("models")
                 elif self.btn_dash.collidepoint((mx, my)):
-                    # Placeholder for DashboardState
-                    print("Dashboard State not implemented yet")
+                    self.manager.change_state("dashboard")
                 elif self.btn_quit.collidepoint((mx, my)):
                     self.manager.running = False
 
