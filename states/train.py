@@ -121,14 +121,14 @@ class VisualReporter(neat.reporting.BaseReporter):
             # AI (Left)
             state = game.get_state()
             inputs = (
-                state["paddle_left_y"],
-                state["ball_x"],
-                state["ball_y"],
-                state["ball_vel_x"],
-                state["ball_vel_y"],
-                state["paddle_left_y"] - state["ball_y"],
+                state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
                 1.0 if state["ball_vel_x"] < 0 else 0.0,
-                state["paddle_right_y"]
+                state["paddle_right_y"] / config.SCREEN_HEIGHT
             )
             output = net.activate(inputs)
             action_idx = output.index(max(output))
