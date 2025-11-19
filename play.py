@@ -1,44 +1,14 @@
-    pygame.init()
-    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-    pygame.display.set_caption("Project PaddleMind")
-    clock = pygame.time.Clock()
-    font = pygame.font.Font(None, 50)
-    small_font = pygame.font.Font(None, 36)
+import patch_neat
+import pygame
+import neat
+import os
+import pickle
+import config
+from game_engine import Game
+from human_rival import HumanRival
+import sys
 
-    # List models (Recursively scan models/ and models/tiers/)
-    models = []
-    for root, dirs, files in os.walk(config.MODEL_DIR):
-        for file in files:
-            if file.endswith(".pkl"):
-                # Store relative path for display, or full path?
-                # Storing full path is safer, but display needs to be clean
-                full_path = os.path.join(root, file)
-                models.append(full_path)
-
-    if not models:
-        print("No models found. Please train first.")
-        pygame.quit()
-        return
-
-    def get_fitness(filepath):
-        filename = os.path.basename(filepath)
-        try:
-            if "fitness" in filename:
-                return int(filename.split("fitness")[1].split(".")[0])
-            elif "_fit_" in filename:
-                return int(filename.split("_fit_")[1].split(".")[0])
-            return 0
-        except (IndexError, ValueError):
-            return 0
-    models.sort(key=get_fitness)
-
-    # Helper to get display name
-    def get_display_name(filepath):
-        filename = os.path.basename(filepath)
-        # Check if it's in a tier
-        parent = os.path.basename(os.path.dirname(filepath))
-        if parent in ["God", "Master", "Challenger", "Archive"]:
-            return f"[{parent}] {filename}"
+def play_game():
     pygame.init()
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption("Project PaddleMind")
@@ -164,10 +134,6 @@
                     elif btn_select.collidepoint((mx, my)):
                         # Simple file dialog simulation or just list
                         # For now, let's just pick the best one to save time or implement a list later
-                        # The user can use Visual Model Manager to see files.
-                        # Let's just use the same logic as Challenge Best for now but maybe random?
-                        # Actually, let's just launch the visual training menu but for selection?
-                        # No, let's keep it simple.
                         pass 
                         
                     elif btn_rival.collidepoint((mx, my)) and rival_path:
@@ -265,3 +231,6 @@
         pygame.quit()
         
     pygame.quit()
+
+if __name__ == "__main__":
+    play_game()
