@@ -60,9 +60,13 @@ class Dashboard:
                         "file": os.path.basename(f),
                         "frames": len(df),
                         "max_score_left": df['score_left'].max(),
-            text = font.render(tab, True, TEXT_COLOR)
-            text_rect = text.get_rect(center=rect.center)
-            screen.blit(text, text_rect)
+                        "max_score_right": df['score_right'].max(),
+                        "avg_ball_speed": df['ball_vel_x'].abs().mean()
+                    })
+            except:
+                pass
+        matches.sort(key=lambda x: x["file"], reverse=True) # Newest first
+        return matches
 
     def draw_overview(self):
         y = 80
