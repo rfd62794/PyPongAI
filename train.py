@@ -77,6 +77,16 @@ def run_training(seed_genomes=None):
                 avg_rally, win_rate = ai_module.validate_genome(best_genome, config)
                 print(f"   [Validation] Best Genome vs Rule-Based: Avg Rally={avg_rally:.2f}, Win Rate={win_rate:.2f}")
                 
+                # Update Hall of Fame every 5 generations
+                if self.generation % 5 == 0:
+                    # We need to clone it to ensure it doesn't get mutated later?
+                    # NEAT genomes are usually mutated in place or cloned during reproduction.
+                    # But the population object persists.
+                    # Safest is to pickle/unpickle or use copy.deepcopy
+                    import copy
+                    ai_module.HALL_OF_FAME.append(copy.deepcopy(best_genome))
+                    print(f"   [HOF] Added Best Genome to Hall of Fame. Size: {len(ai_module.HALL_OF_FAME)}")
+                
                 # Log to CSV
                 with open(os.path.join(config_neat.stats_path_csv), 'a', newline='') as f:
                     writer = csv.writer(f)
