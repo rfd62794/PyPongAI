@@ -79,9 +79,16 @@ def main_menu():
                         pygame.display.set_caption("Project PaddleMind - Hub")
                         
                     elif btn_manage.collidepoint((mx, my)):
-                        subprocess.run([sys.executable, "model_manager.py", "--report"])
-                        print("\nPress Enter to return to menu...")
-                        input()
+                        pygame.quit()
+                        try:
+                            subprocess.check_call([sys.executable, "visual_model_manager.py"])
+                        except subprocess.CalledProcessError as e:
+                            if e.returncode == 100:
+                                print("Exiting application...")
+                                sys.exit()
+                        pygame.init()
+                        screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+                        pygame.display.set_caption("Project PaddleMind - Hub")
                         
                     elif btn_dash.collidepoint((mx, my)):
                         pygame.quit()
