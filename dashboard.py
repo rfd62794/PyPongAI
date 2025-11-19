@@ -1,13 +1,3 @@
-import pygame
-import sys
-import os
-import glob
-import pandas as pd
-import config
-
-# Initialize Pygame
-pygame.init()
-screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
 pygame.display.set_caption("Project PaddleMind - Analytics Dashboard")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 40)
