@@ -4,9 +4,9 @@ import argparse
 import config
 
 TIERS = {
-    "God": 1,          # Top 1
-    "Master": 5,       # Top 2-5
-    "Challenger": 15,  # Top 6-15
+    "God": 20,         # Top 20
+    "Master": 50,      # Top 21-50
+    "Challenger": 100, # Top 51-100
     "Archive": None    # The rest
 }
 
