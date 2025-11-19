@@ -1,74 +1,32 @@
-# main.py
-import train
-import play
 import pygame
 import config
-import game_engine
-
-def play_pvp():
-    """
-    Runs the game in Player vs Player mode.
-    """
-    print("Starting Player vs Player...")
-    pygame.init()
-    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-    pygame.display.set_caption("Project PaddleMind - PvP")
-    clock = pygame.time.Clock()
-    
-    game = game_engine.Game()
-    
-    running = True
-    while running:
-        clock.tick(config.FPS)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        keys = pygame.key.get_pressed()
-        
-        # Left Paddle (W/S)
-        left_move = None
-        if keys[pygame.K_w]:
-            left_move = "UP"
-        elif keys[pygame.K_s]:
-            left_move = "DOWN"
-            
-        # Right Paddle (Up/Down)
-        right_move = None
-        if keys[pygame.K_UP]:
-            right_move = "UP"
-        elif keys[pygame.K_DOWN]:
-            right_move = "DOWN"
-
-        score_data = game.update(left_move, right_move)
-        if score_data and score_data.get("game_over"):
-            print(f"Game Over! Left: {score_data['score_left']}, Right: {score_data['score_right']}")
-            running = False
-
-        game.draw(screen)
-        pygame.display.flip()
-
-    pygame.quit()
+from states.manager import StateManager
+from states.menu import MenuState
+from states.game import GameState
+from states.lobby import LobbyState
 
 def main():
-    print("Welcome to Project PaddleMind")
-    print("1. Train a new AI")
-    print("2. Play against an AI")
-    print("3. Play Player vs Player")
+    pygame.init()
+    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+    pygame.display.set_caption("Project PaddleMind")
     
-    try:
-        choice = input("Enter your choice (1-3): ")
-        if choice == '1':
-            train.run_training()
-        elif choice == '2':
-            play.play_game()
-        elif choice == '3':
-            play_pvp()
-        else:
-            print("Invalid choice.")
-    except KeyboardInterrupt:
-        print("\nExiting...")
+    manager = StateManager(screen)
+    
+    # Register States
+    manager.register_state("menu", MenuState(manager))
+    manager.register_state("lobby", LobbyState(manager))
+    manager.register_state("game", GameState(manager))
+    
+    # Start with Menu
+    manager.change_state("menu")
+    
+    manager.run()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Error: {e}")
+        pygame.quit()
