@@ -114,6 +114,7 @@ class LeagueState(BaseState):
         self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
         self.cancel_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 50)
         self.visual_toggle_button = pygame.Rect(config.SCREEN_WIDTH - 220, 10, 100, 40)
+        self.dashboard_button = pygame.Rect(config.SCREEN_WIDTH//2 - 100, 600, 200, 40)
         
         # Sliders for setup
         self.min_fitness_slider_rect = pygame.Rect(150, 300, 500, 20)
@@ -531,7 +532,11 @@ class LeagueState(BaseState):
                     self.match_queue = []
             
             elif self.mode == "RESULTS":
-                # Any click returns to menu
+                if self.dashboard_button.collidepoint((mx, my)):
+                    self.mode = "DASHBOARD"
+            
+            elif self.mode == "DASHBOARD":
+                # Back button is handled at top
                 pass
                 
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -604,6 +609,8 @@ class LeagueState(BaseState):
             self.draw_running(screen)
         elif self.mode == "RESULTS":
             self.draw_results(screen)
+        elif self.mode == "DASHBOARD":
+            self.draw_dashboard(screen)
     
     def draw_setup(self, screen):
         """Draw setup screen"""
@@ -741,4 +748,64 @@ class LeagueState(BaseState):
         
         # Instructions
         instruction = self.small_font.render("Press ESC or click Back to return to menu", True, config.GRAY)
-        screen.blit(instruction, (config.SCREEN_WIDTH//2 - instruction.get_width()//2, config.SCREEN_HEIGHT - 50))
+        screen.blit(instruction, (config.SCREEN_WIDTH//2 - instruction.get_width()//2, config.SCREEN_HEIGHT - 80))
+        
+        # Dashboard Button
+        pygame.draw.rect(screen, (50, 100, 150), self.dashboard_button)
+        pygame.draw.rect(screen, config.WHITE, self.dashboard_button, 2)
+        dash_text = self.small_font.render("Analytics Dashboard", True, config.WHITE)
+        dash_rect = dash_text.get_rect(center=self.dashboard_button.center)
+        screen.blit(dash_text, dash_rect)
+
+    def draw_dashboard(self, screen):
+        """Draw analytics dashboard"""
+        title = self.font.render("Analytics Dashboard", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
+        
+        # Header
+        headers = ["Rank", "Model", "ELO", "Win%", "React(f)", "Eff(px/pt)"]
+        x_offsets = [50, 120, 350, 450, 550, 680]
+        
+        for i, h in enumerate(headers):
+            text = self.small_font.render(h, True, (100, 200, 255))
+            screen.blit(text, (x_offsets[i], 80))
+            
+        # Rows
+        y = 120
+        # Sort by ELO for dashboard
+        sorted_models = sorted(self.models, key=lambda x: self.model_stats[x]["elo"], reverse=True)
+        
+        for i, model_path in enumerate(sorted_models[:15]): # Show top 15
+            stats = self.model_stats[model_path]
+            
+            # Calculate metrics
+            win_rate = 0
+            if stats["matches_played"] > 0:
+                win_rate = (stats["wins"] / stats["matches_played"]) * 100
+                
+            avg_reaction = 0
+            if stats["reaction_count"] > 0:
+                avg_reaction = stats["total_reaction_time"] / stats["reaction_count"]
+                
+            efficiency = 0
+            if stats["points_scored"] > 0:
+                efficiency = stats["distance_moved"] / stats["points_scored"]
+            
+            # Draw row
+            row_data = [
+                f"{i+1}",
+                os.path.basename(model_path)[:15],
+                f"{int(stats['elo'])}",
+                f"{win_rate:.1f}%",
+                f"{avg_reaction:.1f}",
+                f"{int(efficiency)}"
+            ]
+            
+            for j, data in enumerate(row_data):
+                color = config.WHITE
+                if j == 0: color = (255, 255, 0) # Rank
+                
+                text = self.tiny_font.render(data, True, color)
+                screen.blit(text, (x_offsets[j], y))
+            
+            y += 30
