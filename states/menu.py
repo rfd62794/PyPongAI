@@ -13,8 +13,9 @@ class MenuState(BaseState):
         self.btn_play = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 150, 300, 50)
         self.btn_train = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 220, 300, 50)
         self.btn_manage = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 290, 300, 50)
-        self.btn_dash = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 360, 300, 50)
-        self.btn_quit = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 430, 300, 50)
+        self.btn_league = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 360, 300, 50)
+        self.btn_dash = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 430, 300, 50)
+        self.btn_quit = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 50)
 
     def draw_button(self, screen, rect, text, hover=False):
         color = (100, 100, 100) if hover else (50, 50, 50)
@@ -36,6 +37,8 @@ class MenuState(BaseState):
                     self.manager.change_state("train")
                 elif self.btn_manage.collidepoint((mx, my)):
                     self.manager.change_state("models")
+                elif self.btn_league.collidepoint((mx, my)):
+                    self.manager.change_state("league")
                 elif self.btn_dash.collidepoint((mx, my)):
                     self.manager.change_state("dashboard")
                 elif self.btn_quit.collidepoint((mx, my)):
@@ -53,5 +56,6 @@ class MenuState(BaseState):
         self.draw_button(screen, self.btn_play, "Play Game", self.btn_play.collidepoint((mx, my)))
         self.draw_button(screen, self.btn_train, "Visual Training", self.btn_train.collidepoint((mx, my)))
         self.draw_button(screen, self.btn_manage, "Manage Models", self.btn_manage.collidepoint((mx, my)))
+        self.draw_button(screen, self.btn_league, "League Mode", self.btn_league.collidepoint((mx, my)))
         self.draw_button(screen, self.btn_dash, "Analytics Dashboard", self.btn_dash.collidepoint((mx, my)))
         self.draw_button(screen, self.btn_quit, "Quit", self.btn_quit.collidepoint((mx, my)))
