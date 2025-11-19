@@ -262,7 +262,15 @@ class TrainState(BaseState):
                     self.manager.change_state("menu")
                     return
 
-                if self.btn_league.collidepoint((mx, my)):
+                # Visual Toggle
+                toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 60, 240, 40)
+                if toggle_rect.collidepoint((mx, my)):
+                    self.visual_mode = not self.visual_mode
+                    return
+                
+                # Auto-seed Toggle
+                seed_toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 110, 240, 40)
+                if seed_toggle_rect.collidepoint((mx, my)):
                     self.use_best_seed = not self.use_best_seed
                     return
 
@@ -312,6 +320,17 @@ class TrainState(BaseState):
             text_surf = self.small_font.render(toggle_text, True, config.WHITE)
             text_rect = text_surf.get_rect(center=toggle_rect.center)
             screen.blit(text_surf, text_rect)
+            
+            # Auto-seed Toggle
+            seed_toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 110, 240, 40)
+            seed_color = (50, 150, 50) if self.use_best_seed else (150, 50, 50)
+            pygame.draw.rect(screen, seed_color, seed_toggle_rect)
+            pygame.draw.rect(screen, config.WHITE, seed_toggle_rect, 2)
+            
+            seed_toggle_text = f"Auto-Seed: {'ON' if self.use_best_seed else 'OFF'}"
+            seed_text_surf = self.small_font.render(seed_toggle_text, True, config.WHITE)
+            seed_text_rect = seed_text_surf.get_rect(center=seed_toggle_rect.center)
+            screen.blit(seed_text_surf, seed_text_rect)
             
             start_idx = self.page * self.per_page
             end_idx = min(start_idx + self.per_page, len(self.models))
