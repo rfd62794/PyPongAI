@@ -42,16 +42,15 @@ def eval_genomes(genomes, config_neat):
             # Get current game state
             state = game.get_state()
             
-            # Prepare inputs for the network
-            # Inputs: paddle_y, ball_x, ball_y, ball_vel_x, ball_vel_y
+            # Prepare inputs for the network (normalized to 0-1 range)
             inputs = (
-                state["paddle_left_y"],
-                state["ball_x"],
-                state["ball_y"],
-                state["ball_vel_x"],
-                state["ball_vel_y"],
-                state["paddle_left_y"] - state["ball_y"], # Relative Y
-                1.0 if state["ball_vel_x"] < 0 else 0.0   # Incoming (Left is target)
+                state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                1.0 if state["ball_vel_x"] < 0 else 0.0
             )
             
             # Get network output
@@ -77,17 +76,22 @@ def eval_genomes(genomes, config_neat):
             # Fitness reward for surviving a frame
             genome.fitness += 0.1
             
-            # Check for game over or scoring
+            # Check for scoring and hit events
             if score_data:
-                if score_data["score_right"] > score_data["score_left"]:
-                    # Opponent scored (Left/Genome missed)
-                    # Penalize or just end? SDD says "loop ends when genome's paddle misses"
-                    genome.fitness -= 1 # Slight penalty for losing
+                # Reward for scoring
+                if score_data.get("scored") == "left":
+                    genome.fitness += 10  # Genome scored
+                elif score_data.get("scored") == "right":
+                    genome.fitness -= 5   # Opponent scored, penalty
+                # Reward for paddle hits
+                if score_data.get("hit_left"):
+                    genome.fitness += 1   # Successful hit by genome
+                # End episode if a point was scored
+                if score_data.get("scored"):
                     run = False
-                else:
-                    # Genome scored
-                    genome.fitness += 5 # Bonus for scoring
-                    # Game continues, ball is reset by game engine
+                # Optionally cap fitness
+                if genome.fitness > 2000:
+                    run = False
             
             # Optional: Cap fitness or duration to prevent infinite stalling if both are perfect
             if genome.fitness > 2000:
