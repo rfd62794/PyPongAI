@@ -109,7 +109,7 @@ class VisualReporter(neat.reporting.BaseReporter):
         # pygame.quit() # Don't call full quit, might break things if re-init? 
         # Actually pygame.quit() is fine if we re-init next time.
 
-def run_visual_training():
+def run_visual_training(seed_genome=None):
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'neat_config.txt')
     
@@ -118,6 +118,14 @@ def run_visual_training():
                               config_path)
                               
     p = neat.Population(config_neat)
+    
+    if seed_genome:
+        print("Seeding population with selected model...")
+        # Seed the first genome
+        target_id = list(p.population.keys())[0]
+        seed_genome.key = target_id
+        p.population[target_id] = seed_genome
+        
     p.add_reporter(neat.StdOutReporter(True))
     p.add_reporter(neat.StatisticsReporter())
     p.add_reporter(VisualReporter(config_neat))
@@ -128,5 +136,110 @@ def run_visual_training():
     with open(os.path.join(config.MODEL_DIR, "visual_winner.pkl"), "wb") as f:
         pickle.dump(winner, f)
 
+def show_start_menu():
+    pygame.init()
+    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+    pygame.display.set_caption("Visual Training - Select Seed")
+    font = pygame.font.Font(None, 40)
+    small_font = pygame.font.Font(None, 30)
+    
+    # Scan models
+    models = []
+    for root, dirs, files in os.walk(config.MODEL_DIR):
+        for file in files:
+            if file.endswith(".pkl"):
+                full_path = os.path.join(root, file)
+                models.append(full_path)
+    
+    def get_fitness(filepath):
+        filename = os.path.basename(filepath)
+        try:
+            if "fitness" in filename:
+                return int(filename.split("fitness")[1].split(".")[0])
+            elif "_fit_" in filename:
+                return int(filename.split("_fit_")[1].split(".")[0])
+            return 0
+        except:
+            return 0
+            
+    models.sort(key=get_fitness, reverse=True)
+    
+    # Pagination
+    page = 0
+    per_page = 5
+    
+    selected_model_path = None
+    running = True
+    
+    while running:
+        screen.fill(config.BLACK)
+        
+        title = font.render("Select Seed Model for Training", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
+        
+        sub = small_font.render("(Press N for New Run / No Seed)", True, config.GRAY)
+        screen.blit(sub, (config.SCREEN_WIDTH//2 - sub.get_width()//2, 70))
+
+        mx, my = pygame.mouse.get_pos()
+        
+        start_idx = page * per_page
+        end_idx = min(start_idx + per_page, len(models))
+        
+        for i in range(start_idx, end_idx):
+            model_path = models[i]
+            filename = os.path.basename(model_path)
+            fitness = get_fitness(model_path)
+            parent = os.path.basename(os.path.dirname(model_path))
+            display_text = f"{filename} (Fit: {fitness}) [{parent}]"
+            
+            y_pos = 150 + (i - start_idx) * 60
+            rect = pygame.Rect(100, y_pos, config.SCREEN_WIDTH - 200, 50)
+            
+            color = (50, 50, 50)
+            if rect.collidepoint((mx, my)):
+                color = (100, 100, 100)
+                
+            pygame.draw.rect(screen, color, rect)
+            
+            text_surf = small_font.render(display_text, True, config.WHITE)
+            screen.blit(text_surf, (rect.x + 10, rect.centery - text_surf.get_height()//2))
+            
+            if pygame.mouse.get_pressed()[0] and rect.collidepoint((mx, my)):
+                selected_model_path = model_path
+                running = False
+                pygame.time.wait(200) # Debounce
+
+        # Navigation
+        if len(models) > per_page:
+            nav_text = f"Page {page + 1} / {(len(models) - 1) // per_page + 1} (Arrows to change)"
+            nav_surf = small_font.render(nav_text, True, config.WHITE)
+            screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
+
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_n:
+                    running = False # No seed
+                elif event.key == pygame.K_RIGHT:
+                    if (page + 1) * per_page < len(models):
+                        page += 1
+                elif event.key == pygame.K_LEFT:
+                    if page > 0:
+                        page -= 1
+
+    pygame.quit()
+    return selected_model_path
+
 if __name__ == "__main__":
-    run_visual_training()
+    seed_path = show_start_menu()
+    seed_genome = None
+    if seed_path:
+        print(f"Loading seed: {seed_path}")
+        with open(seed_path, "rb") as f:
+            seed_genome = pickle.load(f)
+            
+    run_visual_training(seed_genome)
