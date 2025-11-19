@@ -183,21 +183,6 @@ def play_game():
                 font_go = pygame.font.Font(None, 74)
                 text_go = font_go.render("GAME OVER", True, config.WHITE)
                 screen.blit(text_go, (config.SCREEN_WIDTH//2 - text_go.get_width()//2, config.SCREEN_HEIGHT//2))
-                pygame.display.flip()
-                pygame.time.wait(2000)
-                running = False
-
-            # Draw
-            game.draw(screen)
-            pygame.display.flip()
-    finally:
-        recorder.close()
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    try:
-        play_game()
     except KeyboardInterrupt:
         print("\n[!] Game interrupted by user.")
         pygame.quit()
