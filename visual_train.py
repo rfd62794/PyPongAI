@@ -218,7 +218,7 @@ def show_start_menu():
             nav_surf = small_font.render(nav_text, True, config.WHITE)
             screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
 
-        # Back Button
+    # Back Button
         back_rect = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
         pygame.draw.rect(screen, (150, 50, 50), back_rect)
         pygame.draw.rect(screen, config.WHITE, back_rect, 2)
@@ -236,7 +236,7 @@ def show_start_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_rect.collidepoint(event.pos):
                     pygame.quit()
-                    return None
+                    sys.exit(0) # Exit cleanly to return to menu
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_n:

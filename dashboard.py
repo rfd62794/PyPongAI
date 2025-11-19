@@ -161,7 +161,7 @@ class Dashboard:
                     sys.exit(100)
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mx, my = pygame.mouse.get_pos()
+                    mx, my = event.pos # Use event position for accuracy
                     
                     # Tab Click
                     if my < 50:
@@ -174,6 +174,7 @@ class Dashboard:
                     # Back Button
                     if back_btn.collidepoint((mx, my)):
                         self.running = False
+                        sys.exit(0) # Return to main menu logic
                         
                     # Scroll
                     if event.button == 4: # Up

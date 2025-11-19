@@ -37,12 +37,11 @@ def show_model_manager():
                 running = False
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = pygame.mouse.get_pos()
+                mx, my = event.pos # Use event position for accuracy
                 
                 if btn_back.collidepoint((mx, my)):
                     running = False
-                    # Return to main menu logic would go here, or just close this window
-                    return
+                    sys.exit(0) # Return to main menu logic
 
                 if btn_organize.collidepoint((mx, my)):
                     print("Organizing models...")
