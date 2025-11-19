@@ -18,17 +18,6 @@ class LeagueState(BaseState):
         self.mode = "SETUP"  # SETUP, RUNNING, RESULTS
         self.models = []
         self.model_stats = {}  # {path: {"wins": 0, "losses": 0, "fitness": 0, "points_scored": 0, "points_conceded": 0}}
-        self.current_match = None
-        self.match_queue = []
-        self.completed_matches = 0
-        self.total_matches = 0
-        
-        # Tournament Enhancement Settings
-        
-        # UI
-        self.start_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 480, 300, 50)
-        self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
-        self.cancel_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 50)
         self.visual_toggle_button = pygame.Rect(config.SCREEN_WIDTH - 220, 10, 100, 40)
         
         # Sliders for setup
