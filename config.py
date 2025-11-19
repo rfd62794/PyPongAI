@@ -35,6 +35,12 @@ LOGS_TRAINING_DIR = os.path.join(LOG_DIR, "training")
 LOGS_MATCHES_DIR = os.path.join(LOG_DIR, "matches")
 LOGS_HUMAN_DIR = os.path.join(LOG_DIR, "human")
 
+# Tournament Settings
+TOURNAMENT_MIN_FITNESS_DEFAULT = 200
+TOURNAMENT_SIMILARITY_THRESHOLD = 10
+TOURNAMENT_DELETE_SHUTOUTS = True
+TOURNAMENT_VISUAL_DEFAULT = True
+
 # Create directories if they don't exist
 for d in [DATA_DIR, MODEL_DIR, LOG_DIR, LOGS_TRAINING_DIR, LOGS_MATCHES_DIR, LOGS_HUMAN_DIR]:
     os.makedirs(d, exist_ok=True)
