@@ -253,7 +253,21 @@ def show_start_menu():
         if len(models) > per_page:
             nav_text = f"Page {page + 1} / {(len(models) - 1) // per_page + 1} (Arrows to change)"
             nav_surf = small_font.render(nav_text, True, config.WHITE)
-            screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
+            screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 120))
+
+        # START Button (Auto-Seed)
+        start_btn_rect = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 60)
+        btn_color = (50, 200, 50) if start_btn_rect.collidepoint((mx, my)) else (30, 150, 30)
+        pygame.draw.rect(screen, btn_color, start_btn_rect)
+        pygame.draw.rect(screen, config.WHITE, start_btn_rect, 3)
+        
+        start_text = font.render("START AUTO-SEED", True, config.WHITE)
+        start_rect = start_text.get_rect(center=start_btn_rect.center)
+        screen.blit(start_text, start_rect)
+        
+        if pygame.mouse.get_pressed()[0] and start_btn_rect.collidepoint((mx, my)):
+            pygame.quit()
+            return get_best_model()
 
     # Back Button
         back_rect = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
@@ -274,9 +288,22 @@ def show_start_menu():
                 if back_rect.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit(0) # Exit cleanly to return to menu
+                
+                # Check model selection
+                start_idx = page * per_page
+                end_idx = min(start_idx + per_page, len(models))
+                for i in range(start_idx, end_idx):
+                    y_pos = 150 + (i - start_idx) * 60
+                    rect = pygame.Rect(100, y_pos, config.SCREEN_WIDTH - 200, 50)
+                    if rect.collidepoint(event.pos):
+                        selected_model_path = models[i]
+                        running = False
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_n:
+                if event.key == pygame.K_RETURN:
+                    pygame.quit()
+                    return get_best_model()
+                elif event.key == pygame.K_n:
                     running = False # No seed
                 elif event.key == pygame.K_RIGHT:
                     if (page + 1) * per_page < len(models):

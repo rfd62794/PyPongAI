@@ -273,6 +273,12 @@ class TrainState(BaseState):
                 if seed_toggle_rect.collidepoint((mx, my)):
                     self.use_best_seed = not self.use_best_seed
                     return
+                    
+                # START Button
+                start_btn_rect = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 60)
+                if start_btn_rect.collidepoint((mx, my)):
+                    self.start_training(None) # Auto-seed logic handles it
+                    return
 
                 # Model Selection
                 start_idx = self.page * self.per_page
@@ -289,8 +295,14 @@ class TrainState(BaseState):
                         return
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_n:
-                    self.start_training(None) # New Run
+                if event.key == pygame.K_RETURN:
+                    self.start_training(None) # Auto-seed
+                elif event.key == pygame.K_n:
+                    # Force new run (disable auto-seed temporarily)
+                    prev = self.use_best_seed
+                    self.use_best_seed = False
+                    self.start_training(None)
+                    self.use_best_seed = prev
                 elif event.key == pygame.K_RIGHT:
                     if (self.page + 1) * self.per_page < len(self.models):
                         self.page += 1
@@ -305,7 +317,7 @@ class TrainState(BaseState):
             title = self.font.render("Select Seed Model for Training", True, config.WHITE)
             screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
             
-            sub = self.small_font.render("(Press N for New Run / No Seed)", True, config.GRAY)
+            sub = self.small_font.render("(Select a model below OR click START to Auto-Seed)", True, config.GRAY)
             screen.blit(sub, (config.SCREEN_WIDTH//2 - sub.get_width()//2, 70))
             
             mx, my = pygame.mouse.get_pos()
@@ -364,7 +376,21 @@ class TrainState(BaseState):
             if len(self.models) > self.per_page:
                 nav_text = f"Page {self.page + 1} / {(len(self.models) - 1) // self.per_page + 1} (Arrows to change)"
                 nav_surf = self.small_font.render(nav_text, True, config.WHITE)
-                screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
+                screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 120))
+
+            # START Button
+            start_btn_rect = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 60)
+            btn_color = (50, 200, 50) if start_btn_rect.collidepoint((mx, my)) else (30, 150, 30)
+            pygame.draw.rect(screen, btn_color, start_btn_rect)
+            pygame.draw.rect(screen, config.WHITE, start_btn_rect, 3)
+            
+            start_text = self.font.render("START TRAINING", True, config.WHITE)
+            start_rect = start_text.get_rect(center=start_btn_rect.center)
+            screen.blit(start_text, start_rect)
+            
+            sub_start = self.tiny_font.render("(Uses Best Model if Auto-Seed ON)", True, config.WHITE)
+            sub_rect = sub_start.get_rect(center=(start_btn_rect.centerx, start_btn_rect.bottom + 15))
+            screen.blit(sub_start, sub_rect)
 
             # Back Button
             back_rect = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
