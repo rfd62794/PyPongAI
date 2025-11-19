@@ -149,7 +149,9 @@ class LeagueState(BaseState):
                 "hits": 0,
                 "misses": 0,
                 "rallies": [],
-                "distance_moved": 0
+                "distance_moved": 0,
+                "total_reaction_time": 0,
+                "reaction_count": 0
             }
     
     def pre_filter_models(self):
@@ -372,12 +374,21 @@ class LeagueState(BaseState):
         
         # Update Analytics from Analyzer
         if hasattr(self, 'analyzer'):
+            self.analyzer.get_averages()
+            
             # P1
             self.model_stats[model1_path]["hits"] += self.analyzer.p1_stats["hits"]
             self.model_stats[model1_path]["distance_moved"] += self.analyzer.p1_stats["distance"]
+            if self.analyzer.p1_stats["reaction_frames"]:
+                self.model_stats[model1_path]["total_reaction_time"] += sum(self.analyzer.p1_stats["reaction_frames"])
+                self.model_stats[model1_path]["reaction_count"] += len(self.analyzer.p1_stats["reaction_frames"])
+            
             # P2
             self.model_stats[model2_path]["hits"] += self.analyzer.p2_stats["hits"]
             self.model_stats[model2_path]["distance_moved"] += self.analyzer.p2_stats["distance"]
+            if self.analyzer.p2_stats["reaction_frames"]:
+                self.model_stats[model2_path]["total_reaction_time"] += sum(self.analyzer.p2_stats["reaction_frames"])
+                self.model_stats[model2_path]["reaction_count"] += len(self.analyzer.p2_stats["reaction_frames"])
             
             # Rallies (assign to both? or just track globally? assigning to both for now)
             self.model_stats[model1_path]["rallies"].extend(self.analyzer.rally_lengths)
