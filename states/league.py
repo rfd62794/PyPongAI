@@ -457,6 +457,14 @@ class LeagueState(BaseState):
         back_rect = back_text.get_rect(center=self.back_button.center)
         screen.blit(back_text, back_rect)
         
+        # Visual toggle button
+        color = (50, 150, 50) if self.show_visuals else (150, 50, 50)
+        pygame.draw.rect(screen, color, self.visual_toggle_button)
+        pygame.draw.rect(screen, config.WHITE, self.visual_toggle_button, 2)
+        vis_text = self.tiny_font.render("Visuals: ON" if self.show_visuals else "Visuals: OFF", True, config.WHITE)
+        vis_rect = vis_text.get_rect(center=self.visual_toggle_button.center)
+        screen.blit(vis_text, vis_rect)
+        
         if self.mode == "SETUP":
             self.draw_setup(screen)
         elif self.mode == "RUNNING":
@@ -470,19 +478,43 @@ class LeagueState(BaseState):
         screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 50))
         
         info = self.small_font.render(f"Found {len(self.models)} models", True, config.WHITE)
-        screen.blit(info, (config.SCREEN_WIDTH//2 - info.get_width()//2, 120))
+        screen.blit(info, (config.SCREEN_WIDTH//2 - info.get_width()//2, 100))
         
+        # Sliders
+        # Min Fitness
+        pygame.draw.rect(screen, (50, 50, 50), self.min_fitness_slider_rect)
+        fill_w = int((self.min_fitness_threshold / 1000) * self.min_fitness_slider_rect.width)
+        pygame.draw.rect(screen, (100, 100, 200), (self.min_fitness_slider_rect.x, self.min_fitness_slider_rect.y, fill_w, self.min_fitness_slider_rect.height))
+        pygame.draw.rect(screen, config.WHITE, self.min_fitness_slider_rect, 2)
+        
+        fit_label = self.tiny_font.render(f"Min Fitness Filter: {self.min_fitness_threshold}", True, config.WHITE)
+        screen.blit(fit_label, (self.min_fitness_slider_rect.x, self.min_fitness_slider_rect.y - 25))
+        
+        # Similarity
+        pygame.draw.rect(screen, (50, 50, 50), self.similarity_slider_rect)
+        fill_w = int((self.similarity_threshold / 100) * self.similarity_slider_rect.width)
+        pygame.draw.rect(screen, (200, 100, 200), (self.similarity_slider_rect.x, self.similarity_slider_rect.y, fill_w, self.similarity_slider_rect.height))
+        pygame.draw.rect(screen, config.WHITE, self.similarity_slider_rect, 2)
+        
+        sim_label = self.tiny_font.render(f"Similarity Pruning Threshold: {self.similarity_threshold}", True, config.WHITE)
+        screen.blit(sim_label, (self.similarity_slider_rect.x, self.similarity_slider_rect.y - 25))
+        
+        # Warnings
         if len(self.models) < 2:
             warning = self.small_font.render("Need at least 2 models to run tournament!", True, (255, 100, 100))
-            screen.blit(warning, (config.SCREEN_WIDTH//2 - warning.get_width()//2, 180))
+            screen.blit(warning, (config.SCREEN_WIDTH//2 - warning.get_width()//2, 420))
         else:
-            desc1 = self.tiny_font.render("All models will compete in a round-robin tournament.", True, config.GRAY)
-            desc2 = self.tiny_font.render("Only the top 10 performers will be kept.", True, config.GRAY)
-            desc3 = self.tiny_font.render(f"This will DELETE {max(0, len(self.models) - 10)} models!", True, (255, 150, 150))
+            # Calculate estimated survivors
+            pre_filter_count = sum(1 for m in self.models if self.model_stats[m]["fitness"] < self.min_fitness_threshold)
+            est_survivors = len(self.models) - pre_filter_count
             
-            screen.blit(desc1, (config.SCREEN_WIDTH//2 - desc1.get_width()//2, 180))
-            screen.blit(desc2, (config.SCREEN_WIDTH//2 - desc2.get_width()//2, 210))
-            screen.blit(desc3, (config.SCREEN_WIDTH//2 - desc3.get_width()//2, 240))
+            desc1 = self.tiny_font.render(f"Pre-filter will remove {pre_filter_count} models.", True, (255, 200, 100))
+            desc2 = self.tiny_font.render("Shutout (5-0) losers will be deleted immediately.", True, (255, 150, 150))
+            desc3 = self.tiny_font.render("Similar models will be pruned after tournament.", True, (200, 100, 255))
+            
+            screen.blit(desc1, (config.SCREEN_WIDTH//2 - desc1.get_width()//2, 400))
+            screen.blit(desc2, (config.SCREEN_WIDTH//2 - desc2.get_width()//2, 425))
+            screen.blit(desc3, (config.SCREEN_WIDTH//2 - desc3.get_width()//2, 450))
             
             # Start button
             mx, my = pygame.mouse.get_pos()
@@ -500,8 +532,16 @@ class LeagueState(BaseState):
         
         # Draw the actual game if a match is active
         if self.current_match and not self.current_match["finished"]:
-            # Draw the game
-            self.current_match["game"].draw(screen)
+            if self.show_visuals:
+                # Draw the game
+                self.current_match["game"].draw(screen)
+            else:
+                # Minimal UI when visuals off
+                msg = self.font.render("Simulating Matches...", True, config.WHITE)
+                screen.blit(msg, (config.SCREEN_WIDTH//2 - msg.get_width()//2, config.SCREEN_HEIGHT//2 - 50))
+                
+                speed_msg = self.small_font.render("(Visuals OFF - High Speed)", True, (100, 255, 100))
+                screen.blit(speed_msg, (config.SCREEN_WIDTH//2 - speed_msg.get_width()//2, config.SCREEN_HEIGHT//2 + 20))
             
             # Overlay match info at top
             info_bg = pygame.Rect(0, 0, config.SCREEN_WIDTH, 80)
@@ -519,6 +559,13 @@ class LeagueState(BaseState):
                 True, config.WHITE
             )
             screen.blit(progress_text, (config.SCREEN_WIDTH//2 - progress_text.get_width()//2, 10))
+            
+            # Deletion stats
+            del_text = self.tiny_font.render(
+                f"Deleted: {len(self.deleted_models)} (Shutouts: {self.shutout_deletions})",
+                True, (255, 100, 100)
+            )
+            screen.blit(del_text, (config.SCREEN_WIDTH//2 - del_text.get_width()//2, 60))
             
             # Score display (larger)
             score_text = self.small_font.render(
@@ -565,21 +612,37 @@ class LeagueState(BaseState):
         title = self.font.render("Tournament Complete!", True, config.WHITE)
         screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 30))
         
-        subtitle = self.small_font.render("Top 10 Models (Survivors)", True, (100, 255, 100))
-        screen.blit(subtitle, (config.SCREEN_WIDTH//2 - subtitle.get_width()//2, 90))
+        # Stats summary
+        summary = f"Survivors: {len(self.models)} | Deleted: {len(self.deleted_models)}"
+        summary_surf = self.small_font.render(summary, True, config.WHITE)
+        screen.blit(summary_surf, (config.SCREEN_WIDTH//2 - summary_surf.get_width()//2, 80))
+        
+        # Deletion breakdown
+        breakdown = f"Pre-filter: {self.prefilter_deletions} | Shutouts: {self.shutout_deletions} | Similarity: {self.similarity_deletions}"
+        breakdown_surf = self.tiny_font.render(breakdown, True, (255, 150, 150))
+        screen.blit(breakdown_surf, (config.SCREEN_WIDTH//2 - breakdown_surf.get_width()//2, 110))
+        
+        subtitle = self.small_font.render("Top Survivors", True, (100, 255, 100))
+        screen.blit(subtitle, (config.SCREEN_WIDTH//2 - subtitle.get_width()//2, 140))
         
         # Display top 10
-        y_offset = 140
+        y_offset = 180
         for i, model_path in enumerate(self.models[:10]):
             stats = self.model_stats[model_path]
-            rank_text = f"{i+1}. {os.path.basename(model_path)[:40]}"
-            stats_text = f"W:{stats['wins']} L:{stats['losses']} Fit:{stats['fitness']}"
+            rank_text = f"{i+1}. {os.path.basename(model_path)[:30]}"
+            
+            # Enhanced stats display
+            avg_score = 0
+            if stats['matches_played'] > 0:
+                avg_score = (stats['points_scored'] - stats['points_conceded']) / stats['matches_played']
+                
+            stats_text = f"W:{stats['wins']} L:{stats['losses']} Fit:{stats['fitness']} Diff:{avg_score:.1f}"
             
             rank_surf = self.tiny_font.render(rank_text, True, config.WHITE)
             stats_surf = self.tiny_font.render(stats_text, True, config.GRAY)
             
             screen.blit(rank_surf, (50, y_offset))
-            screen.blit(stats_surf, (config.SCREEN_WIDTH - 250, y_offset))
+            screen.blit(stats_surf, (config.SCREEN_WIDTH - 350, y_offset))
             
             y_offset += 30
         
