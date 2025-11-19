@@ -28,7 +28,7 @@ def run_training():
     
     # Run for 50 generations
     print("Starting training...")
-    winner = p.run(ai_module.eval_genomes, 1)
+    winner = p.run(ai_module.eval_genomes, 50)
 
     # Save the winner
     import datetime
