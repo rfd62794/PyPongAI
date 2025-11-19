@@ -24,17 +24,6 @@ class LeagueState(BaseState):
         self.total_matches = 0
         
         # Tournament Enhancement Settings
-        self.show_visuals = config.TOURNAMENT_VISUAL_DEFAULT
-        self.min_fitness_threshold = config.TOURNAMENT_MIN_FITNESS_DEFAULT
-        self.similarity_threshold = config.TOURNAMENT_SIMILARITY_THRESHOLD
-        self.delete_shutouts = config.TOURNAMENT_DELETE_SHUTOUTS
-        
-        # Deletion Tracking
-        self.deleted_models = []  # List of deleted model paths
-        self.deletion_reasons = {}  # {path: reason_string}
-        self.prefilter_deletions = 0
-        self.shutout_deletions = 0
-        self.similarity_deletions = 0
         
         # UI
         self.start_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 480, 300, 50)
