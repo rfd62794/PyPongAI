@@ -91,4 +91,4 @@ def show_model_manager():
         sys.exit(100)
     except Exception as e:
         print(f"Error: {e}")
-        pygame.quit()
+    pygame.quit()
