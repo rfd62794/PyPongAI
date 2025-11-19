@@ -9,6 +9,7 @@ import math
 from states.base import BaseState
 from model_manager import get_fitness_from_filename, delete_models
 import elo_manager
+from match_recorder import MatchRecorder
 
 class MatchAnalyzer:
     def __init__(self):
@@ -223,6 +224,7 @@ class LeagueState(BaseState):
         
         # Initialize Match Analyzer
         self.analyzer = MatchAnalyzer()
+        self.recorder = MatchRecorder(os.path.basename(p1_path), os.path.basename(p2_path))
         
         # Load Genomes
         try:
@@ -318,6 +320,9 @@ class LeagueState(BaseState):
         
         self.model_stats[p2]["total_reaction_time"] += stats["right"]["reaction_sum"]
         self.model_stats[p2]["reaction_count"] += stats["right"]["reaction_count"]
+        
+        # Save Match Recording
+        self.recorder.save()
         
         self.completed_matches += 1
         self.start_next_match()
@@ -428,6 +433,7 @@ class LeagueState(BaseState):
                 
                 # Update Analyzer
                 self.analyzer.update(state)
+                self.recorder.record_frame(state)
                 
                 # AI 1 (Left)
                 inputs1 = (
