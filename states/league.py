@@ -73,8 +73,38 @@ class LeagueState(BaseState):
                 "matches_played": 0
             }
     
+    def pre_filter_models(self):
+        """Filter out models below the minimum fitness threshold"""
+        if self.min_fitness_threshold <= 0:
+            return
+            
+        to_delete = []
+        survivors = []
+        
+        for model_path in self.models:
+            stats = self.model_stats.get(model_path)
+            if stats and stats["fitness"] < self.min_fitness_threshold:
+                to_delete.append(model_path)
+            else:
+                survivors.append(model_path)
+                
+        if to_delete:
+            count = delete_models(to_delete)
+            self.prefilter_deletions = count
+            self.deleted_models.extend(to_delete)
+            for path in to_delete:
+                self.deletion_reasons[path] = f"Pre-filter: Fitness {self.model_stats[path]['fitness']} < {self.min_fitness_threshold}"
+                if path in self.model_stats:
+                    del self.model_stats[path]
+            
+            print(f"Pre-filtered {count} models below fitness {self.min_fitness_threshold}")
+            self.models = survivors
+
     def start_tournament(self):
         """Initialize and start the round-robin tournament"""
+        # Pre-filter models based on fitness
+        self.pre_filter_models()
+        
         if len(self.models) < 2:
             print("Not enough models for a tournament!")
             return
