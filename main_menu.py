@@ -79,9 +79,11 @@ def main_menu():
                         input()
                         
                     elif btn_dash.collidepoint((mx, my)):
+                        pygame.quit()
                         subprocess.run([sys.executable, "dashboard.py"])
-                        print("\nPress Enter to return to menu...")
-                        input()
+                        pygame.init()
+                        screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+                        pygame.display.set_caption("Project PaddleMind - Hub")
                         
                     elif btn_quit.collidepoint((mx, my)):
                         running = False

@@ -65,6 +65,18 @@ def run_training(seed_genomes=None):
     print("Starting training...")
     winner = p.run(ai_module.eval_genomes, 50)
 
+    # Save training stats
+    import csv
+    stats_filename = f"training_stats_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    stats_path = os.path.join(config.LOGS_TRAINING_DIR, stats_filename)
+    
+    with open(stats_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["generation", "max_fitness", "avg_fitness", "std_dev"])
+        for i, (max_f, avg_f, std) in enumerate(zip(stats.get_fitness_stat(max), stats.get_fitness_mean(), stats.get_fitness_stdev())):
+            writer.writerow([i, max_f, avg_f, std])
+    print(f"Training stats saved to {stats_path}")
+
     # Save the winner
     import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
