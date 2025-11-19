@@ -122,7 +122,7 @@ def run_visual_training():
     p.add_reporter(neat.StatisticsReporter())
     p.add_reporter(VisualReporter(config_neat))
     
-    winner = p.run(ai_module.eval_genomes, 50)
+    winner = p.run(ai_module.eval_genomes, 1)
     
     # Save final winner
     with open(os.path.join(config.MODEL_DIR, "visual_winner.pkl"), "wb") as f:
