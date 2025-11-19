@@ -205,13 +205,13 @@ def play_game():
                 game.left_paddle.move(up=False)
             # 2 is Stay
             
-            game.update(dt)
+            game_state = game.update(dt)
             game.draw(screen)
             
             pygame.display.flip()
             
-            if game.game_over:
-                final_score_human = game.score_r
+            if game_state and game_state.get("game_over"):
+                final_score_human = game.score_right
                 
                 # Update Rival Stats
                 if rival_sys.update_score(final_score_human):
