@@ -17,16 +17,36 @@ class LeagueState(BaseState):
         
         self.mode = "SETUP"  # SETUP, RUNNING, RESULTS
         self.models = []
-        self.model_stats = {}  # {path: {"wins": 0, "losses": 0, "fitness": 0}}
+        self.model_stats = {}  # {path: {"wins": 0, "losses": 0, "fitness": 0, "points_scored": 0, "points_conceded": 0}}
         self.current_match = None
         self.match_queue = []
         self.completed_matches = 0
         self.total_matches = 0
         
+        # Tournament Enhancement Settings
+        self.show_visuals = config.TOURNAMENT_VISUAL_DEFAULT
+        self.min_fitness_threshold = config.TOURNAMENT_MIN_FITNESS_DEFAULT
+        self.similarity_threshold = config.TOURNAMENT_SIMILARITY_THRESHOLD
+        self.delete_shutouts = config.TOURNAMENT_DELETE_SHUTOUTS
+        
+        # Deletion Tracking
+        self.deleted_models = []  # List of deleted model paths
+        self.deletion_reasons = {}  # {path: reason_string}
+        self.prefilter_deletions = 0
+        self.shutout_deletions = 0
+        self.similarity_deletions = 0
+        
         # UI
-        self.start_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 400, 300, 50)
+        self.start_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 480, 300, 50)
         self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
         self.cancel_button = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 500, 300, 50)
+        self.visual_toggle_button = pygame.Rect(config.SCREEN_WIDTH - 220, 10, 100, 40)
+        
+        # Sliders for setup
+        self.min_fitness_slider_rect = pygame.Rect(150, 300, 500, 20)
+        self.similarity_slider_rect = pygame.Rect(150, 360, 500, 20)
+        self.dragging_min_fitness = False
+        self.dragging_similarity = False
         
     def enter(self, **kwargs):
         self.mode = "SETUP"
@@ -47,7 +67,10 @@ class LeagueState(BaseState):
                 "wins": 0,
                 "losses": 0,
                 "fitness": fitness,
-                "score": 0  # Will be calculated as wins - losses
+                "score": 0,  # Will be calculated as wins - losses
+                "points_scored": 0,
+                "points_conceded": 0,
+                "matches_played": 0
             }
     
     def start_tournament(self):
