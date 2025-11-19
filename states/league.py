@@ -8,6 +8,43 @@ import sys
 from states.base import BaseState
 from model_manager import scan_models, get_fitness_from_filename, delete_models
 
+class MatchAnalyzer:
+    def __init__(self):
+        self.p1_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": []}
+        self.p2_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": []}
+        self.rally_lengths = []
+        self.current_rally = 0
+        self.last_ball_vel_x = 0
+        self.last_paddle1_y = 0
+        self.last_paddle2_y = 0
+        self.ball_bounce_frame = 0
+        
+    def update(self, game_state):
+        # Track paddle distance
+        self.p1_stats["distance"] += abs(game_state["paddle_left_y"] - self.last_paddle1_y)
+        self.p2_stats["distance"] += abs(game_state["paddle_right_y"] - self.last_paddle2_y)
+        self.last_paddle1_y = game_state["paddle_left_y"]
+        self.last_paddle2_y = game_state["paddle_right_y"]
+        
+        # Track rally
+        if game_state["ball_vel_x"] * self.last_ball_vel_x < 0:
+            # Velocity flipped direction
+            self.current_rally += 1
+            self.ball_bounce_frame = 0 
+            
+            # Determine who hit it based on position
+            if game_state["ball_x"] < config.SCREEN_WIDTH / 2:
+                self.p1_stats["hits"] += 1
+            else:
+                self.p2_stats["hits"] += 1
+                
+        self.last_ball_vel_x = game_state["ball_vel_x"]
+
+    def end_rally(self):
+        if self.current_rally > 0:
+            self.rally_lengths.append(self.current_rally)
+        self.current_rally = 0
+
 class LeagueState(BaseState):
     def __init__(self, manager):
         super().__init__(manager)
@@ -70,7 +107,13 @@ class LeagueState(BaseState):
                 "score": 0,  # Will be calculated as wins - losses
                 "points_scored": 0,
                 "points_conceded": 0,
-                "matches_played": 0
+                "matches_played": 0,
+                # New Analytics
+                "elo": config.ELO_INITIAL_RATING,
+                "hits": 0,
+                "misses": 0,
+                "rallies": [],
+                "distance_moved": 0
             }
     
     def pre_filter_models(self):
@@ -161,6 +204,9 @@ class LeagueState(BaseState):
             "target_score": 5,
             "finished": False
         }
+        
+        # Initialize Analyzer
+        self.analyzer = MatchAnalyzer()
     
     def update_match(self):
         """Update the current match by one frame"""
@@ -171,6 +217,10 @@ class LeagueState(BaseState):
         match["frame_count"] += 1
         
         state = match["game"].get_state()
+        
+        # Update Analyzer
+        if hasattr(self, 'analyzer'):
+            self.analyzer.update(state)
         
         # Player 1 (Left)
         inputs1 = (
@@ -205,11 +255,23 @@ class LeagueState(BaseState):
         # Update game
         match["game"].update(move1, move2)
         
+        # Check for rally end (score change)
+        # We can compare scores to detect points
+        # But game_engine doesn't expose 'just_scored' easily. 
+        # We can check if score changed.
+        # For now, analyzer tracks hits/misses via velocity flips.
+        
         # Check for winner
         if (match["game"].score_left >= match["target_score"] or 
             match["game"].score_right >= match["target_score"] or
             match["frame_count"] >= match["max_frames"]):
             self.finish_match()
+    
+    def calculate_elo_change(self, rating_a, rating_b, actual_score):
+        """Calculate ELO rating change"""
+        expected_score = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
+        change = config.ELO_K_FACTOR * (actual_score - expected_score)
+        return change
     
     def check_for_shutout(self, match):
         """Check if the match was a shutout (5-0) and delete the loser if enabled"""
@@ -256,10 +318,12 @@ class LeagueState(BaseState):
             self.model_stats[model1_path]["wins"] += 1
             self.model_stats[model2_path]["losses"] += 1
             match["winner"] = 1
+            actual_score_1 = 1
         else:
             self.model_stats[model2_path]["wins"] += 1
             self.model_stats[model1_path]["losses"] += 1
             match["winner"] = 2
+            actual_score_1 = 0
             
         # Update detailed stats
         self.model_stats[model1_path]["matches_played"] += 1
@@ -270,7 +334,29 @@ class LeagueState(BaseState):
         self.model_stats[model2_path]["points_scored"] += match["score2"]
         self.model_stats[model2_path]["points_conceded"] += match["score1"]
         
-        # Update scores
+        # Update Analytics from Analyzer
+        if hasattr(self, 'analyzer'):
+            # P1
+            self.model_stats[model1_path]["hits"] += self.analyzer.p1_stats["hits"]
+            self.model_stats[model1_path]["distance_moved"] += self.analyzer.p1_stats["distance"]
+            # P2
+            self.model_stats[model2_path]["hits"] += self.analyzer.p2_stats["hits"]
+            self.model_stats[model2_path]["distance_moved"] += self.analyzer.p2_stats["distance"]
+            
+            # Rallies (assign to both? or just track globally? assigning to both for now)
+            self.model_stats[model1_path]["rallies"].extend(self.analyzer.rally_lengths)
+            self.model_stats[model2_path]["rallies"].extend(self.analyzer.rally_lengths)
+            
+        # Update ELO
+        elo1 = self.model_stats[model1_path]["elo"]
+        elo2 = self.model_stats[model2_path]["elo"]
+        
+        change = self.calculate_elo_change(elo1, elo2, actual_score_1)
+        
+        self.model_stats[model1_path]["elo"] += change
+        self.model_stats[model2_path]["elo"] -= change
+        
+        # Update scores (wins - losses)
         for model_path in self.models:
             if model_path in self.model_stats:
                 stats = self.model_stats[model_path]
@@ -543,69 +629,24 @@ class LeagueState(BaseState):
                 speed_msg = self.small_font.render("(Visuals OFF - High Speed)", True, (100, 255, 100))
                 screen.blit(speed_msg, (config.SCREEN_WIDTH//2 - speed_msg.get_width()//2, config.SCREEN_HEIGHT//2 + 20))
             
-            # Overlay match info at top
-            info_bg = pygame.Rect(0, 0, config.SCREEN_WIDTH, 80)
-            pygame.draw.rect(screen, (0, 0, 0, 180), info_bg)
+            # Info overlay
+            info_text = f"Match {self.completed_matches + 1}/{self.total_matches}"
+            info_surf = self.small_font.render(info_text, True, config.WHITE)
+            screen.blit(info_surf, (10, 10))
             
-            # Model names
-            model1_text = self.tiny_font.render(self.current_match["model1"][:30], True, config.WHITE)
-            model2_text = self.tiny_font.render(self.current_match["model2"][:30], True, config.WHITE)
-            screen.blit(model1_text, (10, 10))
-            screen.blit(model2_text, (config.SCREEN_WIDTH - model2_text.get_width() - 10, 10))
+            vs_text = f"{self.current_match['model1'][:15]} vs {self.current_match['model2'][:15]}"
+            vs_surf = self.small_font.render(vs_text, True, config.WHITE)
+            screen.blit(vs_surf, (config.SCREEN_WIDTH//2 - vs_surf.get_width()//2, 10))
             
-            # Progress
-            progress_text = self.tiny_font.render(
-                f"Match {self.completed_matches + 1} / {self.total_matches}",
-                True, config.WHITE
-            )
-            screen.blit(progress_text, (config.SCREEN_WIDTH//2 - progress_text.get_width()//2, 10))
+            # Deletion stats in corner
+            del_text = f"Shutouts: {self.shutout_deletions}"
+            del_surf = self.tiny_font.render(del_text, True, (255, 100, 100))
+            screen.blit(del_surf, (config.SCREEN_WIDTH - 150, 60))
             
-            # Deletion stats
-            del_text = self.tiny_font.render(
-                f"Deleted: {len(self.deleted_models)} (Shutouts: {self.shutout_deletions})",
-                True, (255, 100, 100)
-            )
-            screen.blit(del_text, (config.SCREEN_WIDTH//2 - del_text.get_width()//2, 60))
-            
-            # Score display (larger)
-            score_text = self.small_font.render(
-                f"{self.current_match['game'].score_left} - {self.current_match['game'].score_right}",
-                True, config.WHITE
-            )
-            screen.blit(score_text, (config.SCREEN_WIDTH//2 - score_text.get_width()//2, 40))
-            
-        elif self.current_match and self.current_match["finished"]:
-            # Show result screen briefly
-            result_text = self.font.render("Match Complete!", True, config.WHITE)
-            screen.blit(result_text, (config.SCREEN_WIDTH//2 - result_text.get_width()//2, 200))
-            
-            winner_name = self.current_match["model1"] if self.current_match["winner"] == 1 else self.current_match["model2"]
-            winner_text = self.small_font.render(f"Winner: {winner_name[:40]}", True, (100, 255, 100))
-            screen.blit(winner_text, (config.SCREEN_WIDTH//2 - winner_text.get_width()//2, 270))
-            
-            score_text = self.small_font.render(
-                f"{self.current_match['score1']} - {self.current_match['score2']}",
-                True, config.WHITE
-            )
-            screen.blit(score_text, (config.SCREEN_WIDTH//2 - score_text.get_width()//2, 320))
-        
-        # Progress bar at bottom
-        bar_width = config.SCREEN_WIDTH - 40
-        bar_height = 20
-        bar_x = 20
-        bar_y = config.SCREEN_HEIGHT - 60
-        
-        pygame.draw.rect(screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height))
-        if self.total_matches > 0:
-            progress_width = int((self.completed_matches / self.total_matches) * bar_width)
-            pygame.draw.rect(screen, (50, 150, 50), (bar_x, bar_y, progress_width, bar_height))
-        pygame.draw.rect(screen, config.WHITE, (bar_x, bar_y, bar_width, bar_height), 2)
-        
-        progress_pct = self.tiny_font.render(
-            f"{int((self.completed_matches / self.total_matches) * 100)}%" if self.total_matches > 0 else "0%",
-            True, config.WHITE
-        )
-        screen.blit(progress_pct, (config.SCREEN_WIDTH//2 - progress_pct.get_width()//2, bar_y - 25))
+        else:
+            # Between matches
+            msg = self.font.render("Preparing next match...", True, config.WHITE)
+            screen.blit(msg, (config.SCREEN_WIDTH//2 - msg.get_width()//2, config.SCREEN_HEIGHT//2))
     
     def draw_results(self, screen):
         """Draw tournament results"""
@@ -622,27 +663,32 @@ class LeagueState(BaseState):
         breakdown_surf = self.tiny_font.render(breakdown, True, (255, 150, 150))
         screen.blit(breakdown_surf, (config.SCREEN_WIDTH//2 - breakdown_surf.get_width()//2, 110))
         
-        subtitle = self.small_font.render("Top Survivors", True, (100, 255, 100))
+        subtitle = self.small_font.render("Top Survivors (Ranked by Score & ELO)", True, (100, 255, 100))
         screen.blit(subtitle, (config.SCREEN_WIDTH//2 - subtitle.get_width()//2, 140))
         
         # Display top 10
         y_offset = 180
         for i, model_path in enumerate(self.models[:10]):
             stats = self.model_stats[model_path]
-            rank_text = f"{i+1}. {os.path.basename(model_path)[:30]}"
+            rank_text = f"{i+1}. {os.path.basename(model_path)[:20]}"
             
             # Enhanced stats display
             avg_score = 0
             if stats['matches_played'] > 0:
                 avg_score = (stats['points_scored'] - stats['points_conceded']) / stats['matches_played']
-                
-            stats_text = f"W:{stats['wins']} L:{stats['losses']} Fit:{stats['fitness']} Diff:{avg_score:.1f}"
+            
+            # Calculate Accuracy
+            total_hits = stats['hits']
+            # Misses aren't explicitly tracked well yet, but we can use points conceded as a proxy for misses? 
+            # Or just show total hits.
+            
+            stats_text = f"ELO:{int(stats['elo'])} W:{stats['wins']} L:{stats['losses']} Diff:{avg_score:.1f} Hits:{stats['hits']}"
             
             rank_surf = self.tiny_font.render(rank_text, True, config.WHITE)
             stats_surf = self.tiny_font.render(stats_text, True, config.GRAY)
             
             screen.blit(rank_surf, (50, y_offset))
-            screen.blit(stats_surf, (config.SCREEN_WIDTH - 350, y_offset))
+            screen.blit(stats_surf, (config.SCREEN_WIDTH - 450, y_offset))
             
             y_offset += 30
         
