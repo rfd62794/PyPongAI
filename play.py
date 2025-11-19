@@ -232,7 +232,8 @@ def play_game():
                     game.ball.vel_x,
                     game.ball.vel_y,
                     game.left_paddle.rect.y - game.ball.rect.y,
-                    1.0 if game.ball.vel_x < 0 else 0.0
+                    1.0 if game.ball.vel_x < 0 else 0.0,
+                    game.right_paddle.rect.y
                 )
                 output = net.activate(inputs)
                 
