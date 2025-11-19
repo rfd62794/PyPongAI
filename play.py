@@ -189,7 +189,16 @@ def play_game():
 
             # AI Input (Left Paddle)
             # Inputs: Ball Y, Ball X, Paddle Y, Ball VY, Ball VX
-            inputs = (game.ball.rect.y, game.ball.rect.x, game.left_paddle.rect.y, game.ball.vel_y, game.ball.vel_x)
+            # Inputs: Paddle Y, Ball X, Ball Y, Ball VX, Ball VY, Relative Y, Incoming
+            inputs = (
+                game.left_paddle.rect.y,
+                game.ball.rect.x,
+                game.ball.rect.y,
+                game.ball.vel_x,
+                game.ball.vel_y,
+                game.left_paddle.rect.y - game.ball.rect.y,
+                1.0 if game.ball.vel_x < 0 else 0.0
+            )
             output = net.activate(inputs)
             
             # Output is usually a list of floats. 
