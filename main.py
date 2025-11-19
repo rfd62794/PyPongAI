@@ -1,3 +1,4 @@
+import patch_neat
 import pygame
 import config
 from states.manager import StateManager
