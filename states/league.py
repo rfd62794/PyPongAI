@@ -281,9 +281,72 @@ class LeagueState(BaseState):
         # Check for shutout deletion
         self.check_for_shutout(match)
     
+    def prune_similar_models(self):
+        """Prune models that have very similar fitness scores"""
+        if self.similarity_threshold <= 0:
+            return
+            
+        # Sort by fitness to easily find clusters
+        sorted_models = sorted(
+            self.models,
+            key=lambda x: self.model_stats[x]["fitness"],
+            reverse=True
+        )
+        
+        to_delete = []
+        processed = set()
+        
+        for i in range(len(sorted_models)):
+            if sorted_models[i] in processed:
+                continue
+                
+            current = sorted_models[i]
+            cluster = [current]
+            processed.add(current)
+            
+            # Find all similar models
+            for j in range(i + 1, len(sorted_models)):
+                candidate = sorted_models[j]
+                if candidate in processed:
+                    continue
+                    
+                diff = abs(self.model_stats[current]["fitness"] - self.model_stats[candidate]["fitness"])
+                if diff <= self.similarity_threshold:
+                    cluster.append(candidate)
+                    processed.add(candidate)
+                else:
+                    # Since sorted by fitness, if diff exceeds threshold, all subsequent will too
+                    break
+            
+            # If cluster has more than 1, keep only the best tournament performer
+            if len(cluster) > 1:
+                # Sort cluster by tournament score (descending)
+                cluster.sort(key=lambda x: self.model_stats[x]["score"], reverse=True)
+                
+                # Keep the first one (best score), delete the rest
+                survivor = cluster[0]
+                victims = cluster[1:]
+                
+                to_delete.extend(victims)
+                
+        if to_delete:
+            count = delete_models(to_delete)
+            self.similarity_deletions = count
+            self.deleted_models.extend(to_delete)
+            for path in to_delete:
+                self.deletion_reasons[path] = f"Similarity Pruning (Threshold {self.similarity_threshold})"
+            
+            print(f"Pruned {count} similar models")
+            
+            # Update survivors
+            self.models = [m for m in self.models if m not in to_delete]
+
     def finish_tournament(self):
         """Process tournament results and delete underperforming models"""
         self.mode = "RESULTS"
+        
+        # First, prune similar models
+        self.prune_similar_models()
         
         # Rank models by score (wins - losses), then by fitness
         ranked_models = sorted(
@@ -300,6 +363,9 @@ class LeagueState(BaseState):
         if to_delete:
             deleted_count = delete_models(to_delete)
             print(f"Deleted {deleted_count} underperforming models")
+            self.deleted_models.extend(to_delete)
+            for path in to_delete:
+                self.deletion_reasons[path] = "Not in Top 10"
         
         # Update models list to only include survivors
         self.models = top_10
@@ -334,13 +400,23 @@ class LeagueState(BaseState):
         if self.mode == "RUNNING":
             if self.current_match and not self.current_match["finished"]:
                 # Update current match
-                self.update_match()
+                if self.show_visuals:
+                    self.update_match()
+                else:
+                    # Speed up! Run multiple updates per frame
+                    for _ in range(100):  # Run 100 steps per frame
+                        if self.current_match["finished"]:
+                            break
+                        self.update_match()
+                        
             elif self.match_queue:
                 # Start next match
                 self.start_next_match()
             elif self.current_match and self.current_match["finished"]:
                 # Wait a moment before next match (so user can see result)
-                pass
+                # If visuals are off, skip the wait
+                if not self.show_visuals:
+                    self.current_match = None  # Clear it so next update loop picks up next match immediately
     
     def draw(self, screen):
         screen.fill(config.BLACK)
