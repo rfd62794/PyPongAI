@@ -1,5 +1,5 @@
 {
-    "best_score": 0,
-    "rival_model": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\models\\tiers\\God\\gen_0_fit_218.pkl",
-    "rival_fitness": 218
+    "best_score": 9,
+    "rival_model": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\models\\checkpoints\\gen_1_fit_500.pkl",
+    "rival_fitness": 500
 }
