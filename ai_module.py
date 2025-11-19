@@ -239,7 +239,8 @@ def validate_genome(genome, config_neat):
                 state["ball_vel_x"] / config.BALL_MAX_SPEED,
                 state["ball_vel_y"] / config.BALL_MAX_SPEED,
                 (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] < 0 else 0.0
+                1.0 if state["ball_vel_x"] < 0 else 0.0,
+                state["paddle_right_y"] / config.SCREEN_HEIGHT
             )
             output = net.activate(inputs)
             action_idx = output.index(max(output))
