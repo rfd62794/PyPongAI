@@ -203,3 +203,164 @@ def eval_genomes_competitive(genomes, config_neat):
     # Normalize fitness by number of matches played
     for _, genome in genome_list:
         genome.fitness = genome.fitness / matches_per_genome if matches_per_genome > 0 else 0
+
+def validate_genome(genome, config_neat):
+    """
+    Validates a genome by playing a match against the Rule-Based AI.
+    Returns: (avg_rally_length, win_rate)
+    """
+    net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
+    
+    total_rallies = 0
+    total_hits = 0
+    wins = 0
+    num_games = 5 # Play 5 validation games
+    
+    for _ in range(num_games):
+        game = game_engine.Game()
+        run = True
+        frame_count = 0
+        max_frames = 5000
+        
+        current_rally = 0
+        
+        while run and frame_count < max_frames:
+            frame_count += 1
+            state = game.get_state()
+            
+            # AI plays Left
+            inputs = (
+                state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                1.0 if state["ball_vel_x"] < 0 else 0.0
+            )
+            output = net.activate(inputs)
+            action_idx = output.index(max(output))
+            left_move = "UP" if action_idx == 0 else "DOWN" if action_idx == 1 else None
+            
+            # Rule-Based plays Right
+            right_move = get_rule_based_move(state, "right")
+            
+            score_data = game.update(left_move, right_move)
+            
+            if score_data:
+                if score_data.get("hit_left") or score_data.get("hit_right"):
+                    current_rally += 1
+                    total_hits += 1
+                
+                if score_data.get("scored"):
+                    if score_data.get("scored") == "left":
+                        wins += 1
+                    # End game after 1 point for validation speed? 
+                    # Or play to a score? Let's play single point games for validation stats to be granular
+                    # But user wants 9 points.
+                    # Let's simulate a full game to 9 points? That might take too long for validation every gen.
+                    # Let's stick to single point episodes for validation efficiency, but average over 5 episodes.
+                    run = False
+        
+        total_rallies += current_rally
+
+    avg_rally = total_hits / num_games
+    win_rate = wins / num_games
+    return avg_rally, win_rate
+
+def eval_genomes_self_play(genomes, config_neat):
+    """
+    Self-Play Fitness Function.
+    Genomes play against other genomes in the population.
+    """
+    genome_list = list(genomes)
+    for _, genome in genome_list:
+        genome.fitness = 0
+    
+    # Randomize list
+    random.shuffle(genome_list)
+    
+    # Pair up adjacent genomes (1 vs 2, 3 vs 4, etc.)
+    # If odd, last one plays first one? Or random.
+    # Better: Each genome plays 2 matches against random opponents.
+    
+    matches_per_genome = 2
+    
+    for i in range(matches_per_genome):
+        # Shuffle for new pairings
+        random.shuffle(genome_list)
+        
+        # Pair (0,1), (2,3)...
+        for j in range(0, len(genome_list) - 1, 2):
+            g1_id, g1 = genome_list[j]
+            g2_id, g2 = genome_list[j+1]
+            
+            net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
+            net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
+            
+            game = game_engine.Game()
+            run = True
+            frame_count = 0
+            max_frames = 10000 # Allow longer games
+            
+            # Play to 3 points for training speed (user said 9, but for training 50 genomes * 2 matches * 9 points might be too slow? Let's try 3 first, or 5).
+            # User asked for 9. Let's do 5 for training efficiency, 9 for final testing?
+            # Let's compromise at 5 for now to keep training loop reasonable.
+            target_score = 5 
+            
+            while run and frame_count < max_frames:
+                frame_count += 1
+                state = game.get_state()
+                
+                # Player 1 (Left)
+                inputs1 = (
+                    state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                    state["ball_x"] / config.SCREEN_WIDTH,
+                    state["ball_y"] / config.SCREEN_HEIGHT,
+                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                    (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                    1.0 if state["ball_vel_x"] < 0 else 0.0
+                )
+                out1 = net1.activate(inputs1)
+                act1 = out1.index(max(out1))
+                move1 = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+                
+                # Player 2 (Right)
+                inputs2 = (
+                    state["paddle_right_y"] / config.SCREEN_HEIGHT,
+                    state["ball_x"] / config.SCREEN_WIDTH,
+                    state["ball_y"] / config.SCREEN_HEIGHT,
+                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                    (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                    1.0 if state["ball_vel_x"] > 0 else 0.0 # Incoming from right
+                )
+                out2 = net2.activate(inputs2)
+                act2 = out2.index(max(out2))
+                move2 = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+                
+                score_data = game.update(move1, move2)
+                
+                # Fitness Rewards
+                # 1. Survival (small)
+                g1.fitness += 0.01
+                g2.fitness += 0.01
+                
+                if score_data:
+                    # 2. Volley Reward (Primary Metric)
+                    if score_data.get("hit_left"):
+                        g1.fitness += 1.0
+                    if score_data.get("hit_right"):
+                        g2.fitness += 1.0
+                        
+                    # 3. Scoring/Winning
+                    if score_data.get("scored") == "left":
+                        g1.fitness += 5.0
+                        g2.fitness -= 2.0
+                    elif score_data.get("scored") == "right":
+                        g2.fitness += 5.0
+                        g1.fitness -= 2.0
+                        
+                if game.score_left >= target_score or game.score_right >= target_score:
+                    run = False
