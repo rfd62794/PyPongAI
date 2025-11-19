@@ -55,32 +55,42 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if btn_play.collidepoint((mx, my)):
-                        pygame.quit() # Close hub to free resources
-                        subprocess.run([sys.executable, "play.py"])
-                        pygame.init() # Re-init after return
+                        pygame.quit()
+                        try:
+                            subprocess.check_call([sys.executable, "play.py"])
+                        except subprocess.CalledProcessError as e:
+                            if e.returncode == 100:
+                                print("Exiting application...")
+                                sys.exit()
+                        pygame.init()
                         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
                         pygame.display.set_caption("Project PaddleMind - Hub")
                         
                     elif btn_train.collidepoint((mx, my)):
                         pygame.quit()
-                        subprocess.run([sys.executable, "visual_train.py"])
+                        try:
+                            subprocess.check_call([sys.executable, "visual_train.py"])
+                        except subprocess.CalledProcessError as e:
+                            if e.returncode == 100:
+                                print("Exiting application...")
+                                sys.exit()
                         pygame.init()
                         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
                         pygame.display.set_caption("Project PaddleMind - Hub")
                         
                     elif btn_manage.collidepoint((mx, my)):
-                        # Run report mode first
                         subprocess.run([sys.executable, "model_manager.py", "--report"])
-                        # Then organize? Or just show report?
-                        # Let's just run organize for now as it's the most useful action
-                        # Or maybe we should make a GUI for this later.
-                        # For now, let's just run the report and pause
                         print("\nPress Enter to return to menu...")
                         input()
                         
                     elif btn_dash.collidepoint((mx, my)):
                         pygame.quit()
-                        subprocess.run([sys.executable, "dashboard.py"])
+                        try:
+                            subprocess.check_call([sys.executable, "dashboard.py"])
+                        except subprocess.CalledProcessError as e:
+                            if e.returncode == 100:
+                                print("Exiting application...")
+                                sys.exit()
                         pygame.init()
                         screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
                         pygame.display.set_caption("Project PaddleMind - Hub")
