@@ -165,6 +165,11 @@ def play_game():
     game = Game()
     clock = pygame.time.Clock()
     running = True
+    game_over = False
+    
+    # Initialize Recorder
+    from game_recorder import GameRecorder
+    recorder = GameRecorder()
     
     print("\n[!] Starting Match vs AI...")
     print("Controls: UP/DOWN Arrows")
@@ -179,55 +184,107 @@ def play_game():
                 if event.type == pygame.QUIT:
                     running = False
                     sys.exit(100)
+                
+                # Game Over Menu Events
+                if game_over:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            # Rematch
+                            game = Game()
+                            recorder = GameRecorder() # New recording
+                            game_over = False
+                        elif event.key == pygame.K_m:
+                            # Menu
+                            running = False
+                        elif event.key == pygame.K_q:
+                            # Quit
+                            running = False
+                            sys.exit(100)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                         # Check clicks if we add buttons later
+                         pass
 
-            # Human Input (Right Paddle)
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_UP]:
-                game.right_paddle.move(up=True)
-            if keys[pygame.K_DOWN]:
-                game.right_paddle.move(up=False)
+            if not game_over:
+                # Human Input (Right Paddle)
+                keys = pygame.key.get_pressed()
+                action_right = None
+                if keys[pygame.K_UP]:
+                    game.right_paddle.move(up=True)
+                    action_right = "UP"
+                if keys[pygame.K_DOWN]:
+                    game.right_paddle.move(up=False)
+                    action_right = "DOWN"
 
-            # AI Input (Left Paddle)
-            # Inputs: Ball Y, Ball X, Paddle Y, Ball VY, Ball VX
-            # Inputs: Paddle Y, Ball X, Ball Y, Ball VX, Ball VY, Relative Y, Incoming
-            inputs = (
-                game.left_paddle.rect.y,
-                game.ball.rect.x,
-                game.ball.rect.y,
-                game.ball.vel_x,
-                game.ball.vel_y,
-                game.left_paddle.rect.y - game.ball.rect.y,
-                1.0 if game.ball.vel_x < 0 else 0.0
-            )
-            output = net.activate(inputs)
+                # AI Input (Left Paddle)
+                # Inputs: Paddle Y, Ball X, Ball Y, Ball VX, Ball VY, Relative Y, Incoming
+                inputs = (
+                    game.left_paddle.rect.y,
+                    game.ball.rect.x,
+                    game.ball.rect.y,
+                    game.ball.vel_x,
+                    game.ball.vel_y,
+                    game.left_paddle.rect.y - game.ball.rect.y,
+                    1.0 if game.ball.vel_x < 0 else 0.0
+                )
+                output = net.activate(inputs)
+                
+                decision = output.index(max(output))
+                action_left = None
+                
+                if decision == 0: # Up
+                    game.left_paddle.move(up=True)
+                    action_left = "UP"
+                elif decision == 1: # Down
+                    game.left_paddle.move(up=False)
+                    action_left = "DOWN"
+                # 2 is Stay
+                
+                # Update Game
+                game_state = game.update(dt)
+                
+                # Log Frame
+                # We need to get state dict manually or use game.get_state() if available
+                # game_engine.py has get_state()
+                state = game.get_state()
+                recorder.log_frame(state, action_left, action_right)
+                
+                game.draw(screen)
+                
+                if game_state and game_state.get("game_over"):
+                    final_score_human = game.score_right
+                    
+                    # Update Rival Stats
+                    if rival_sys.update_score(final_score_human):
+                        print(f"New Personal Best! {final_score_human}")
+                    
+                    # Save Recording
+                    recorder.save_recording()
+                    
+                    game_over = True
+                    # Don't exit loop, just switch to game_over state
             
-            # Output is usually a list of floats. 
-            # Decision: > 0.5 move down, < -0.5 move up, else stay
-            # Or 3 outputs: Up, Down, Stay
-            
-            # Assuming 3 outputs from config
-            decision = output.index(max(output))
-            
-            if decision == 0: # Up
-                game.left_paddle.move(up=True)
-            elif decision == 1: # Down
-                game.left_paddle.move(up=False)
-            # 2 is Stay
-            
-            game_state = game.update(dt)
-            game.draw(screen)
+            else:
+                # Draw Game Over Screen
+                # Darken background
+                s = pygame.Surface((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+                s.set_alpha(128)
+                s.fill((0,0,0))
+                screen.blit(s, (0,0))
+                
+                # Text
+                res_text = "YOU WON!" if game.score_right > game.score_left else "YOU LOST!"
+                color = (50, 255, 50) if game.score_right > game.score_left else (255, 50, 50)
+                
+                title_surf = font.render(res_text, True, color)
+                screen.blit(title_surf, (config.SCREEN_WIDTH//2 - title_surf.get_width()//2, 150))
+                
+                score_surf = font.render(f"{game.score_left} - {game.score_right}", True, config.WHITE)
+                screen.blit(score_surf, (config.SCREEN_WIDTH//2 - score_surf.get_width()//2, 220))
+                
+                info_surf = small_font.render("Press R to Rematch, M for Menu, Q to Quit", True, config.GRAY)
+                screen.blit(info_surf, (config.SCREEN_WIDTH//2 - info_surf.get_width()//2, 400))
             
             pygame.display.flip()
-            
-            if game_state and game_state.get("game_over"):
-                final_score_human = game.score_right
-                
-                # Update Rival Stats
-                if rival_sys.update_score(final_score_human):
-                    print(f"New Personal Best! {final_score_human}")
-                
-                pygame.time.wait(2000)
-                running = False
                 
     except KeyboardInterrupt:
         print("\n[!] Game interrupted by user.")
