@@ -212,6 +212,20 @@ def show_start_menu():
                 pygame.time.wait(200) # Debounce
 
         # Navigation
+        if len(models) > per_page:
+            nav_text = f"Page {page + 1} / {(len(models) - 1) // per_page + 1} (Arrows to change)"
+            nav_surf = small_font.render(nav_text, True, config.WHITE)
+            screen.blit(nav_surf, (config.SCREEN_WIDTH//2 - nav_surf.get_width()//2, config.SCREEN_HEIGHT - 50))
+
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_n:
+                    running = False # No seed
                 elif event.key == pygame.K_RIGHT:
                     if (page + 1) * per_page < len(models):
                         page += 1
