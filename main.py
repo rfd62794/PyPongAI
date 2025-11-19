@@ -34,6 +34,9 @@ def main():
 if __name__ == "__main__":
     try:
         main()
+    except KeyboardInterrupt:
+        print("\nExiting gracefully...")
+        pygame.quit()
     except Exception as e:
         import traceback
         traceback.print_exc()
