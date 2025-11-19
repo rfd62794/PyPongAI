@@ -159,6 +159,7 @@ class TrainState(BaseState):
         super().__init__(manager)
         self.font = pygame.font.Font(None, 40)
         self.small_font = pygame.font.Font(None, 30)
+        self.tiny_font = pygame.font.Font(None, 24)
         self.models = []
         self.page = 0
         self.per_page = 5
