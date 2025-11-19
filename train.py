@@ -51,6 +51,9 @@ def run_training(seed_genomes=None):
             seed_genome.key = target_id
             p.population[target_id] = seed_genome
             
+        # Re-speciate to ensure species set references the new genome objects
+        p.species.speciate(config_neat, p.population, p.generation)
+            
         print("Seeding complete.")
 
     # Add reporters

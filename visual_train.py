@@ -125,6 +125,8 @@ def run_visual_training(seed_genome=None):
         target_id = list(p.population.keys())[0]
         seed_genome.key = target_id
         p.population[target_id] = seed_genome
+        # Re-speciate to ensure species set references the new genome object
+        p.species.speciate(config_neat, p.population, p.generation)
         
     p.add_reporter(neat.StdOutReporter(True))
     p.add_reporter(neat.StatisticsReporter())
