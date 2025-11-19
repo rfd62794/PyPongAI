@@ -445,8 +445,40 @@ class LeagueState(BaseState):
 
         elif self.mode == "DASHBOARD":
             if event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = event.pos
+                
+                # Back button - return to results or previous view
                 if self.back_button.collidepoint(event.pos):
-                    self.mode = "RESULTS"
+                    if self.dashboard_view == "OVERVIEW":
+                        self.mode = "RESULTS"
+                    else:
+                        self.dashboard_view = "OVERVIEW"
+                        self.selected_model = None
+                        self.selected_match = None
+                    return
+                
+                # View-specific handling
+                if self.dashboard_view == "OVERVIEW":
+                    # Check if clicked on a model in the list
+                    y_start = 110
+                    for i, model in enumerate(self.models[:15]):
+                        row_rect = pygame.Rect(50, y_start + i * 30, config.SCREEN_WIDTH - 100, 28)
+                        if row_rect.collidepoint((mx, my)):
+                            self.selected_model = model
+                            self.dashboard_view = "MODEL_DETAIL"
+                            return
+                
+                elif self.dashboard_view == "MODEL_DETAIL":
+                    # Check for match history clicks
+                    pass  # Will implement when drawing
+                
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if self.dashboard_view == "OVERVIEW":
+                        self.mode = "RESULTS"
+                    else:
+                        self.dashboard_view = "OVERVIEW"
+                        self.selected_model = None
 
     def update(self, dt):
         if self.mode == "RUNNING":
