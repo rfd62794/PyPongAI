@@ -49,7 +49,9 @@ def eval_genomes(genomes, config_neat):
                 state["ball_x"],
                 state["ball_y"],
                 state["ball_vel_x"],
-                state["ball_vel_y"]
+                state["ball_vel_y"],
+                state["paddle_left_y"] - state["ball_y"], # Relative Y
+                1.0 if state["ball_vel_x"] < 0 else 0.0   # Incoming (Left is target)
             )
             
             # Get network output
