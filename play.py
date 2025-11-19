@@ -20,19 +20,41 @@ def play_game():
     font = pygame.font.Font(None, 50)
     small_font = pygame.font.Font(None, 36)
 
-    # List models
-    models = [f for f in os.listdir(config.MODEL_DIR) if f.endswith(".pkl")]
+    # List models (Recursively scan models/ and models/tiers/)
+    models = []
+    for root, dirs, files in os.walk(config.MODEL_DIR):
+        for file in files:
+            if file.endswith(".pkl"):
+                # Store relative path for display, or full path?
+                # Storing full path is safer, but display needs to be clean
+                full_path = os.path.join(root, file)
+                models.append(full_path)
+
     if not models:
         print("No models found. Please train first.")
         pygame.quit()
         return
 
-    def get_fitness(filename):
+    def get_fitness(filepath):
+        filename = os.path.basename(filepath)
         try:
-            return int(filename.split("fitness")[1].split(".")[0])
+            if "fitness" in filename:
+                return int(filename.split("fitness")[1].split(".")[0])
+            elif "_fit_" in filename:
+                return int(filename.split("_fit_")[1].split(".")[0])
+            return 0
         except (IndexError, ValueError):
             return 0
     models.sort(key=get_fitness)
+
+    # Helper to get display name
+    def get_display_name(filepath):
+        filename = os.path.basename(filepath)
+        # Check if it's in a tier
+        parent = os.path.basename(os.path.dirname(filepath))
+        if parent in ["God", "Master", "Challenger", "Archive"]:
+            return f"[{parent}] {filename}"
+        return filename
 
     # Menu Loop
     selected_model_path = None
@@ -84,15 +106,13 @@ def play_game():
                 if event.button == 1:
                     if btn_challenge.collidepoint((mx, my)):
                         # Median model
-                        model_filename = models[len(models) // 2] if len(models) > 1 else models[0]
-                        selected_model_path = os.path.join(config.MODEL_DIR, model_filename)
-                        print(f"Selected: {model_filename}")
+                        selected_model_path = models[len(models) // 2] if len(models) > 1 else models[0]
+                        print(f"Selected: {selected_model_path}")
                         menu_running = False
                     elif btn_master.collidepoint((mx, my)):
                         # Best model
-                        model_filename = models[-1]
-                        selected_model_path = os.path.join(config.MODEL_DIR, model_filename)
-                        print(f"Selected: {model_filename}")
+                        selected_model_path = models[-1]
+                        print(f"Selected: {selected_model_path}")
                         menu_running = False
                     elif btn_quit.collidepoint((mx, my)):
                         pygame.quit()
