@@ -8,6 +8,7 @@ min_species_size      = 1
 
 [DefaultGenome]
 single_structural_mutation = False
+structural_mutation_surer = default
 # node aggregation options
 aggregation_default     = sum
 aggregation_mutate_rate = 0.0
