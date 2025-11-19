@@ -41,7 +41,11 @@ def play_pvp():
         elif keys[pygame.K_DOWN]:
             right_move = "DOWN"
 
-        game.update(left_move, right_move)
+        score_data = game.update(left_move, right_move)
+        if score_data and score_data.get("game_over"):
+            print(f"Game Over! Left: {score_data['score_left']}, Right: {score_data['score_right']}")
+            running = False
+
         game.draw(screen)
         pygame.display.flip()
 

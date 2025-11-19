@@ -99,6 +99,12 @@ class Game:
             score_data = self.get_state()
             self.ball.reset()
             
+        # Check for Game Over
+        if self.score_left >= config.MAX_SCORE or self.score_right >= config.MAX_SCORE:
+            if score_data is None:
+                 score_data = self.get_state()
+            score_data["game_over"] = True
+            
         return score_data
 
     def get_state(self):
@@ -110,11 +116,24 @@ class Game:
             "paddle_left_y": self.left_paddle.rect.y,
             "paddle_right_y": self.right_paddle.rect.y,
             "score_left": self.score_left,
-            "score_right": self.score_right
+            "score_right": self.score_right,
+            "game_over": False
         }
 
     def draw(self, screen):
         screen.fill(config.BLACK)
+        
+        # Draw Net
+        pygame.draw.line(screen, config.WHITE, (config.SCREEN_WIDTH // 2, 0), (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT), 2)
+        
+        # Draw Scores
+        if pygame.font.get_init():
+            font = pygame.font.Font(None, 74)
+            text_left = font.render(str(self.score_left), 1, config.WHITE)
+            screen.blit(text_left, (config.SCREEN_WIDTH // 4, 10))
+            text_right = font.render(str(self.score_right), 1, config.WHITE)
+            screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4, 10))
+        
         self.left_paddle.draw(screen)
         self.right_paddle.draw(screen)
         self.ball.draw(screen)
