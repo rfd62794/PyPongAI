@@ -119,6 +119,13 @@ class LeagueState(BaseState):
         self.similarity_slider = pygame.Rect(config.SCREEN_WIDTH//2 - 150, 300, 300, 20)
         self.dragging_fitness = False
         self.dragging_similarity = False
+        
+        # Dashboard State
+        self.dashboard_view = "OVERVIEW"  # OVERVIEW, MODEL_DETAIL, MATCH_HISTORY, REPLAY
+        self.selected_model = None  # For MODEL_DETAIL view
+        self.selected_match = None  # For REPLAY view
+        self.model_list_scroll = 0  # For scrolling through models
+        self.match_history_scroll = 0  # For scrolling through matches
 
     def enter(self, **kwargs):
         self.mode = "SETUP"
