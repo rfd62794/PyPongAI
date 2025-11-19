@@ -377,10 +377,20 @@ class LeagueState(BaseState):
             if self.back_button.collidepoint((mx, my)):
                 self.manager.change_state("menu")
                 return
+                
+            # Visual toggle (always available)
+            if self.visual_toggle_button.collidepoint((mx, my)):
+                self.show_visuals = not self.show_visuals
             
             if self.mode == "SETUP":
                 if self.start_button.collidepoint((mx, my)):
                     self.start_tournament()
+                    
+                # Sliders
+                if self.min_fitness_slider_rect.collidepoint((mx, my)):
+                    self.dragging_min_fitness = True
+                if self.similarity_slider_rect.collidepoint((mx, my)):
+                    self.dragging_similarity = True
             
             elif self.mode == "RUNNING":
                 if self.cancel_button.collidepoint((mx, my)):
@@ -390,6 +400,25 @@ class LeagueState(BaseState):
             elif self.mode == "RESULTS":
                 # Any click returns to menu
                 pass
+                
+        elif event.type == pygame.MOUSEBUTTONUP:
+            self.dragging_min_fitness = False
+            self.dragging_similarity = False
+            
+        elif event.type == pygame.MOUSEMOTION:
+            mx, my = event.pos
+            if self.mode == "SETUP":
+                if self.dragging_min_fitness:
+                    # 0 to 1000 range
+                    val = (mx - self.min_fitness_slider_rect.x) / self.min_fitness_slider_rect.width
+                    val = max(0, min(1, val))
+                    self.min_fitness_threshold = int(val * 1000)
+                    
+                if self.dragging_similarity:
+                    # 0 to 100 range
+                    val = (mx - self.similarity_slider_rect.x) / self.similarity_slider_rect.width
+                    val = max(0, min(1, val))
+                    self.similarity_threshold = int(val * 100)
         
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
