@@ -88,7 +88,8 @@ class VisualReporter(neat.reporting.BaseReporter):
                 state["ball_vel_x"] / config.BALL_MAX_SPEED,
                 state["ball_vel_y"] / config.BALL_MAX_SPEED,
                 (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] < 0 else 0.0
+                1.0 if state["ball_vel_x"] < 0 else 0.0,
+                state["paddle_right_y"] / config.SCREEN_HEIGHT
             )
             out1 = net1.activate(inputs1)
             act1 = out1.index(max(out1))
@@ -102,7 +103,8 @@ class VisualReporter(neat.reporting.BaseReporter):
                 state["ball_vel_x"] / config.BALL_MAX_SPEED,
                 state["ball_vel_y"] / config.BALL_MAX_SPEED,
                 (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] > 0 else 0.0
+                1.0 if state["ball_vel_x"] > 0 else 0.0,
+                state["paddle_left_y"] / config.SCREEN_HEIGHT
             )
             out2 = net2.activate(inputs2)
             act2 = out2.index(max(out2))
