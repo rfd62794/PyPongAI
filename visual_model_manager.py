@@ -3,7 +3,6 @@ import sys
 import os
 import config
 import model_manager
-import shutil
 
 def show_model_manager():
     pygame.init()
@@ -25,13 +24,42 @@ def show_model_manager():
     
     # Buttons
     btn_organize = pygame.Rect(50, config.SCREEN_HEIGHT - 80, 200, 50)
-    btn_delete = pygame.Rect(270, config.SCREEN_HEIGHT - 80, 200, 50)
+    # btn_delete = pygame.Rect(270, config.SCREEN_HEIGHT - 80, 200, 50) # TODO: Implement delete
     btn_back = pygame.Rect(config.SCREEN_WIDTH - 150, 20, 100, 40)
     
     running = True
     while running:
         screen.fill(config.BLACK)
         
+        # Event Handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = pygame.mouse.get_pos()
+                
+                if btn_back.collidepoint((mx, my)):
+                    running = False
+                    # Return to main menu logic would go here, or just close this window
+                    return
+
+                if btn_organize.collidepoint((mx, my)):
+                    print("Organizing models...")
+                    model_manager.organize_models()
+                    # Reload models
+                    models = model_manager.scan_models()
+                    models.sort(key=lambda x: model_manager.get_fitness_from_filename(os.path.basename(x)), reverse=True)
+                
+                # Pagination clicks (simple zones)
+                # Left side of pagination text
+                if config.SCREEN_HEIGHT - 150 < my < config.SCREEN_HEIGHT - 100:
+                     if mx < config.SCREEN_WIDTH // 2:
+                         page = max(0, page - 1)
+                     else:
+                         max_page = (len(models) - 1) // per_page
+                         page = min(max_page, page + 1)
+
         # Header
         title = font.render("Model Manager", True, config.WHITE)
         screen.blit(title, (50, 30))
@@ -59,6 +87,8 @@ def show_model_manager():
             mx, my = pygame.mouse.get_pos()
             if rect.collidepoint((mx, my)):
                 color = (60, 60, 80) if i != selected_index else (80, 80, 120)
+                if pygame.mouse.get_pressed()[0]:
+                    selected_index = i
                 
             pygame.draw.rect(screen, color, rect)
             pygame.draw.rect(screen, config.WHITE, rect, 1)
@@ -75,7 +105,7 @@ def show_model_manager():
             page_surf = small_font.render(page_text, True, config.WHITE)
             screen.blit(page_surf, (config.SCREEN_WIDTH // 2 - page_surf.get_width() // 2, list_y + 10))
             
-            hint = small_font.render("Use Left/Right Arrows to Navigate", True, config.GRAY)
+            hint = small_font.render("Click Left/Right side to Navigate", True, config.GRAY)
             screen.blit(hint, (config.SCREEN_WIDTH // 2 - hint.get_width() // 2, list_y + 30))
 
         # Action Buttons
@@ -85,10 +115,22 @@ def show_model_manager():
         org_text = font.render("Auto-Organize", True, config.WHITE)
         screen.blit(org_text, (btn_organize.centerx - org_text.get_width()//2, btn_organize.centery - org_text.get_height()//2))
         
-        # Delete
+        # Back
+        pygame.draw.rect(screen, (100, 50, 50), btn_back)
+        pygame.draw.rect(screen, config.WHITE, btn_back, 2)
+        back_text = small_font.render("Back", True, config.WHITE)
+        screen.blit(back_text, (btn_back.centerx - back_text.get_width()//2, btn_back.centery - back_text.get_height()//2))
+
+        pygame.display.flip()
+        clock.tick(30)
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    try:
         show_model_manager()
     except KeyboardInterrupt:
-        sys.exit(100)
+        sys.exit(0)
     except Exception as e:
         print(f"Error: {e}")
-    pygame.quit()
+        pygame.quit()
