@@ -183,13 +183,13 @@ def play_game():
             # Human Input (Right Paddle)
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
-                game.paddle_r.move(-1, dt)
+                game.right_paddle.move(up=True)
             if keys[pygame.K_DOWN]:
-                game.paddle_r.move(1, dt)
+                game.right_paddle.move(up=False)
 
             # AI Input (Left Paddle)
             # Inputs: Ball Y, Ball X, Paddle Y, Ball VY, Ball VX
-            inputs = (game.ball.rect.y, game.ball.rect.x, game.paddle_l.rect.y, game.ball.vel_y, game.ball.vel_x)
+            inputs = (game.ball.rect.y, game.ball.rect.x, game.left_paddle.rect.y, game.ball.vel_y, game.ball.vel_x)
             output = net.activate(inputs)
             
             # Output is usually a list of floats. 
@@ -200,9 +200,9 @@ def play_game():
             decision = output.index(max(output))
             
             if decision == 0: # Up
-                game.paddle_l.move(-1, dt)
+                game.left_paddle.move(up=True)
             elif decision == 1: # Down
-                game.paddle_l.move(1, dt)
+                game.left_paddle.move(up=False)
             # 2 is Stay
             
             game.update(dt)
