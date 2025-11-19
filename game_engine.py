@@ -77,14 +77,22 @@ class Game:
 
         # Paddle Collision
         # Left Paddle
+        # Paddle Collision
+        # Left Paddle
         if self.ball.rect.colliderect(self.left_paddle.rect):
-            self.ball.vel_x *= -1
+            self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
+            self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.left = self.left_paddle.rect.right # Prevent sticking
         
         # Right Paddle
         if self.ball.rect.colliderect(self.right_paddle.rect):
-            self.ball.vel_x *= -1
+            self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
+            self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.right = self.right_paddle.rect.left # Prevent sticking
+            
+        # Cap Speed
+        self.ball.vel_x = max(min(self.ball.vel_x, config.BALL_MAX_SPEED), -config.BALL_MAX_SPEED)
+        self.ball.vel_y = max(min(self.ball.vel_y, config.BALL_MAX_SPEED), -config.BALL_MAX_SPEED)
 
         # Scoring
         score_data = None

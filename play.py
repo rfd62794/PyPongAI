@@ -227,6 +227,8 @@ def play_game():
         if e.code == 100:
             sys.exit(100)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"\n[!] An error occurred: {e}")
         pygame.quit()
         

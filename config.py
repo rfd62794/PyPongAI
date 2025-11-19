@@ -5,20 +5,6 @@ import os
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-# Game Settings
-FPS = 60
-PADDLE_WIDTH = 20
-PADDLE_HEIGHT = 100
-PADDLE_SPEED = 7
-BALL_RADIUS = 7
-BALL_SPEED_X = 8
-BALL_SPEED_Y = 8
-MAX_SCORE = 9
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (128, 128, 128)
 
 # File Paths
 NEAT_CONFIG_PATH = "neat_config.txt"
