@@ -10,40 +10,76 @@ from model_manager import scan_models, get_fitness_from_filename, delete_models
 
 class MatchAnalyzer:
     def __init__(self):
-        self.p1_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": []}
-        self.p2_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": []}
+        self.p1_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": [], "avg_reaction": 0}
+        self.p2_stats = {"hits": 0, "misses": 0, "distance": 0, "reaction_frames": [], "avg_reaction": 0}
         self.rally_lengths = []
         self.current_rally = 0
         self.last_ball_vel_x = 0
         self.last_paddle1_y = 0
         self.last_paddle2_y = 0
-        self.ball_bounce_frame = 0
+        
+        # Reaction time tracking
+        self.ball_bounce_frame = -1  # Frame when ball last bounced/changed direction
+        self.ball_heading_to = 0 # 1 for P1 (Left), 2 for P2 (Right)
+        self.p1_reacted = True
+        self.p2_reacted = True
         
     def update(self, game_state):
         # Track paddle distance
         self.p1_stats["distance"] += abs(game_state["paddle_left_y"] - self.last_paddle1_y)
         self.p2_stats["distance"] += abs(game_state["paddle_right_y"] - self.last_paddle2_y)
+        
+        # Detect Paddle Movement (Reaction)
+        if not self.p1_reacted and self.ball_heading_to == 1:
+            if abs(game_state["paddle_left_y"] - self.last_paddle1_y) > 0.5: # Threshold for movement
+                reaction_time = self.current_frame_count - self.ball_bounce_frame
+                self.p1_stats["reaction_frames"].append(reaction_time)
+                self.p1_reacted = True
+                
+        if not self.p2_reacted and self.ball_heading_to == 2:
+            if abs(game_state["paddle_right_y"] - self.last_paddle2_y) > 0.5:
+                reaction_time = self.current_frame_count - self.ball_bounce_frame
+                self.p2_stats["reaction_frames"].append(reaction_time)
+                self.p2_reacted = True
+
         self.last_paddle1_y = game_state["paddle_left_y"]
         self.last_paddle2_y = game_state["paddle_right_y"]
         
-        # Track rally
+        # Track rally & Ball Direction Changes
+        # Note: We need frame count passed in or tracked internally. 
+        # Let's assume update is called every frame. We'll track internal frame count.
+        if not hasattr(self, 'current_frame_count'):
+            self.current_frame_count = 0
+        self.current_frame_count += 1
+        
         if game_state["ball_vel_x"] * self.last_ball_vel_x < 0:
-            # Velocity flipped direction
+            # Velocity flipped direction (Bounce or Hit)
             self.current_rally += 1
-            self.ball_bounce_frame = 0 
+            self.ball_bounce_frame = self.current_frame_count
             
-            # Determine who hit it based on position
-            if game_state["ball_x"] < config.SCREEN_WIDTH / 2:
-                self.p1_stats["hits"] += 1
+            if game_state["ball_vel_x"] < 0:
+                # Heading to Left (P1)
+                self.ball_heading_to = 1
+                self.p1_reacted = False # Reset reaction flag
+                # If it was heading to P2 and flipped, P2 hit it.
+                if self.last_ball_vel_x > 0:
+                    self.p2_stats["hits"] += 1
             else:
-                self.p2_stats["hits"] += 1
+                # Heading to Right (P2)
+                self.ball_heading_to = 2
+                self.p2_reacted = False
+                # If it was heading to P1 and flipped, P1 hit it.
+                if self.last_ball_vel_x < 0:
+                    self.p1_stats["hits"] += 1
                 
         self.last_ball_vel_x = game_state["ball_vel_x"]
 
-    def end_rally(self):
-        if self.current_rally > 0:
-            self.rally_lengths.append(self.current_rally)
-        self.current_rally = 0
+    def get_averages(self):
+        # Calculate averages
+        if self.p1_stats["reaction_frames"]:
+            self.p1_stats["avg_reaction"] = sum(self.p1_stats["reaction_frames"]) / len(self.p1_stats["reaction_frames"])
+        if self.p2_stats["reaction_frames"]:
+            self.p2_stats["avg_reaction"] = sum(self.p2_stats["reaction_frames"]) / len(self.p2_stats["reaction_frames"])
 
 class LeagueState(BaseState):
     def __init__(self, manager):
