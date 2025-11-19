@@ -127,7 +127,8 @@ class VisualReporter(neat.reporting.BaseReporter):
                 state["ball_vel_x"],
                 state["ball_vel_y"],
                 state["paddle_left_y"] - state["ball_y"],
-                1.0 if state["ball_vel_x"] < 0 else 0.0
+                1.0 if state["ball_vel_x"] < 0 else 0.0,
+                state["paddle_right_y"]
             )
             output = net.activate(inputs)
             action_idx = output.index(max(output))
