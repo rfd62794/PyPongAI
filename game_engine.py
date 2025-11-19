@@ -58,6 +58,13 @@ class Game:
         Returns: score_data (dict) if a score occurred, else None
         """
         # Move paddles
+        # Dynamic Paddle Speed
+        current_speed_ratio = abs(self.ball.vel_x) / config.BALL_SPEED_X
+        new_paddle_speed = config.PADDLE_SPEED * current_speed_ratio
+        new_paddle_speed = min(new_paddle_speed, config.PADDLE_MAX_SPEED)
+        self.left_paddle.speed = new_paddle_speed
+        self.right_paddle.speed = new_paddle_speed
+
         if left_move == "UP":
             self.left_paddle.move(up=True)
         elif left_move == "DOWN":

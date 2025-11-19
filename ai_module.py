@@ -90,5 +90,5 @@ def eval_genomes(genomes, config_neat):
                     # Game continues, ball is reset by game engine
             
             # Optional: Cap fitness or duration to prevent infinite stalling if both are perfect
-            if genome.fitness > 500:
+            if genome.fitness > 2000:
                 run = False
