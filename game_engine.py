@@ -82,20 +82,24 @@ class Game:
         if self.ball.rect.top <= 0 or self.ball.rect.bottom >= config.SCREEN_HEIGHT:
             self.ball.vel_y *= -1
 
-        # Paddle Collision
-        # Left Paddle
+        # Track paddle hits
+        hit_left = False
+        hit_right = False
+
         # Paddle Collision
         # Left Paddle
         if self.ball.rect.colliderect(self.left_paddle.rect):
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.left = self.left_paddle.rect.right # Prevent sticking
+            hit_left = True
         
         # Right Paddle
         if self.ball.rect.colliderect(self.right_paddle.rect):
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.right = self.right_paddle.rect.left # Prevent sticking
+            hit_right = True
             
         # Cap Speed
         self.ball.vel_x = max(min(self.ball.vel_x, config.BALL_MAX_SPEED), -config.BALL_MAX_SPEED)
@@ -107,11 +111,13 @@ class Game:
             # Right scores
             self.score_right += 1
             score_data = self.get_state()
+            score_data["scored"] = "right"
             self.ball.reset()
         elif self.ball.rect.right >= config.SCREEN_WIDTH:
             # Left scores
             self.score_left += 1
             score_data = self.get_state()
+            score_data["scored"] = "left"
             self.ball.reset()
             
         # Check for Game Over
@@ -119,6 +125,14 @@ class Game:
             if score_data is None:
                  score_data = self.get_state()
             score_data["game_over"] = True
+        
+        # Return hit events even if no score
+        if score_data is None and (hit_left or hit_right):
+            score_data = {}
+        
+        if score_data is not None:
+            score_data["hit_left"] = hit_left
+            score_data["hit_right"] = hit_right
             
         return score_data
 
