@@ -99,18 +99,34 @@ def eval_genomes(genomes, config_neat):
             if genome.fitness > 2000:
                 run = False
 
+def calculate_expected_score(rating_a, rating_b):
+    """
+    Calculates the expected score for player A against player B.
+    """
+    return 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
+
+def calculate_new_rating(rating, expected_score, actual_score, k_factor=32):
+    """
+    Calculates the new rating based on expected vs actual score.
+    """
+    return rating + k_factor * (actual_score - expected_score)
+
 def eval_genomes_competitive(genomes, config_neat):
     """
-    Competitive co-evolution fitness function.
+    Competitive co-evolution fitness function using ELO ratings.
     Each genome plays multiple matches against other genomes.
-    Both paddles are controlled by evolving AI.
+    Fitness is determined by the final ELO rating.
     """
     # Convert to list for easier indexing
     genome_list = list(genomes)
     
-    # Initialize fitness to 0
+    # Initialize ELO ratings if not present
     for _, genome in genome_list:
-        genome.fitness = 0
+        if not hasattr(genome, 'elo_rating'):
+            genome.elo_rating = config.ELO_INITIAL_RATING
+        # We don't reset fitness to 0 here because we want to track ELO over time.
+        # However, NEAT expects fitness to be set for the current generation.
+        # We will set genome.fitness = genome.elo_rating at the end.
     
     # Number of matches per genome
     matches_per_genome = min(5, len(genome_list) - 1)
@@ -133,6 +149,9 @@ def eval_genomes_competitive(genomes, config_neat):
             run = True
             frame_count = 0
             max_frames = 3000  # Prevent infinite games
+            
+            # Match result: 1 for Left Win, 0 for Right Win, 0.5 for Draw
+            match_result = 0.5 
             
             while run and frame_count < max_frames:
                 frame_count += 1
@@ -181,31 +200,38 @@ def eval_genomes_competitive(genomes, config_neat):
                 # Update game
                 score_data = game.update(left_move, right_move)
                 
-                # Survival reward
-                genome.fitness += 0.1
-                opp_genome.fitness += 0.1
-                
-                # Check for scoring and hit events
+                # Check for scoring
                 if score_data:
-                    # Reward hits
-                    if score_data.get("hit_left"):
-                        genome.fitness += 1
-                    if score_data.get("hit_right"):
-                        opp_genome.fitness += 1
-                    
-                    # Reward/penalize scoring
                     if score_data.get("scored") == "left":
-                        genome.fitness += 20  # Win
-                        opp_genome.fitness -= 10  # Loss
+                        match_result = 1.0 # Left Wins
                         run = False
                     elif score_data.get("scored") == "right":
-                        genome.fitness -= 10  # Loss
-                        opp_genome.fitness += 20  # Win
+                        match_result = 0.0 # Right Wins (Left Loses)
                         run = False
-    
-    # Normalize fitness by number of matches played
+            
+            # Calculate ELO updates
+            # Left Genome (genome) vs Right Genome (opp_genome)
+            rating_a = genome.elo_rating
+            rating_b = opp_genome.elo_rating
+            
+            expected_a = calculate_expected_score(rating_a, rating_b)
+            expected_b = calculate_expected_score(rating_b, rating_a)
+            
+            # Actual scores
+            actual_a = match_result
+            actual_b = 1.0 - match_result
+            
+            # Update ratings
+            new_rating_a = calculate_new_rating(rating_a, expected_a, actual_a, config.ELO_K_FACTOR)
+            new_rating_b = calculate_new_rating(rating_b, expected_b, actual_b, config.ELO_K_FACTOR)
+            
+            genome.elo_rating = new_rating_a
+            opp_genome.elo_rating = new_rating_b
+            
+    # Set fitness to ELO rating
     for _, genome in genome_list:
-        genome.fitness = genome.fitness / matches_per_genome if matches_per_genome > 0 else 0
+        # Ensure fitness is at least 0, though ELO can technically be negative (unlikely with 1200 start)
+        genome.fitness = max(0, genome.elo_rating)
 
 def validate_genome(genome, config_neat, generation=0, record_matches=True):
     """
