@@ -234,7 +234,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
                 
                 # Collect contact metrics for novelty search
                 if score_data and (score_data.get("hit_left") or score_data.get("hit_right")):
-                    contact_metrics_list.append(score_data)
+                    genome_contact_metrics[genome_id].append(score_data)
                 
                 # Check for scoring
                 if score_data:
@@ -265,16 +265,20 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
             opp_genome.elo_rating = new_rating_b
             
     # Set fitness to ELO rating + Novelty Score
-    for _, genome in genome_list:
-        # This won't work perfectly since contact_metrics_list is per genome in the loop
-        # We need to track it differently - let me use a dict
-        pass
-    
-    # Actually, let's recalculate with novelty in the loop above
-    # For now, just set ELO fitness (novelty will be added in next iteration)
-    for _, genome in genome_list:
-        # Ensure fitness is at least 0, though ELO can technically be negative (unlikely with 1200 start)
-        genome.fitness = max(0, genome.elo_rating)
+    for genome_id, genome in genome_list:
+        # Calculate behavioral characteristic from contact data
+        bc = calculate_bc_from_contacts(genome_contact_metrics.get(genome_id, []))
+        
+        if bc is not None:
+            # Calculate novelty score
+            novelty_score = NOVELTY_ARCHIVE.calculate_novelty(bc)
+            # Add to archive for future comparisons
+            NOVELTY_ARCHIVE.add_bc(bc)
+            # Final fitness = ELO + weighted novelty
+            genome.fitness = max(0, genome.elo_rating + (config.NOVELTY_WEIGHT * novelty_score))
+        else:
+            # No contacts, just use ELO
+            genome.fitness = max(0, genome.elo_rating)
 
 def validate_genome(genome, config_neat, generation=0, record_matches=True):
     """
