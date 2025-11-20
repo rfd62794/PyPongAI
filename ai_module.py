@@ -1,34 +1,29 @@
-# ai_module.py
+"""NEAT-based AI training and evaluation for PyPongAI.
+
+This module contains the core fitness functions for training AI agents using
+the NEAT algorithm. It provides different evaluation strategies including
+competitive ELO-based evaluation and self-play.
+"""
+
 import neat
 import pygame
 import config
 import game_engine
 import game_simulator
 import random
+from opponents import get_rule_based_move
 
-def get_rule_based_move(game_state, paddle="right"):
-    """
-    Returns a simple rule-based move ('UP', 'DOWN', or None).
-    Tracks the ball's Y position.
-    """
-    paddle_y = game_state[f"paddle_{paddle}_y"]
-    ball_y = game_state["ball_y"]
-    paddle_center = paddle_y + config.PADDLE_HEIGHT / 2
-    
-    # Deadzone to prevent jitter
-    if abs(paddle_center - ball_y) < 10:
-        return None
-        
-    if paddle_center < ball_y:
-        return "DOWN"
-    elif paddle_center > ball_y:
-        return "UP"
-    return None
 
 def eval_genomes(genomes, config_neat):
-    """
-    NEAT fitness function.
-    Evaluates each genome by playing a game against a rule-based opponent.
+    """Evaluates genomes by playing against a rule-based opponent.
+    
+    This is a basic fitness function where each genome plays a single game
+    against a simple rule-based AI. Fitness is awarded for survival time,
+    paddle hits, and scoring points.
+    
+    Args:
+        genomes: List of (genome_id, genome) tuples from NEAT population.
+        config_neat: NEAT configuration object.
     """
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
