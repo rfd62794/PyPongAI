@@ -313,6 +313,9 @@ class GameSimulator:
         if score_data is not None:
             score_data["hit_left"] = hit_left
             score_data["hit_right"] = hit_right
+            # Add advanced contact metrics if a hit occurred
+            if hit_left or hit_right:
+                score_data.update(contact_metrics)
             
         return score_data
 
