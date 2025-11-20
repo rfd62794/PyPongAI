@@ -27,22 +27,8 @@ class LobbyState(BaseState):
         screen.blit(text_surf, text_rect)
 
     def get_best_model(self):
-        models = []
-        for root, dirs, files in os.walk(config.MODEL_DIR):
-            for file in files:
-                if file.endswith(".pkl"):
-                    models.append(os.path.join(root, file))
-        
-        if not models:
-            return None
-            
-        def get_fit(p):
-            try:
-                return int(p.split("fitness")[1].split(".")[0])
-            except:
-                return 0
-        models.sort(key=get_fit, reverse=True)
-        return models[0]
+        import model_manager
+        return model_manager.get_best_model_by_elo()
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
