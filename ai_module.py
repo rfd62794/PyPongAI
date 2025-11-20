@@ -124,7 +124,7 @@ def calculate_new_rating(rating, expected_score, actual_score, k_factor=32):
     return rating + k_factor * (actual_score - expected_score)
 
 
-def eval_genomes_competitive(genomes, config_neat):
+def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
     """Evaluates genomes using competitive ELO-based matchmaking.
     
     Each genome plays multiple matches against randomly selected opponents from
@@ -153,7 +153,8 @@ def eval_genomes_competitive(genomes, config_neat):
     # Each genome plays multiple matches
     for idx, (genome_id, genome) in enumerate(genome_list):
         # Create network for this genome
-        net_left = neat.nn.FeedForwardNetwork.create(genome, config_neat)
+        net_left = neat.nn.RecurrentNetwork.create(genome, config_neat)
+        net_left.reset()  # Reset RNN state
         
         # Select random opponents
         opponent_indices = [i for i in range(len(genome_list)) if i != idx]
@@ -161,7 +162,8 @@ def eval_genomes_competitive(genomes, config_neat):
         
         for opp_idx in selected_opponents:
             opp_id, opp_genome = genome_list[opp_idx]
-            net_right = neat.nn.FeedForwardNetwork.create(opp_genome, config_neat)
+            net_right = neat.nn.RecurrentNetwork.create(opp_genome, config_neat)
+            net_right.reset()  # Reset RNN state
             
             # Play a match
             game = game_simulator.GameSimulator()
