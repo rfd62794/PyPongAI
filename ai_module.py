@@ -15,6 +15,10 @@ from opponents import get_rule_based_move
 from novelty_search import NoveltyArchive, calculate_bc_from_contacts
 
 
+# Novelty Search Archive
+NOVELTY_ARCHIVE = NoveltyArchive(max_size=500, k_nearest=config.NOVELTY_K_NEAREST)
+
+
 def eval_genomes(genomes, config_neat, ball_speed=None):
     """Evaluates genomes by playing against a rule-based opponent.
     
