@@ -9,10 +9,12 @@ import game_engine
 import sys
 from states.base import BaseState
 from model_manager import get_best_model, get_fitness_from_filename
+import training_logger
 
 class UIProgressReporter(neat.reporting.BaseReporter):
-    def __init__(self, screen):
+    def __init__(self, screen, logger=None):
         self.screen = screen
+        self.logger = logger
         self.generation = 0
         self.font = pygame.font.Font(None, 36)
         self.checkpoint_dir = os.path.join(config.MODEL_DIR, "checkpoints")
@@ -36,14 +38,28 @@ class UIProgressReporter(neat.reporting.BaseReporter):
         # Find best genome to save checkpoint
         best_genome = None
         best_fitness = -float('inf')
+        total_fitness = 0
+        count = 0
+        best_elo = 0
+        
         for g in population.values():
-            if g.fitness is not None and g.fitness > best_fitness:
-                best_fitness = g.fitness
-                best_genome = g
+            if g.fitness is not None:
+                total_fitness += g.fitness
+                count += 1
+                if g.fitness > best_fitness:
+                    best_fitness = g.fitness
+                    best_genome = g
+                    if hasattr(g, 'elo_rating'):
+                        best_elo = g.elo_rating
+        
+        avg_fitness = total_fitness / count if count > 0 else 0
         
         if best_genome:
             print(f"Generation {self.generation} Best Fitness: {best_fitness}")
             self.save_checkpoint(best_genome)
+            
+        if self.logger:
+            self.logger.log_generation(self.generation, best_fitness, avg_fitness, best_elo, len(species_set.species))
             
         pygame.event.pump()
 
@@ -55,9 +71,10 @@ class UIProgressReporter(neat.reporting.BaseReporter):
             pickle.dump(genome, f)
 
 class VisualReporter(neat.reporting.BaseReporter):
-    def __init__(self, config_neat, screen):
+    def __init__(self, config_neat, screen, logger=None):
         self.config_neat = config_neat
         self.screen = screen
+        self.logger = logger
         self.generation = 0
         self.checkpoint_dir = os.path.join(config.MODEL_DIR, "checkpoints")
         os.makedirs(self.checkpoint_dir, exist_ok=True)
@@ -80,15 +97,29 @@ class VisualReporter(neat.reporting.BaseReporter):
         # Find best genome
         best_genome = None
         best_fitness = -float('inf')
+        total_fitness = 0
+        count = 0
+        best_elo = 0
+        
         for g in population.values():
-            if g.fitness is not None and g.fitness > best_fitness:
-                best_fitness = g.fitness
-                best_genome = g
+            if g.fitness is not None:
+                total_fitness += g.fitness
+                count += 1
+                if g.fitness > best_fitness:
+                    best_fitness = g.fitness
+                    best_genome = g
+                    if hasattr(g, 'elo_rating'):
+                        best_elo = g.elo_rating
+        
+        avg_fitness = total_fitness / count if count > 0 else 0
         
         if best_genome:
             print(f"Generation {self.generation} Best Fitness: {best_fitness}")
             self.save_checkpoint(best_genome)
             self.visualize_best(best_genome)
+            
+        if self.logger:
+            self.logger.log_generation(self.generation, best_fitness, avg_fitness, best_elo, len(species_set.species))
 
     def save_checkpoint(self, genome):
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -200,6 +231,9 @@ class TrainState(BaseState):
         # Render initial loading screen
         self.manager.screen.fill(config.BLACK)
         
+        # Initialize Logger
+        logger = training_logger.TrainingLogger()
+        
         # If no seed provided and use_best_seed is True, load best model
         if seed_genome is None and self.use_best_seed:
             best_path = self.get_best_model_path()
@@ -240,9 +274,9 @@ class TrainState(BaseState):
         p.add_reporter(neat.StatisticsReporter())
         
         if self.visual_mode:
-            p.add_reporter(VisualReporter(config_neat, self.manager.screen))
+            p.add_reporter(VisualReporter(config_neat, self.manager.screen, logger=logger))
         else:
-            p.add_reporter(UIProgressReporter(self.manager.screen))
+            p.add_reporter(UIProgressReporter(self.manager.screen, logger=logger))
         
         winner = p.run(ai_module.eval_genomes_competitive, 50)
         
