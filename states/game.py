@@ -72,13 +72,14 @@ class GameState(BaseState):
         # AI Input
         if self.net:
             inputs = (
-                self.game.left_paddle.rect.y,
-                self.game.ball.rect.x,
-                self.game.ball.rect.y,
-                self.game.ball.vel_x,
-                self.game.ball.vel_y,
-                self.game.left_paddle.rect.y - self.game.ball.rect.y,
-                1.0 if self.game.ball.vel_x < 0 else 0.0
+                self.game.left_paddle.rect.y / config.SCREEN_HEIGHT,
+                self.game.ball.rect.x / config.SCREEN_WIDTH,
+                self.game.ball.rect.y / config.SCREEN_HEIGHT,
+                self.game.ball.vel_x / config.BALL_MAX_SPEED,
+                self.game.ball.vel_y / config.BALL_MAX_SPEED,
+                (self.game.left_paddle.rect.y - self.game.ball.rect.y) / config.SCREEN_HEIGHT,
+                1.0 if self.game.ball.vel_x < 0 else 0.0,
+                self.game.right_paddle.rect.y / config.SCREEN_HEIGHT
             )
             output = self.net.activate(inputs)
             decision = output.index(max(output))
