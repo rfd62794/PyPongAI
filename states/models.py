@@ -16,6 +16,7 @@ class ModelState(BaseState):
         
         # Buttons
         self.btn_organize = pygame.Rect(50, config.SCREEN_HEIGHT - 80, 200, 50)
+        self.btn_convert = pygame.Rect(270, config.SCREEN_HEIGHT - 80, 200, 50)
         self.btn_back = pygame.Rect(config.SCREEN_WIDTH - 150, 20, 100, 40)
 
     def enter(self, **kwargs):
@@ -36,6 +37,11 @@ class ModelState(BaseState):
             if self.btn_organize.collidepoint((mx, my)):
                 print("Organizing models...")
                 model_manager.organize_models()
+                self.refresh_models()
+                
+            if self.btn_convert.collidepoint((mx, my)):
+                print("Converting models to ELO format...")
+                model_manager.convert_models_to_elo_format()
                 self.refresh_models()
             
             # Pagination clicks
@@ -58,6 +64,9 @@ class ModelState(BaseState):
                 list_y += 50
 
     def draw(self, screen):
+        import elo_manager
+        elo_ratings = elo_manager.load_elo_ratings()
+        
         screen.fill(config.BLACK)
         
         # Header
@@ -78,6 +87,7 @@ class ModelState(BaseState):
             filename = os.path.basename(model_path)
             fitness = model_manager.get_fitness_from_filename(filename)
             parent_dir = os.path.basename(os.path.dirname(model_path))
+            elo = elo_ratings.get(filename, "-")
             
             # Highlight selected
             rect = pygame.Rect(50, list_y, config.SCREEN_WIDTH - 100, 40)
@@ -91,7 +101,7 @@ class ModelState(BaseState):
             pygame.draw.rect(screen, color, rect)
             pygame.draw.rect(screen, config.WHITE, rect, 1)
             
-            text = f"{i+1}. {filename} | Fit: {fitness} | Loc: {parent_dir}"
+            text = f"{i+1}. {filename} | Fit: {fitness} | ELO: {elo} | Loc: {parent_dir}"
             text_surf = self.small_font.render(text, True, config.WHITE)
             screen.blit(text_surf, (60, list_y + 10))
             
@@ -112,6 +122,12 @@ class ModelState(BaseState):
         pygame.draw.rect(screen, config.WHITE, self.btn_organize, 2)
         org_text = self.font.render("Auto-Organize", True, config.WHITE)
         screen.blit(org_text, (self.btn_organize.centerx - org_text.get_width()//2, self.btn_organize.centery - org_text.get_height()//2))
+        
+        # Convert
+        pygame.draw.rect(screen, (50, 50, 100), self.btn_convert)
+        pygame.draw.rect(screen, config.WHITE, self.btn_convert, 2)
+        conv_text = self.font.render("Convert ELO", True, config.WHITE)
+        screen.blit(conv_text, (self.btn_convert.centerx - conv_text.get_width()//2, self.btn_convert.centery - conv_text.get_height()//2))
         
         # Back
         pygame.draw.rect(screen, (100, 50, 50), self.btn_back)
