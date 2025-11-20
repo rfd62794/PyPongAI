@@ -12,6 +12,7 @@ import pickle
 import ai_module
 import config
 import datetime
+from validation import validate_genome
 
 def run_training(seed_genomes=None):
     """
@@ -77,7 +78,7 @@ def run_training(seed_genomes=None):
                     best_genome = g
             
             if best_genome:
-                avg_rally, win_rate = ai_module.validate_genome(best_genome, config, generation=self.generation)
+                avg_rally, win_rate = validate_genome(best_genome, config, generation=self.generation)
                 print(f"   [Validation] Best Genome vs Rule-Based: Avg Rally={avg_rally:.2f}, Win Rate={win_rate:.2f}")
                 
                 # Update Hall of Fame every 5 generations
@@ -143,7 +144,7 @@ def run_training(seed_genomes=None):
             val_rally = 0
             val_win = 0
             if best_genome:
-                val_rally, val_win = ai_module.validate_genome(best_genome, config, generation=self.generation)
+                val_rally, val_win = validate_genome(best_genome, config, generation=self.generation)
                 print(f"   [Validation] Best Genome vs Rule-Based: Avg Rally={val_rally:.2f}, Win Rate={val_win:.2f}")
 
             with open(self.csv_path, 'a', newline='') as f:
