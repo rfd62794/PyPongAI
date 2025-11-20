@@ -12,6 +12,7 @@ import game_engine
 import game_simulator
 import random
 from opponents import get_rule_based_move
+from novelty_search import NoveltyArchive, calculate_bc_from_contacts
 
 
 def eval_genomes(genomes, config_neat, ball_speed=None):
