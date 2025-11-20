@@ -30,7 +30,7 @@ def eval_genomes(genomes, config_neat, ball_speed=None):
         net.reset()  # Reset RNN state
         genome.fitness = 0
         
-        game = game_simulator.GameSimulator()
+        game = game_simulator.GameSimulator(ball_speed=ball_speed)
         
         # Genome plays as Left Paddle
         # Rule-based plays as Right Paddle
