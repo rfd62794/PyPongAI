@@ -2,6 +2,7 @@ import pygame
 import os
 import config
 import model_manager
+import elo_manager
 from states.base import BaseState
 
 class ModelState(BaseState):
@@ -89,6 +90,12 @@ class ModelState(BaseState):
             parent_dir = os.path.basename(os.path.dirname(model_path))
             elo = elo_ratings.get(filename, "-")
             
+            # Get ELO tier
+            if isinstance(elo, (int, float)):
+                tier = elo_manager.get_elo_tier(elo)
+            else:
+                tier = "N/A"
+            
             # Highlight selected
             rect = pygame.Rect(50, list_y, config.SCREEN_WIDTH - 100, 40)
             color = (70, 70, 100) if i == self.selected_index else (40, 40, 40)
@@ -101,7 +108,7 @@ class ModelState(BaseState):
             pygame.draw.rect(screen, color, rect)
             pygame.draw.rect(screen, config.WHITE, rect, 1)
             
-            text = f"{i+1}. {filename} | Fit: {fitness} | ELO: {elo} | Loc: {parent_dir}"
+            text = f"{i+1}. {filename} | Fit: {fitness} | ELO: {elo} [{tier}] | Loc: {parent_dir}"
             text_surf = self.small_font.render(text, True, config.WHITE)
             screen.blit(text_surf, (60, list_y + 10))
             
