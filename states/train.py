@@ -150,8 +150,8 @@ class VisualReporter(neat.reporting.BaseReporter):
             
             pygame.display.flip()
             
-            # Check end condition (quick match to 3)
-            if game.score_left >= 3 or game.score_right >= 3:
+            # Check end condition (quick match to VISUAL_MAX_SCORE)
+            if game.score_left >= config.VISUAL_MAX_SCORE or game.score_right >= config.VISUAL_MAX_SCORE:
                 running = False
 
 class TrainState(BaseState):

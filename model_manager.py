@@ -51,6 +51,58 @@ def get_best_model_by_elo():
     return models[0]
 
 import elo_manager
+import pickle
+
+def convert_models_to_elo_format():
+    """
+    Scans all models, ensures they have an ELO rating (default 1200),
+    and saves them back. Also updates the central ELO registry.
+    """
+    models = scan_models()
+    print(f"Scanning {len(models)} models for ELO conversion...")
+    
+    elo_ratings = elo_manager.load_elo_ratings()
+    updates = 0
+    
+    for model_path in models:
+        try:
+            filename = os.path.basename(model_path)
+            
+            # Load Genome
+            with open(model_path, "rb") as f:
+                genome = pickle.load(f)
+                
+            # Check/Set ELO
+            if not hasattr(genome, 'elo_rating'):
+                # Check if we have it in registry
+                if filename in elo_ratings:
+                    genome.elo_rating = elo_ratings[filename]
+                else:
+                    genome.elo_rating = config.ELO_INITIAL_RATING
+                    elo_ratings[filename] = config.ELO_INITIAL_RATING
+                
+                # Save back
+                with open(model_path, "wb") as f:
+                    pickle.dump(genome, f)
+                updates += 1
+            else:
+                # Ensure registry matches genome
+                if filename not in elo_ratings:
+                    elo_ratings[filename] = genome.elo_rating
+                elif elo_ratings[filename] != genome.elo_rating:
+                    # Registry takes precedence or genome? Let's trust registry if available, else genome
+                    # Actually, let's trust the registry as the source of truth for ELO
+                    genome.elo_rating = elo_ratings[filename]
+                    with open(model_path, "wb") as f:
+                        pickle.dump(genome, f)
+                    updates += 1
+                    
+        except Exception as e:
+            print(f"Error converting {model_path}: {e}")
+            
+    # Save registry
+    elo_manager.save_elo_ratings(elo_ratings)
+    print(f"Conversion complete. Updated {updates} models.")
 
 def delete_models(model_paths):
     """

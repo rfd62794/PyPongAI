@@ -494,7 +494,8 @@ class LeagueState(BaseState):
                 
                 game.update(left_move, right_move)
                 
-                if game.score_left >= config.MAX_SCORE or game.score_right >= config.MAX_SCORE:
+                target_score = config.VISUAL_MAX_SCORE if self.show_visuals else config.MAX_SCORE
+                if game.score_left >= target_score or game.score_right >= target_score:
                     self.finish_match()
             else:
                 self.start_next_match()
