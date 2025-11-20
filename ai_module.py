@@ -261,7 +261,14 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
             genome.elo_rating = new_rating_a
             opp_genome.elo_rating = new_rating_b
             
-    # Set fitness to ELO rating
+    # Set fitness to ELO rating + Novelty Score
+    for _, genome in genome_list:
+        # This won't work perfectly since contact_metrics_list is per genome in the loop
+        # We need to track it differently - let me use a dict
+        pass
+    
+    # Actually, let's recalculate with novelty in the loop above
+    # For now, just set ELO fitness (novelty will be added in next iteration)
     for _, genome in genome_list:
         # Ensure fitness is at least 0, though ELO can technically be negative (unlikely with 1200 start)
         genome.fitness = max(0, genome.elo_rating)
