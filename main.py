@@ -10,6 +10,7 @@ from states.models import ModelState
 from states.analytics import AnalyticsState
 from states.league import LeagueState
 from states.replay import ReplayState
+from states.settings import SettingsState
 
 def main():
     pygame.init()
@@ -27,6 +28,7 @@ def main():
     manager.register_state("analytics", AnalyticsState(manager))
     manager.register_state("league", LeagueState(manager))
     manager.register_state("replay", ReplayState(manager))
+    manager.register_state("settings", SettingsState(manager))
     
     # Start with Menu
     manager.change_state("menu")
