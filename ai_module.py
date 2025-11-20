@@ -96,22 +96,44 @@ def eval_genomes(genomes, config_neat):
                 run = False
 
 def calculate_expected_score(rating_a, rating_b):
-    """
-    Calculates the expected score for player A against player B.
+    """Calculates the expected score for player A against player B using ELO formula.
+    
+    Args:
+        rating_a: ELO rating of player A.
+        rating_b: ELO rating of player B.
+    
+    Returns:
+        float: Expected score between 0.0 and 1.0.
     """
     return 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
 
+
 def calculate_new_rating(rating, expected_score, actual_score, k_factor=32):
-    """
-    Calculates the new rating based on expected vs actual score.
+    """Calculates the new ELO rating after a match.
+    
+    Args:
+        rating: Current ELO rating.
+        expected_score: Expected match outcome (from calculate_expected_score).
+        actual_score: Actual match outcome (1.0 for win, 0.0 for loss, 0.5 for draw).
+        k_factor: ELO K-factor controlling rating volatility. Defaults to 32.
+    
+    Returns:
+        float: New ELO rating.
     """
     return rating + k_factor * (actual_score - expected_score)
 
+
 def eval_genomes_competitive(genomes, config_neat):
-    """
-    Competitive co-evolution fitness function using ELO ratings.
-    Each genome plays multiple matches against other genomes.
-    Fitness is determined by the final ELO rating.
+    """Evaluates genomes using competitive ELO-based matchmaking.
+    
+    Each genome plays multiple matches against randomly selected opponents from
+    the population. Fitness is determined by final ELO rating after all matches.
+    This method encourages competitive evolution and provides more stable
+    fitness assessments than single-opponent evaluation.
+    
+    Args:
+        genomes: List of (genome_id, genome) tuples from NEAT population.
+        config_neat: NEAT configuration object.
     """
     # Convert to list for easier indexing
     genome_list = list(genomes)
@@ -229,100 +251,26 @@ def eval_genomes_competitive(genomes, config_neat):
         # Ensure fitness is at least 0, though ELO can technically be negative (unlikely with 1200 start)
         genome.fitness = max(0, genome.elo_rating)
 
-def validate_genome(genome, config_neat, generation=0, record_matches=True):
-    """
-    Validates a genome by playing a match against the Rule-Based AI.
-    Returns: (avg_rally_length, win_rate)
-    """
-    from match_recorder import MatchRecorder
-    import match_database
-    
-    net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
-    
-    total_rallies = 0
-    total_hits = 0
-    wins = 0
-    num_games = 5 # Play 5 validation games
-    
-    for game_idx in range(num_games):
-        game = game_engine.Game()
-        run = True
-        frame_count = 0
-        max_frames = 5000
-        
-        current_rally = 0
-        
-        # Initialize recorder if enabled
-        recorder = None
-        if record_matches:
-            metadata = {
-                "generation": generation,
-                "fitness": genome.fitness if hasattr(genome, 'fitness') and genome.fitness else 0
-            }
-            recorder = MatchRecorder(
-                f"gen{generation}_trainee",
-                "rule_based_ai",
-                match_type="training_validation",
-                metadata=metadata
-            )
-        
-        while run and frame_count < max_frames:
-            frame_count += 1
-            state = game.get_state()
-            
-            # Record frame
-            if recorder:
-                recorder.record_frame(state)
-            
-            # AI plays Left
-            inputs = (
-                state["paddle_left_y"] / config.SCREEN_HEIGHT,
-                state["ball_x"] / config.SCREEN_WIDTH,
-                state["ball_y"] / config.SCREEN_HEIGHT,
-                state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                1.0 if state["ball_vel_x"] < 0 else 0.0,
-                state["paddle_right_y"] / config.SCREEN_HEIGHT
-            )
-            output = net.activate(inputs)
-            action_idx = output.index(max(output))
-            left_move = "UP" if action_idx == 0 else "DOWN" if action_idx == 1 else None
-            
-            # Rule-Based plays Right
-            right_move = get_rule_based_move(state, "right")
-            
-            score_data = game.update(left_move, right_move)
-            
-            if score_data:
-                if score_data.get("hit_left") or score_data.get("hit_right"):
-                    current_rally += 1
-                    total_hits += 1
-                
-                if score_data.get("scored"):
-                    if score_data.get("scored") == "left":
-                        wins += 1
-                    run = False
-        
-        total_rallies += current_rally
-        
-        # Save and index recording
-        if recorder:
-            match_metadata = recorder.save()
-            if match_metadata:
-                match_database.index_match(match_metadata)
-
-    avg_rally = total_hits / num_games
-    win_rate = wins / num_games
-    return avg_rally, win_rate
 
 # Hall of Fame Storage
 HALL_OF_FAME = []
+"""List of elite genomes from previous generations for self-play training.
+
+This global list maintains high-performing genomes that can be used as
+opponents during self-play evaluation to ensure diverse training scenarios.
+"""
+
 
 def eval_genomes_self_play(genomes, config_neat):
-    """
-    Self-Play Fitness Function.
-    Genomes play against other genomes in the population.
+    """Evaluates genomes through self-play matches within the population.
+    
+    Genomes play against each other and occasionally against Hall of Fame
+    members. This encourages diverse strategies and prevents local optima
+    by exposing genomes to various play styles.
+    
+    Args:
+        genomes: List of (genome_id, genome) tuples from NEAT population.
+        config_neat: NEAT configuration object.
     """
     genome_list = list(genomes)
     for _, genome in genome_list:
