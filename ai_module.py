@@ -161,6 +161,9 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
         net_left = neat.nn.RecurrentNetwork.create(genome, config_neat)
         net_left.reset()  # Reset RNN state
         
+        # Track contact metrics for novelty search
+        contact_metrics_list = []
+        
         # Select random opponents
         opponent_indices = [i for i in range(len(genome_list)) if i != idx]
         selected_opponents = random.sample(opponent_indices, min(matches_per_genome, len(opponent_indices)))
