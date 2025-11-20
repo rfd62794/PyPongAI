@@ -14,7 +14,7 @@ import random
 from opponents import get_rule_based_move
 
 
-def eval_genomes(genomes, config_neat):
+def eval_genomes(genomes, config_neat, ball_speed=None):
     """Evaluates genomes by playing against a rule-based opponent.
     
     This is a basic fitness function where each genome plays a single game
