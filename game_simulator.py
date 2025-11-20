@@ -151,15 +151,24 @@ class Ball:
         rect: Rect instance defining ball position and dimensions.
         vel_x: Horizontal velocity in pixels per frame.
         vel_y: Vertical velocity in pixels per frame.
+        initial_speed_x: Initial X speed for resets.
+        initial_speed_y: Initial Y speed for resets.
     """
     
-    def __init__(self):
-        """Initializes the ball at screen center with random velocity."""
+    def __init__(self, speed_x=None, speed_y=None):
+        """Initializes the ball at screen center with specified or default velocity.
+        
+        Args:
+            speed_x: Initial horizontal speed. If None, uses config.BALL_SPEED_X.
+            speed_y: Initial vertical speed. If None, uses config.BALL_SPEED_Y.
+        """
         self.rect = Rect(config.SCREEN_WIDTH // 2 - config.BALL_RADIUS,
                          config.SCREEN_HEIGHT // 2 - config.BALL_RADIUS,
                          config.BALL_RADIUS * 2, config.BALL_RADIUS * 2)
-        self.vel_x = config.BALL_SPEED_X * random.choice((1, -1))
-        self.vel_y = config.BALL_SPEED_Y * random.choice((1, -1))
+        self.initial_speed_x = speed_x if speed_x is not None else config.BALL_SPEED_X
+        self.initial_speed_y = speed_y if speed_y is not None else config.BALL_SPEED_Y
+        self.vel_x = self.initial_speed_x * random.choice((1, -1))
+        self.vel_y = self.initial_speed_y * random.choice((1, -1))
 
     def move(self):
         """Updates ball position based on current velocity."""
@@ -169,8 +178,8 @@ class Ball:
     def reset(self):
         """Resets ball to center with random velocity direction."""
         self.rect.center = (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 2)
-        self.vel_x = config.BALL_SPEED_X * random.choice((1, -1))
-        self.vel_y = config.BALL_SPEED_Y * random.choice((1, -1))
+        self.vel_x = self.initial_speed_x * random.choice((1, -1))
+        self.vel_y = self.initial_speed_y * random.choice((1, -1))
 
 
 class GameSimulator:
@@ -188,12 +197,17 @@ class GameSimulator:
         score_right: Current score for right player.
     """
     
-    def __init__(self):
-        """Initializes a new game with paddles and ball at starting positions."""
+    def __init__(self, ball_speed=None):
+        """Initializes a new game with paddles and ball at starting positions.
+        
+        Args:
+            ball_speed: Optional custom ball speed for curriculum learning.
+                If None, uses default config values.
+        """
         self.left_paddle = Paddle(10, config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2)
         self.right_paddle = Paddle(config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH,
                                     config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2)
-        self.ball = Ball()
+        self.ball = Ball(speed_x=ball_speed, speed_y=ball_speed)
         self.score_left = 0
         self.score_right = 0
 
