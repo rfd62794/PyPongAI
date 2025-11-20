@@ -26,7 +26,8 @@ def eval_genomes(genomes, config_neat, ball_speed=None):
         config_neat: NEAT configuration object.
     """
     for genome_id, genome in genomes:
-        net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
+        net = neat.nn.RecurrentNetwork.create(genome, config_neat)
+        net.reset()  # Reset RNN state
         genome.fitness = 0
         
         game = game_simulator.GameSimulator()
