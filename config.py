@@ -19,6 +19,11 @@ MAX_SCORE = 20
 VISUAL_MAX_SCORE = 5
 PADDLE_MAX_SPEED = 15
 
+# Curriculum Learning Settings
+INITIAL_BALL_SPEED = 2  # Starting ball speed for generation 0
+SPEED_INCREASE_PER_GEN = 0.05  # Speed increase per generation
+MAX_CURRICULUM_SPEED = 10  # Maximum ball speed cap for curriculum
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
