@@ -229,6 +229,10 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
                 # Update game
                 score_data = game.update(left_move, right_move)
                 
+                # Collect contact metrics for novelty search
+                if score_data and (score_data.get("hit_left") or score_data.get("hit_right")):
+                    contact_metrics_list.append(score_data)
+                
                 # Check for scoring
                 if score_data:
                     if score_data.get("scored") == "left":
