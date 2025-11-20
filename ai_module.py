@@ -155,6 +155,9 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
     # Number of matches per genome
     matches_per_genome = min(5, len(genome_list) - 1)
     
+    # Track contact metrics for each genome (for novelty search)
+    genome_contact_metrics = {}
+    
     # Each genome plays multiple matches
     for idx, (genome_id, genome) in enumerate(genome_list):
         # Create network for this genome
@@ -162,7 +165,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
         net_left.reset()  # Reset RNN state
         
         # Track contact metrics for novelty search
-        contact_metrics_list = []
+        genome_contact_metrics[genome_id] = []
         
         # Select random opponents
         opponent_indices = [i for i in range(len(genome_list)) if i != idx]
