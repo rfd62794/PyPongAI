@@ -30,6 +30,26 @@ def get_best_model():
     models.sort(key=lambda x: get_fitness_from_filename(os.path.basename(x)), reverse=True)
     return models[0]
 
+def get_best_model_by_elo():
+    """
+    Returns the path to the best model based on ELO rating.
+    Falls back to fitness if ELO is not available or equal.
+    """
+    models = scan_models()
+    if not models:
+        return None
+        
+    elo_ratings = elo_manager.load_elo_ratings()
+    
+    def get_sort_key(model_path):
+        filename = os.path.basename(model_path)
+        elo = elo_ratings.get(filename, config.ELO_INITIAL_RATING)
+        fitness = get_fitness_from_filename(filename)
+        return (elo, fitness)
+        
+    models.sort(key=get_sort_key, reverse=True)
+    return models[0]
+
 import elo_manager
 
 def delete_models(model_paths):
