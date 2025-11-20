@@ -18,6 +18,14 @@ import config
 import model_manager
 
 
+class SimpleGenome:
+    """Simple picklable genome replacement for testing."""
+    def __init__(self, fitness=100, elo_rating=None):
+        self.fitness = fitness
+        if elo_rating is not None:
+            self.elo_rating = elo_rating
+
+
 class TestModelScanning(unittest.TestCase):
     """Tests for model scanning functionality."""
     
@@ -36,12 +44,11 @@ class TestModelScanning(unittest.TestCase):
         """Helper to create a mock model file."""
         filepath = os.path.join(self.test_dir, filename)
         
-        # Create a mock genome
-        mock_genome = Mock()
-        mock_genome.fitness = fitness
+        # Create a simple genome
+        genome = SimpleGenome(fitness=fitness)
         
         with open(filepath, 'wb') as f:
-            pickle.dump(mock_genome, f)
+            pickle.dump(genome, f)
         
         return filepath
     
@@ -82,9 +89,9 @@ class TestModelScanning(unittest.TestCase):
         
         # Create model in subdirectory
         filepath = os.path.join(subdir, "checkpoint_model.pkl")
-        mock_genome = Mock()
+        genome = SimpleGenome()
         with open(filepath, 'wb') as f:
-            pickle.dump(mock_genome, f)
+            pickle.dump(genome, f)
         
         models = model_manager.scan_models()
         
@@ -109,11 +116,13 @@ class TestModelConversion(unittest.TestCase):
         """Create a mock model without ELO attribute."""
         filepath = os.path.join(self.test_dir, filename)
         
-        mock_genome = Mock(spec=[])  # Empty spec = no attributes
-        mock_genome.fitness = 100
+        genome = SimpleGenome(fitness=100, elo_rating=None)
+        # Remove elo_rating if it was added
+        if hasattr(genome, 'elo_rating'):
+            delattr(genome, 'elo_rating')
         
         with open(filepath, 'wb') as f:
-            pickle.dump(mock_genome, f)
+            pickle.dump(genome, f)
         
         return filepath
     
@@ -136,12 +145,10 @@ class TestModelConversion(unittest.TestCase):
         """Test conversion doesn't overwrite existing ELO."""
         filepath = os.path.join(self.test_dir, "model_with_elo.pkl")
         
-        mock_genome = Mock()
-        mock_genome.fitness = 150
-        mock_genome.elo_rating = 1400
+        genome = SimpleGenome(fitness=150, elo_rating=1400)
         
         with open(filepath, 'wb') as f:
-            pickle.dump(mock_genome, f)
+            pickle.dump(genome, f)
         
         model_manager.convert_models_to_elo_format()
         
@@ -181,12 +188,10 @@ class TestBestModelSelection(unittest.TestCase):
         """Create model with specific ELO."""
         filepath = os.path.join(self.test_dir, filename)
         
-        mock_genome = Mock()
-        mock_genome.elo_rating = elo
-        mock_genome.fitness = elo  # For compatibility
+        genome = SimpleGenome(fitness=elo, elo_rating=elo)
         
         with open(filepath, 'wb') as f:
-            pickle.dump(mock_genome, f)
+            pickle.dump(genome, f)
         
         return filepath
     
@@ -247,8 +252,9 @@ class TestModelDeletion(unittest.TestCase):
         """Test models are deleted correctly."""
         # Create test file
         filepath = os.path.join(self.test_dir, "model_to_delete.pkl")
+        genome = SimpleGenome()
         with open(filepath, 'wb') as f:
-            pickle.dump(Mock(), f)
+            pickle.dump(genome, f)
         
         self.assertTrue(os.path.exists(filepath))
         
@@ -275,18 +281,16 @@ class TestModelMetadata(unittest.TestCase):
     
     def test_model_has_fitness_attribute(self):
         """Test loaded models have fitness attribute."""
-        mock_genome = Mock()
-        mock_genome.fitness = 1234
+        genome = SimpleGenome(fitness=1234)
         
-        self.assertTrue(hasattr(mock_genome, 'fitness'))
-        self.assertEqual(mock_genome.fitness, 1234)
+        self.assertTrue(hasattr(genome, 'fitness'))
+        self.assertEqual(genome.fitness, 1234)
     
     def test_model_has_elo_after_conversion(self):
         """Test models have ELO after conversion."""
-        mock_genome = Mock()
-        mock_genome.elo_rating = 1200
+        genome = SimpleGenome(elo_rating=1200)
         
-        self.assertTrue(hasattr(mock_genome, 'elo_rating'))
+        self.assertTrue(hasattr(genome, 'elo_rating'))
 
 
 if __name__ == '__main__':
