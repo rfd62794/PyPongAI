@@ -166,7 +166,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
             net_right.reset()  # Reset RNN state
             
             # Play a match
-            game = game_simulator.GameSimulator()
+            game = game_simulator.GameSimulator(ball_speed=ball_speed)
             run = True
             frame_count = 0
             max_frames = 3000  # Prevent infinite games
