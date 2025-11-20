@@ -323,6 +323,27 @@ class AnalyticsState(BaseState):
             
             y += 25
             
+            # Draw Replay Button
+            replay_btn = pygame.Rect(config.SCREEN_WIDTH - 100, y, 80, 20)
+            if replay_btn.collidepoint((mx, my)):
+                pygame.draw.rect(screen, (50, 50, 150), replay_btn)
+                if pygame.mouse.get_pressed()[0]:
+                    # Check if recording exists
+                    match_id = match.get("match_id")
+                    if match_id:
+                        filename = f"match_{match_id}.json"
+                        filepath = os.path.join(config.LOGS_MATCHES_DIR, filename)
+                        if os.path.exists(filepath):
+                            self.manager.change_state("replay", match_file=filepath)
+                            return
+            else:
+                pygame.draw.rect(screen, (30, 30, 100), replay_btn)
+                
+            btn_text = self.tiny_font.render("Replay", True, config.WHITE)
+            screen.blit(btn_text, (replay_btn.centerx - btn_text.get_width()//2, replay_btn.centery - btn_text.get_height()//2))
+
+            y += 25
+            
         # Back Button
         pygame.draw.rect(screen, (100, 0, 0), self.back_button)
         back_text = self.small_font.render("< Back", True, config.WHITE)
