@@ -255,17 +255,27 @@ class GameSimulator:
         # Track paddle hits
         hit_left = False
         hit_right = False
+        contact_metrics = {}
 
-        # Paddle Collision
-        # Left Paddle
+        # Paddle Collision - Left Paddle
         if self.ball.rect.colliderect(self.left_paddle.rect):
+            # Store contact metrics BEFORE modifying velocities
+            contact_metrics["contact_y"] = self.ball.rect.y
+            contact_metrics["ball_vel_x_before"] = self.ball.vel_x
+            contact_metrics["ball_vel_y_before"] = self.ball.vel_y
+            
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.left = self.left_paddle.rect.right  # Prevent sticking
             hit_left = True
         
-        # Right Paddle
+        # Paddle Collision - Right Paddle
         if self.ball.rect.colliderect(self.right_paddle.rect):
+            # Store contact metrics BEFORE modifying velocities
+            contact_metrics["contact_y"] = self.ball.rect.y
+            contact_metrics["ball_vel_x_before"] = self.ball.vel_x
+            contact_metrics["ball_vel_y_before"] = self.ball.vel_y
+            
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
             self.ball.rect.right = self.right_paddle.rect.left  # Prevent sticking
