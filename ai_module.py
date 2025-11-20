@@ -3,6 +3,7 @@ import neat
 import pygame
 import config
 import game_engine
+import game_simulator
 import random
 
 def get_rule_based_move(game_state, paddle="right"):
@@ -33,7 +34,7 @@ def eval_genomes(genomes, config_neat):
         net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
         genome.fitness = 0
         
-        game = game_engine.Game()
+        game = game_simulator.GameSimulator()
         
         # Genome plays as Left Paddle
         # Rule-based plays as Right Paddle
@@ -145,7 +146,7 @@ def eval_genomes_competitive(genomes, config_neat):
             net_right = neat.nn.FeedForwardNetwork.create(opp_genome, config_neat)
             
             # Play a match
-            game = game_engine.Game()
+            game = game_simulator.GameSimulator()
             run = True
             frame_count = 0
             max_frames = 3000  # Prevent infinite games
@@ -374,7 +375,7 @@ def eval_genomes_self_play(genomes, config_neat):
             net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
             net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
             
-            game = game_engine.Game()
+            game = game_simulator.GameSimulator()
             run = True
             frame_count = 0
             max_frames = 10000 
