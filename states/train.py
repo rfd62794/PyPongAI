@@ -7,6 +7,7 @@ import config
 import ai_module
 import game_engine
 import sys
+import itertools
 from states.base import BaseState
 from model_manager import get_best_model, get_fitness_from_filename
 import training_logger
@@ -269,6 +270,11 @@ class TrainState(BaseState):
             seed_genome.key = target_id
             p.population[target_id] = seed_genome
             p.species.speciate(config_neat, p.population, p.generation)
+            
+            # Fix for node ID collision
+            max_node_id = max(seed_genome.nodes.keys()) if seed_genome.nodes else 0
+            print(f"Updating node indexer to start from {max_node_id + 1}")
+            config_neat.genome_config.node_indexer = itertools.count(max_node_id + 1)
             
         p.add_reporter(neat.StdOutReporter(True))
         p.add_reporter(neat.StatisticsReporter())
