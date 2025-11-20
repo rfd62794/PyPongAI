@@ -15,6 +15,7 @@ class AnalyticsState(BaseState):
         
         self.models = []
         self.model_stats = {}
+        self.all_matches = []
         
         # View State
         self.view = "OVERVIEW"  # OVERVIEW, MODEL_DETAIL, MATCH_HISTORY
@@ -23,11 +24,13 @@ class AnalyticsState(BaseState):
         
         # UI Elements
         self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
+        self.history_button = pygame.Rect(config.SCREEN_WIDTH - 230, 10, 110, 40)
 
     def enter(self, **kwargs):
         self.view = "OVERVIEW"
         self.selected_model = None
         self.scan_models()
+        self.load_all_matches()
         
     def scan_models(self):
         self.models = []
@@ -40,43 +43,32 @@ class AnalyticsState(BaseState):
             for file in files:
                 if file.endswith(".pkl"):
                     full_path = os.path.join(root, file)
+                    filename = file
                     fitness = get_fitness_from_filename(file)
                     self.models.append(full_path)
                     
                     # Get stored ELO or default
-                    stored_elo = elo_ratings.get(file, config.ELO_INITIAL_RATING)
-                    
-                    # Initialize stats (we might want to load persistent stats if we had them, 
-                    # but for now we rely on ELO and filename fitness, plus maybe match DB aggregation?)
-                    # The original LeagueState calculated stats on the fly during the tournament.
-                    # For a persistent dashboard, we should ideally aggregate from the match database.
-                    # However, to keep it simple and consistent with the request to "move logic",
-                    # I will implement basic stats loading from ELO and DB.
+                    stored_elo = elo_ratings.get(filename, config.ELO_INITIAL_RATING)
                     
                     self.model_stats[full_path] = {
                         "fitness": fitness,
                         "elo": stored_elo,
-                        # These will be populated from DB aggregation if possible, or left 0
                         "wins": 0,
                         "losses": 0,
                         "points_scored": 0,
                         "points_conceded": 0,
-                        "total_reaction_time": 0,
-                        "reaction_count": 0,
-                        "distance_moved": 0,
                         "hits": 0
                     }
                     
                     # Aggregate stats from Match Database
-                    matches = match_database.get_matches_for_model(file)
+                    matches = match_database.get_matches_for_model(filename)
                     for m in matches:
-                        # Simple aggregation
                         p1 = m.get("p1")
                         p2 = m.get("p2")
                         winner = m.get("winner")
                         score = m.get("final_score", [0, 0])
                         
-                        is_p1 = (p1 == file)
+                        is_p1 = (p1 == filename)
                         
                         if is_p1:
                             my_score = score[0]
@@ -92,8 +84,15 @@ class AnalyticsState(BaseState):
                         self.model_stats[full_path]["points_scored"] += my_score
                         self.model_stats[full_path]["points_conceded"] += opp_score
 
-        # Sort by ELO
-        self.models.sort(key=lambda x: self.model_stats[x]["elo"], reverse=True)
+        # Sort by ELO, then Fitness
+        self.models.sort(key=lambda x: (self.model_stats[x]["elo"], self.model_stats[x]["fitness"]), reverse=True)
+
+    def load_all_matches(self):
+        # Load all matches for the history view
+        # This is a bit inefficient if DB is huge, but fine for now
+        self.all_matches = match_database.load_database()
+        # Sort by timestamp (newest first)
+        self.all_matches.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
 
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -106,6 +105,11 @@ class AnalyticsState(BaseState):
                 else:
                     self.view = "OVERVIEW"
                     self.selected_model = None
+                return
+            
+            # History button (only in overview)
+            if self.view == "OVERVIEW" and self.history_button.collidepoint(event.pos):
+                self.view = "MATCH_HISTORY"
                 return
             
             # View-specific handling
@@ -186,10 +190,14 @@ class AnalyticsState(BaseState):
             
             y += 30
 
-        # Back Button
+        # Buttons
         pygame.draw.rect(screen, (100, 0, 0), self.back_button)
         back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+        
+        pygame.draw.rect(screen, (0, 0, 100), self.history_button)
+        hist_text = self.small_font.render("History", True, config.WHITE)
+        screen.blit(hist_text, (self.history_button.centerx - hist_text.get_width()//2, self.history_button.centery - hist_text.get_height()//2))
 
     def draw_model_detail(self, screen):
         screen.fill(config.BLACK)
@@ -273,4 +281,49 @@ class AnalyticsState(BaseState):
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
 
     def draw_match_history(self, screen):
-        pass
+        screen.fill(config.BLACK)
+        title = self.font.render("Global Match History", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 20))
+        
+        y = 80
+        headers = ["Time", "Player 1", "Player 2", "Score", "Winner"]
+        x_offsets = [20, 150, 350, 550, 650]
+        
+        for i, h in enumerate(headers):
+            surf = self.small_font.render(h, True, config.GRAY)
+            screen.blit(surf, (x_offsets[i], y))
+        
+        y += 30
+        
+        for i, match in enumerate(self.all_matches[:15]): # Show top 15 recent
+            p1 = match.get("p1", "Unknown")
+            p2 = match.get("p2", "Unknown")
+            winner = match.get("winner", "?")
+            score = match.get("final_score", [0, 0])
+            ts = match.get("timestamp", "")
+            
+            # Format timestamp
+            ts_short = ts.split("T")[1].split(".")[0] if "T" in ts else ts[-8:]
+            
+            row_data = [
+                ts_short,
+                p1[:15],
+                p2[:15],
+                f"{score[0]}-{score[1]}",
+                "P1" if winner == "p1" else "P2"
+            ]
+            
+            for j, data in enumerate(row_data):
+                color = config.WHITE
+                if j == 4:
+                    color = config.GREEN if winner == "p1" else config.YELLOW
+                
+                surf = self.tiny_font.render(data, True, color)
+                screen.blit(surf, (x_offsets[j], y))
+            
+            y += 25
+            
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
+        back_text = self.small_font.render("< Back", True, config.WHITE)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
