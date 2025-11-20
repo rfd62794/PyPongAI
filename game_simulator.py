@@ -1,65 +1,137 @@
+"""Headless game simulation for PyPongAI.
+
+This module provides a lightweight, Pygame-independent implementation of the
+Pong game logic. It's optimized for high-speed AI training by eliminating
+rendering overhead while maintaining identical game physics to the visual version.
+"""
+
 import random
 import config
 
+
 class Rect:
+    """A simple rectangle class mimicking pygame.Rect for collision detection.
+    
+    Provides properties for accessing and manipulating rectangle boundaries,
+    enabling collision detection without Pygame dependencies.
+    
+    Attributes:
+        x: X-coordinate of the rectangle's top-left corner.
+        y: Y-coordinate of the rectangle's top-left corner.
+        width: Width of the rectangle.
+        height: Height of the rectangle.
     """
-    A simple rectangle class to mimic pygame.Rect for headless simulation.
-    """
+    
     def __init__(self, x, y, width, height):
+        """Initializes a rectangle with position and dimensions.
+        
+        Args:
+            x: X-coordinate of top-left corner.
+            y: Y-coordinate of top-left corner.
+            width: Rectangle width in pixels.
+            height: Rectangle height in pixels.
+        """
         self.x = x
         self.y = y
         self.width = width
         self.height = height
 
     @property
-    def left(self): return self.x
+    def left(self):
+        return self.x
+    
     @left.setter
-    def left(self, value): self.x = value
+    def left(self, value):
+        self.x = value
 
     @property
-    def right(self): return self.x + self.width
+    def right(self):
+        return self.x + self.width
+    
     @right.setter
-    def right(self, value): self.x = value - self.width
+    def right(self, value):
+        self.x = value - self.width
 
     @property
-    def top(self): return self.y
+    def top(self):
+        return self.y
+    
     @top.setter
-    def top(self, value): self.y = value
+    def top(self, value):
+        self.y = value
 
     @property
-    def bottom(self): return self.y + self.height
+    def bottom(self):
+        return self.y + self.height
+    
     @bottom.setter
-    def bottom(self, value): self.y = value - self.height
+    def bottom(self, value):
+        self.y = value - self.height
 
     @property
-    def centerx(self): return self.x + self.width / 2
+    def centerx(self):
+        return self.x + self.width / 2
+    
     @centerx.setter
-    def centerx(self, value): self.x = value - self.width / 2
+    def centerx(self, value):
+        self.x = value - self.width / 2
 
     @property
-    def centery(self): return self.y + self.height / 2
+    def centery(self):
+        return self.y + self.height / 2
+    
     @centery.setter
-    def centery(self, value): self.y = value - self.height / 2
+    def centery(self, value):
+        self.y = value - self.height / 2
     
     @property
-    def center(self): return (self.centerx, self.centery)
+    def center(self):
+        return (self.centerx, self.centery)
+    
     @center.setter
-    def center(self, value): 
+    def center(self, value):
         self.centerx = value[0]
         self.centery = value[1]
 
     def colliderect(self, other):
+        """Checks for collision with another rectangle.
+        
+        Args:
+            other: Another Rect instance to check collision with.
+        
+        Returns:
+            bool: True if rectangles overlap, False otherwise.
+        """
         return (self.x < other.x + other.width and
                 self.x + self.width > other.x and
                 self.y < other.y + other.height and
                 self.y + self.height > other.y)
 
+
 class Paddle:
+    """Represents a game paddle with position and movement logic.
+    
+    Attributes:
+        rect: Rect instance defining paddle position and dimensions.
+        speed: Current movement speed of the paddle.
+    """
+    
     def __init__(self, x, y):
+        """Initializes a paddle at the specified position.
+        
+        Args:
+            x: X-coordinate of paddle's top-left corner.
+            y: Y-coordinate of paddle's top-left corner.
+        """
         self.rect = Rect(x, y, config.PADDLE_WIDTH, config.PADDLE_HEIGHT)
         self.speed = config.PADDLE_SPEED
 
     def move(self, up=True):
+        """Moves the paddle vertically within screen bounds.
+        
+        Args:
+            up: If True, moves paddle upward. If False, moves downward.
+        """
         if up:
             self.rect.y -= self.speed
         else:
@@ -71,8 +143,18 @@ class Paddle:
         if self.rect.bottom > config.SCREEN_HEIGHT:
             self.rect.bottom = config.SCREEN_HEIGHT
 
+
 class Ball:
+    """Represents the game ball with position and velocity.
+    
+    Attributes:
+        rect: Rect instance defining ball position and dimensions.
+        vel_x: Horizontal velocity in pixels per frame.
+        vel_y: Vertical velocity in pixels per frame.
+    """
+    
     def __init__(self):
+        """Initializes the ball at screen center with random velocity."""
         self.rect = Rect(config.SCREEN_WIDTH // 2 - config.BALL_RADIUS,
                          config.SCREEN_HEIGHT // 2 - config.BALL_RADIUS,
                          config.BALL_RADIUS * 2, config.BALL_RADIUS * 2)
@@ -80,30 +162,56 @@ class Ball:
         self.vel_y = config.BALL_SPEED_Y * random.choice((1, -1))
 
     def move(self):
+        """Updates ball position based on current velocity."""
         self.rect.x += self.vel_x
         self.rect.y += self.vel_y
 
     def reset(self):
+        """Resets ball to center with random velocity direction."""
         self.rect.center = (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 2)
         self.vel_x = config.BALL_SPEED_X * random.choice((1, -1))
         self.vel_y = config.BALL_SPEED_Y * random.choice((1, -1))
 
+
 class GameSimulator:
+    """Headless Pong game simulator for high-speed AI training.
+    
+    This class provides the complete game logic without rendering. It handles
+    paddle movement, ball physics, collision detection, and scoring while
+    maintaining identical behavior to the visual game_engine.Game class.
+    
+    Attributes:
+        left_paddle: Paddle instance for the left player.
+        right_paddle: Paddle instance for the right player.
+        ball: Ball instance.
+        score_left: Current score for left player.
+        score_right: Current score for right player.
     """
-    Headless version of the Game class.
-    """
+    
     def __init__(self):
+        """Initializes a new game with paddles and ball at starting positions."""
         self.left_paddle = Paddle(10, config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2)
-        self.right_paddle = Paddle(config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH, config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2)
+        self.right_paddle = Paddle(config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH,
+                                    config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2)
         self.ball = Ball()
         self.score_left = 0
         self.score_right = 0
 
     def update(self, left_move=None, right_move=None):
-        """
-        Updates the game state.
-        left_move, right_move: 'UP', 'DOWN', or None
-        Returns: score_data (dict) if a score occurred, else None
+        """Updates game state for one frame based on player moves.
+        
+        Processes paddle movements, ball physics, collisions, and scoring.
+        Paddle speed dynamically scales with ball velocity for fair gameplay.
+        
+        Args:
+            left_move: Movement command for left paddle ("UP", "DOWN", or None).
+            right_move: Movement command for right paddle ("UP", "DOWN", or None).
+        
+        Returns:
+            dict or None: Dictionary containing game state and event data if an
+                event occurred (scoring, paddle hit, game over), None otherwise.
+                Event dict may contain keys: "scored", "hit_left", "hit_right",
+                "game_over", plus all state keys from get_state().
         """
         # Move paddles
         # Dynamic Paddle Speed
@@ -139,14 +247,14 @@ class GameSimulator:
         if self.ball.rect.colliderect(self.left_paddle.rect):
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
-            self.ball.rect.left = self.left_paddle.rect.right # Prevent sticking
+            self.ball.rect.left = self.left_paddle.rect.right  # Prevent sticking
             hit_left = True
         
         # Right Paddle
         if self.ball.rect.colliderect(self.right_paddle.rect):
             self.ball.vel_x *= -config.BALL_SPEED_INCREMENT
             self.ball.vel_y *= config.BALL_SPEED_INCREMENT
-            self.ball.rect.right = self.right_paddle.rect.left # Prevent sticking
+            self.ball.rect.right = self.right_paddle.rect.left  # Prevent sticking
             hit_right = True
             
         # Cap Speed
@@ -171,7 +279,7 @@ class GameSimulator:
         # Check for Game Over
         if self.score_left >= config.MAX_SCORE or self.score_right >= config.MAX_SCORE:
             if score_data is None:
-                 score_data = self.get_state()
+                score_data = self.get_state()
             score_data["game_over"] = True
         
         # Return hit events even if no score
@@ -185,6 +293,14 @@ class GameSimulator:
         return score_data
 
     def get_state(self):
+        """Returns the current game state as a dictionary.
+        
+        Returns:
+            dict: Dictionary containing ball position/velocity, paddle positions,
+                scores, and game_over flag. Keys: "ball_x", "ball_y", "ball_vel_x",
+                "ball_vel_y", "paddle_left_y", "paddle_right_y", "score_left",
+                "score_right", "game_over".
+        """
         return {
             "ball_x": self.ball.rect.x,
             "ball_y": self.ball.rect.y,
