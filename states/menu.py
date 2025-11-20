@@ -40,7 +40,7 @@ class MenuState(BaseState):
                 elif self.btn_league.collidepoint((mx, my)):
                     self.manager.change_state("league")
                 elif self.btn_dash.collidepoint((mx, my)):
-                    self.manager.change_state("dashboard")
+                    self.manager.change_state("analytics")
                 elif self.btn_quit.collidepoint((mx, my)):
                     self.manager.running = False
 

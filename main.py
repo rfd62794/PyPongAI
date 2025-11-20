@@ -7,7 +7,7 @@ from states.game import GameState
 from states.lobby import LobbyState
 from states.train import TrainState
 from states.models import ModelState
-from states.dashboard import DashboardState
+from states.analytics import AnalyticsState
 from states.league import LeagueState
 
 def main():
@@ -23,7 +23,7 @@ def main():
     manager.register_state("game", GameState(manager))
     manager.register_state("train", TrainState(manager))
     manager.register_state("models", ModelState(manager))
-    manager.register_state("dashboard", DashboardState(manager))
+    manager.register_state("analytics", AnalyticsState(manager))
     manager.register_state("league", LeagueState(manager))
     
     # Start with Menu
