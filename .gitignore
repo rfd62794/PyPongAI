@@ -1,0 +1,11 @@
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore large models and datasets
+*.pkl
+data/models/
+data/logs/
+
+# Ignore virtual environment (optional but recommended)
+venv/
