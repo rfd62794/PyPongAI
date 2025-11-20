@@ -4,6 +4,7 @@ import os
 import pickle
 import config
 import game_engine
+import game_simulator
 import sys
 import math
 from states.base import BaseState
@@ -222,12 +223,19 @@ class LeagueState(BaseState):
             self.start_next_match()
             return
 
+        # Choose engine based on visuals setting
+        if self.show_visuals:
+            game_instance = game_engine.Game()
+        else:
+            game_instance = game_simulator.GameSimulator()
+
         self.current_match = {
             "p1": p1_path,
             "p2": p2_path,
-            "game": game_engine.Game(),
+            "game": game_instance,
             "net1": None,
-            "net2": None
+            "net2": None,
+            "is_visual": self.show_visuals
         }
         
         # Initialize Match Analyzer
@@ -545,7 +553,13 @@ class LeagueState(BaseState):
     def draw_running(self, screen):
         if self.show_visuals:
             if self.current_match:
-                self.current_match["game"].draw(screen)
+                # Only draw if it's a visual game instance
+                if self.current_match.get("is_visual", True):
+                    self.current_match["game"].draw(screen)
+                else:
+                    screen.fill(config.BLACK)
+                    text = self.font.render("Fast Mode (Visuals Disabled for this Match)", True, config.WHITE)
+                    screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
         else:
             screen.fill(config.BLACK)
             text = self.font.render("Tournament Running (Fast Mode)...", True, config.WHITE)
