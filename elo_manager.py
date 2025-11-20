@@ -47,3 +47,21 @@ def remove_elo(filename):
     if filename in ratings:
         del ratings[filename]
         save_elo_ratings(ratings)
+
+def get_elo_tier(elo_rating):
+    """Determines the tier/rank based on ELO rating.
+    
+    Args:
+        elo_rating: The ELO rating to evaluate.
+    
+    Returns:
+        str: Tier name ("Bronze", "Silver", "Gold", or "Platinum").
+    """
+    if elo_rating >= config.PLATINUM_ELO_THRESHOLD:
+        return "Platinum"
+    elif elo_rating >= config.GOLD_ELO_THRESHOLD:
+        return "Gold"
+    elif elo_rating >= config.SILVER_ELO_THRESHOLD:
+        return "Silver"
+    else:
+        return "Bronze"
