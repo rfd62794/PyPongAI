@@ -422,6 +422,12 @@ class LeagueState(BaseState):
                     rel_x = event.pos[0] - self.similarity_slider.x
                     pct = max(0, min(1, rel_x / self.similarity_slider.width))
                     self.similarity_threshold = int(5 + pct * 45) # 5-50
+            
+            # Visual Toggle
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 150, 200, 40)
+                if toggle_rect.collidepoint(event.pos):
+                    self.show_visuals = not self.show_visuals
 
         elif self.mode == "RUNNING":
             # Visual Toggle
@@ -441,44 +447,7 @@ class LeagueState(BaseState):
                 if self.back_button.collidepoint(event.pos):
                     self.manager.change_state("menu")
                 elif self.dashboard_button.collidepoint(event.pos):
-                    self.mode = "DASHBOARD"
-
-        elif self.mode == "DASHBOARD":
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = event.pos
-                
-                # Back button - return to results or previous view
-                if self.back_button.collidepoint(event.pos):
-                    if self.dashboard_view == "OVERVIEW":
-                        self.mode = "RESULTS"
-                    else:
-                        self.dashboard_view = "OVERVIEW"
-                        self.selected_model = None
-                        self.selected_match = None
-                    return
-                
-                # View-specific handling
-                if self.dashboard_view == "OVERVIEW":
-                    # Check if clicked on a model in the list
-                    y_start = 110
-                    for i, model in enumerate(self.models[:15]):
-                        row_rect = pygame.Rect(50, y_start + i * 30, config.SCREEN_WIDTH - 100, 28)
-                        if row_rect.collidepoint((mx, my)):
-                            self.selected_model = model
-                            self.dashboard_view = "MODEL_DETAIL"
-                            return
-                
-                elif self.dashboard_view == "MODEL_DETAIL":
-                    # Check for match history clicks
-                    pass  # Will implement when drawing
-                
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    if self.dashboard_view == "OVERVIEW":
-                        self.mode = "RESULTS"
-                    else:
-                        self.dashboard_view = "OVERVIEW"
-                        self.selected_model = None
+                    self.manager.change_state("analytics")
 
     def update(self, dt):
         if self.mode == "RUNNING":
@@ -546,6 +515,14 @@ class LeagueState(BaseState):
         sim_text = self.small_font.render(f"Similarity Threshold: {self.similarity_threshold}", True, config.WHITE)
         screen.blit(sim_text, (self.similarity_slider.x, self.similarity_slider.y - 30))
         
+        # Visual Toggle
+        toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 150, 200, 40)
+        color = (0, 100, 0) if self.show_visuals else (100, 0, 0)
+        pygame.draw.rect(screen, color, toggle_rect)
+        pygame.draw.rect(screen, config.WHITE, toggle_rect, 2)
+        toggle_text = self.small_font.render("Visuals: " + ("ON" if self.show_visuals else "OFF"), True, config.WHITE)
+        screen.blit(toggle_text, (toggle_rect.centerx - toggle_text.get_width()//2, toggle_rect.centery - toggle_text.get_height()//2))
+
         # Warning
         count = 0
         for m in self.models:
@@ -636,168 +613,6 @@ class LeagueState(BaseState):
         pygame.draw.rect(screen, (100, 0, 0), self.back_button)
         back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
-
-    def draw_dashboard(self, screen):
-        """Dispatch to the appropriate dashboard view."""
-        if self.dashboard_view == "OVERVIEW":
-            self.draw_dashboard_overview(screen)
-        elif self.dashboard_view == "MODEL_DETAIL":
-            self.draw_dashboard_model_detail(screen)
-        elif self.dashboard_view == "MATCH_HISTORY":
-            self.draw_dashboard_match_history(screen)
-        elif self.dashboard_view == "REPLAY":
-            self.draw_dashboard_replay(screen)
-    
-    def draw_dashboard_overview(self, screen):
-        """Original dashboard with clickable model list."""
-        screen.fill(config.BLACK)
-        title = self.font.render("Analytics Dashboard - Overview", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, 20))
-        
-        subtitle = self.tiny_font.render("Click on a model to view details", True, config.GRAY)
-        screen.blit(subtitle, (config.SCREEN_WIDTH//2 - subtitle.get_width()//2, 60))
-        
-        # Headers
-        headers = ["Rank", "Model", "ELO", "Win %", "React (fr)", "Eff (px/pt)"]
-        x_offsets = [50, 120, 350, 450, 550, 700]
-        
-        for i, h in enumerate(headers):
-            surf = self.small_font.render(h, True, config.GRAY)
-            screen.blit(surf, (x_offsets[i], 80))
-            
-        # Data (clickable rows)
-        y = 110
-        mx, my = pygame.mouse.get_pos()
-        
-        for i, model in enumerate(self.models[:15]): # Show top 15
-            stats = self.model_stats[model]
-            name = os.path.basename(model)
-            
-            total_games = stats["wins"] + stats["losses"]
-            win_pct = f"{stats['wins']/total_games*100:.1f}%" if total_games > 0 else "0%"
-            
-            avg_react = f"{stats['total_reaction_time']/stats['reaction_count']:.1f}" if stats['reaction_count'] > 0 else "-"
-            
-            eff = f"{stats['distance_moved']/stats['points_scored']:.1f}" if stats['points_scored'] > 0 else "-"
-            
-            row_data = [
-                str(i+1),
-                name[:20],
-                str(int(stats["elo"])),
-                win_pct,
-                avg_react,
-                eff
-            ]
-            
-            # Highlight row on hover
-            row_rect = pygame.Rect(50, y, config.SCREEN_WIDTH - 100, 28)
-            if row_rect.collidepoint((mx, my)):
-                pygame.draw.rect(screen, (30, 30, 60), row_rect)
-            
-            for j, data in enumerate(row_data):
-                surf = self.small_font.render(data, True, config.WHITE)
-                screen.blit(surf, (x_offsets[j], y))
-            
-            y += 30
-
-        # Back Button
-        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
-        back_text = self.small_font.render("Back", True, config.WHITE)
-        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
-    
-    def draw_dashboard_model_detail(self, screen):
-        """Detailed view of a single model."""
-        import match_database
-        
-        screen.fill(config.BLACK)
-        
-        if not self.selected_model:
-            title = self.font.render("No Model Selected", True, config.WHITE)
-            screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, config.SCREEN_HEIGHT//2))
-            return
-        
-        stats = self.model_stats[self.selected_model]
-        name = os.path.basename(self.selected_model)
-        
-        # Title
-        title = self.font.render(f"Model: {name[:30]}", True, config.WHITE)
-        screen.blit(title, (20, 20))
-        
-        # Stats Card
-        y = 80
-        info_lines = [
-            f"Fitness: {stats['fitness']}",
-            f"ELO Rating: {int(stats['elo'])}",
-            f"Record: {stats['wins']}W - {stats['losses']}L ({stats['wins']/(stats['wins']+stats['losses'])*100:.1f}% win rate)" if (stats[' wins']+stats['losses']) > 0 else "Record: 0W - 0L",
-            f"Points: {stats['points_scored']} scored, {stats['points_conceded']} conceded",
-            "",
-            f"Avg Reaction: {stats['total_reaction_time']/stats['reaction_count']:.1f} frames" if stats['reaction_count'] > 0 else "Avg Reaction: N/A",
-            f"Efficiency: {stats['distance_moved']/stats['points_scored']:.1f} px/pt" if stats['points_scored'] > 0 else "Efficiency: N/A",
-            f"Total Hits: {stats['hits']}",
-        ]
-        
-        for line in info_lines:
-            surf = self.small_font.render(line, True, config.WHITE)
-            screen.blit(surf, (20, y))
-            y += 35
-        
-        # Match History
-        y += 20
-        history_title = self.small_font.render("Match History:", True, config.YELLOW)
-        screen.blit(history_title, (20, y))
-        y += 40
-        
-        # Get matches from database
-        matches = match_database.get_matches_for_model(name)
-        
-        if not matches:
-            no_matches = self.tiny_font.render("No matches recorded yet", True, config.GRAY)
-            screen.blit(no_matches, (40, y))
-        else:
-            # Show last 10 matches
-            for i, match in enumerate(matches[:10]):
-                p1, p2 = match.get("p1"), match.get("p2")
-                winner = match.get("winner")
-                score = match.get("final_score", [0, 0])
-                match_type = match.get("match_type", "unknown")
-                
-                # Determine if this model won
-                if p1 == name:
-                    opponent = p2
-                    result = "W" if winner == "p1" else "L"
-                    score_display = f"{score[0]}-{score[1]}"
-                else:
-                    opponent = p1
-                    result = "W" if winner == "p2" else "L"
-                    score_display = f"{score[1]}-{score[0]}"
-                
-                result_color = config.GREEN if result == "W" else config.RED
-                
-                # Draw match
-                result_text = self.tiny_font.render(f"[{result}]", True, result_color)
-                screen.blit(result_text, (40, y))
-                
-                match_text = self.tiny_font.render(f"vs {opponent[:25]} | {score_display} | {match_type}", True, config.WHITE)
-                screen.blit(match_text, (80, y))
-                
-                y += 25
-                
-                if y > config.SCREEN_HEIGHT - 80:
-                    break
-        
-        # Back Button
-        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
-        back_text = self.small_font.render("< Back", True, config.WHITE)
-        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
-    
-    def draw_dashboard_match_history(self, screen):
-        """List of all recent matches (placeholder for now)."""
-        screen.fill(config.BLACK)
-        title = self.font.render("Match History - Coming Soon", True, config.WHITE)
-        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, config.SCREEN_HEIGHT//2))
-        
-        # Back Button
-        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
         back_text = self.small_font.render("< Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
     
