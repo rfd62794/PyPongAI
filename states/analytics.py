@@ -90,7 +90,7 @@ class AnalyticsState(BaseState):
     def load_all_matches(self):
         # Load all matches for the history view
         # This is a bit inefficient if DB is huge, but fine for now
-        self.all_matches = match_database.load_database()
+        self.all_matches = match_database.load_index()["matches"]
         # Sort by timestamp (newest first)
         self.all_matches.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
 
