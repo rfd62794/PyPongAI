@@ -55,6 +55,16 @@ TOURNAMENT_VISUAL_DEFAULT = True
 ELO_K_FACTOR = 32
 ELO_INITIAL_RATING = 1200
 
+# ELO Tier System (Gamification)
+BRONZE_ELO_THRESHOLD = 1200
+SILVER_ELO_THRESHOLD = 1400
+GOLD_ELO_THRESHOLD = 1600
+PLATINUM_ELO_THRESHOLD = 1800
+
+# Novelty Search Settings
+NOVELTY_WEIGHT = 0.1  # Weight of novelty score in final fitness
+NOVELTY_K_NEAREST = 15  # Number of nearest neighbors for novelty calculation
+
 # Create directories if they don't exist
 for d in [DATA_DIR, MODEL_DIR, LOG_DIR, LOGS_TRAINING_DIR, LOGS_MATCHES_DIR, LOGS_HUMAN_DIR]:
     os.makedirs(d, exist_ok=True)
