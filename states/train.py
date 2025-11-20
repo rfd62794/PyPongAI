@@ -10,6 +10,7 @@ import sys
 import itertools
 from states.base import BaseState
 from model_manager import get_best_model, get_fitness_from_filename
+from opponents import get_rule_based_move
 import training_logger
 
 class UIProgressReporter(neat.reporting.BaseReporter):
@@ -168,7 +169,7 @@ class VisualReporter(neat.reporting.BaseReporter):
             left_move = "UP" if action_idx == 0 else "DOWN" if action_idx == 1 else None
             
             # Rule-Based AI (Right)
-            right_move = ai_module.get_rule_based_move(state, "right")
+            right_move = get_rule_based_move(state, "right")
             
             # Update
             game.update(left_move, right_move)
