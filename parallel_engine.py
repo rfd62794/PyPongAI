@@ -31,7 +31,7 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
                 elif cmd["type"] == "MOVE":
                     if cmd["paddle"] == "left":
                         left_move = cmd["action"]
-                        # print(f"DEBUG: Processing LEFT {left_move}")
+                        print(f"DEBUG: Processing LEFT {left_move}")
                     elif cmd["paddle"] == "right":
                         right_move = cmd["action"]
             except multiprocessing.queues.Empty:
@@ -42,8 +42,8 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
 
         # Update Game
         score_data = game.update(left_move, right_move)
-        # if left_move:
-        #    print(f"DEBUG: Paddle Left Y: {game.left_paddle.rect.y}, Speed: {game.left_paddle.speed}")
+        if left_move:
+            print(f"DEBUG: Paddle Left Y: {game.left_paddle.rect.y}, Speed: {game.left_paddle.speed}")
         
         # Get State
         state = game.get_state()
