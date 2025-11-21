@@ -28,9 +28,6 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
                 if cmd["type"] == "STOP":
                     running = False
                     break
-                if cmd["type"] == "STOP":
-                    running = False
-                    break
                 elif cmd["type"] == "MOVE":
                     if cmd["paddle"] == "left":
                         left_move = cmd["action"]
