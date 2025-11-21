@@ -2219,6 +2219,4306 @@
       "p2_elo_before": 1246.8602798453273,
       "p1_elo_after": 1805.6363861508626,
       "p2_elo_after": 1245.6182764381338
+    },
+    {
+      "match_id": "2832ed2e",
+      "timestamp": 1763691622.4574792,
+      "p1": "gen_37_fit_598.pkl",
+      "p2": "gen_42_fit_539.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        13
+      ],
+      "duration_frames": 12,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691622_2832ed2e_gen_37_fit_598pkl_vs_gen_42_fit_539pkl.json",
+      "p1_fitness": 598,
+      "p2_fitness": 539,
+      "p1_elo_before": 1199.1026498178799,
+      "p2_elo_before": 1184.0,
+      "p1_elo_after": 1214.4075848220373,
+      "p2_elo_after": 1168.6950649958426
+    },
+    {
+      "match_id": "dc85e51c",
+      "timestamp": 1763691623.5937061,
+      "p1": "gen_32_fit_658.pkl",
+      "p2": "gen_34_fit_539.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        18
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691623_dc85e51c_gen_32_fit_658pkl_vs_gen_34_fit_539pkl.json",
+      "p1_fitness": 658,
+      "p2_fitness": 539,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "fc5026bb",
+      "timestamp": 1763691624.2520888,
+      "p1": "gen_26_fit_1841.pkl",
+      "p2": "gen_36_fit_614.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        19
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691624_fc5026bb_gen_26_fit_1841pkl_vs_gen_36_fit_614pkl.json",
+      "p1_fitness": 1841,
+      "p2_fitness": 614,
+      "p1_elo_before": 1840.5511289338122,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1809.3328136842515,
+      "p2_elo_after": 1231.2183152495606
+    },
+    {
+      "match_id": "71e4ea1b",
+      "timestamp": 1763691624.953845,
+      "p1": "gen_15_fit_1725.pkl",
+      "p2": "gen_43_fit_1719.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691624_71e4ea1b_gen_15_fit_1725pkl_vs_gen_43_fit_1719pkl.json",
+      "p1_fitness": 1725,
+      "p2_fitness": 1719,
+      "p1_elo_before": 1725.201856360681,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1726.6861466103023,
+      "p2_elo_after": 1198.5157097503786
+    },
+    {
+      "match_id": "ff64995b",
+      "timestamp": 1763691625.692302,
+      "p1": "gen_8_fit_1616.pkl",
+      "p2": "gen_0_fit_1309.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 12,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691625_ff64995b_gen_8_fit_1616pkl_vs_gen_0_fit_1309pkl.json",
+      "p1_fitness": 1616,
+      "p2_fitness": 1309,
+      "p1_elo_before": 1618.4366899920785,
+      "p2_elo_before": 1309.050020747483,
+      "p1_elo_after": 1623.0505476138599,
+      "p2_elo_after": 1304.4361631257016
+    },
+    {
+      "match_id": "58fbffea",
+      "timestamp": 1763691626.4586093,
+      "p1": "gen_49_fit_1745.pkl",
+      "p2": "gen_9_fit_1636.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691626_58fbffea_gen_49_fit_1745pkl_vs_gen_9_fit_1636pkl.json",
+      "p1_fitness": 1745,
+      "p2_fitness": 1636,
+      "p1_elo_before": 1215.340654786278,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1198.6346502682325,
+      "p2_elo_after": 1216.7060045180456
+    },
+    {
+      "match_id": "59a966a0",
+      "timestamp": 1763691627.221868,
+      "p1": "gen_15_fit_1634.pkl",
+      "p2": "gen_46_fit_712.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691627_59a966a0_gen_15_fit_1634pkl_vs_gen_46_fit_712pkl.json",
+      "p1_fitness": 1634,
+      "p2_fitness": 712,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1215.2975328274754,
+      "p1_elo_after": 1216.7040225341211,
+      "p2_elo_after": 1198.5935102933543
+    },
+    {
+      "match_id": "c1ccb453",
+      "timestamp": 1763691627.966103,
+      "p1": "gen_16_fit_1869.pkl",
+      "p2": "gen_18_fit_1581.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 54,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691627_c1ccb453_gen_16_fit_1869pkl_vs_gen_18_fit_1581pkl.json",
+      "p1_fitness": 1869,
+      "p2_fitness": 1581,
+      "p1_elo_before": 1869.5275486660457,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1870.191633423617,
+      "p2_elo_after": 1199.3359152424287
+    },
+    {
+      "match_id": "a77871aa",
+      "timestamp": 1763691628.8252234,
+      "p1": "gen_12_fit_1845.pkl",
+      "p2": "gen_26_fit_1768.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        10,
+        17
+      ],
+      "duration_frames": 39,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691628_a77871aa_gen_12_fit_1845pkl_vs_gen_26_fit_1768pkl.json",
+      "p1_fitness": 1845,
+      "p2_fitness": 1768,
+      "p1_elo_before": 1845.480640900213,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1814.2409755297815,
+      "p2_elo_after": 1231.2396653704316
+    },
+    {
+      "match_id": "d5194d00",
+      "timestamp": 1763691629.4579139,
+      "p1": "gen_41_fit_1742.pkl",
+      "p2": "gen_46_fit_712.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        9
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691629_d5194d00_gen_41_fit_1742pkl_vs_gen_46_fit_712pkl.json",
+      "p1_fitness": 1742,
+      "p2_fitness": 712,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1198.5935102933543,
+      "p1_elo_after": 1215.9352291091807,
+      "p2_elo_after": 1182.6582811841736
+    },
+    {
+      "match_id": "b4f2eb9d",
+      "timestamp": 1763691630.2093196,
+      "p1": "gen_4_fit_1906.pkl",
+      "p2": "gen_42_fit_685.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        9,
+        17
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691630_b4f2eb9d_gen_4_fit_1906pkl_vs_gen_42_fit_685pkl.json",
+      "p1_fitness": 1906,
+      "p2_fitness": 685,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "2f6264ba",
+      "timestamp": 1763691630.8565314,
+      "p1": "gen_40_fit_1748.pkl",
+      "p2": "gen_46_fit_614.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 13,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691630_2f6264ba_gen_40_fit_1748pkl_vs_gen_46_fit_614pkl.json",
+      "p1_fitness": 1748,
+      "p2_fitness": 614,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "5c43c74a",
+      "timestamp": 1763691631.5635028,
+      "p1": "gen_5_fit_1559.pkl",
+      "p2": "gen_46_fit_712.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691631_5c43c74a_gen_5_fit_1559pkl_vs_gen_46_fit_712pkl.json",
+      "p1_fitness": 1559,
+      "p2_fitness": 712,
+      "p1_elo_before": 1231.2863446008826,
+      "p2_elo_before": 1182.6582811841736,
+      "p1_elo_after": 1213.0614488495812,
+      "p2_elo_after": 1200.883176935475
+    },
+    {
+      "match_id": "de60b300",
+      "timestamp": 1763691632.1604524,
+      "p1": "gen_21_fit_1578.pkl",
+      "p2": "gen_38_fit_616.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691632_de60b300_gen_21_fit_1578pkl_vs_gen_38_fit_616pkl.json",
+      "p1_fitness": 1578,
+      "p2_fitness": 616,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1184.736306793522,
+      "p2_elo_after": 1231.263693206478
+    },
+    {
+      "match_id": "804ff3a9",
+      "timestamp": 1763691632.7528796,
+      "p1": "gen_10_fit_1637.pkl",
+      "p2": "gen_44_fit_555.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691632_804ff3a9_gen_10_fit_1637pkl_vs_gen_44_fit_555pkl.json",
+      "p1_fitness": 1637,
+      "p2_fitness": 555,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1231.3914911226263,
+      "p1_elo_after": 1185.4417105986834,
+      "p2_elo_after": 1245.949780523943
+    },
+    {
+      "match_id": "1e75be1f",
+      "timestamp": 1763691633.3321745,
+      "p1": "gen_1_fit_1908.pkl",
+      "p2": "gen_24_fit_591.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691633_1e75be1f_gen_1_fit_1908pkl_vs_gen_24_fit_591pkl.json",
+      "p1_fitness": 1908,
+      "p2_fitness": 591,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "1e8a3fbd",
+      "timestamp": 1763691633.948229,
+      "p1": "gen_11_fit_1743.pkl",
+      "p2": "gen_42_fit_584.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        18
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691633_1e8a3fbd_gen_11_fit_1743pkl_vs_gen_42_fit_584pkl.json",
+      "p1_fitness": 1743,
+      "p2_fitness": 584,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "d703cdfe",
+      "timestamp": 1763691634.5123491,
+      "p1": "gen_13_fit_1692.pkl",
+      "p2": "gen_39_fit_561.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691634_d703cdfe_gen_13_fit_1692pkl_vs_gen_39_fit_561pkl.json",
+      "p1_fitness": 1692,
+      "p2_fitness": 561,
+      "p1_elo_before": 1692.7257592315045,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1694.4982653533152,
+      "p2_elo_after": 1198.2274938781893
+    },
+    {
+      "match_id": "22e42e3b",
+      "timestamp": 1763691635.1109707,
+      "p1": "gen_0_fit_1361.pkl",
+      "p2": "gen_0_fit_1340.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691635_22e42e3b_gen_0_fit_1361pkl_vs_gen_0_fit_1340pkl.json",
+      "p1_fitness": 1361,
+      "p2_fitness": 1340,
+      "p1_elo_before": 1370.0801785579317,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1378.818684108338,
+      "p2_elo_after": 1191.2614944495938
+    },
+    {
+      "match_id": "f1f1cbae",
+      "timestamp": 1763691635.749729,
+      "p1": "gen_34_fit_1852.pkl",
+      "p2": "gen_4_fit_1558.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691635_f1f1cbae_gen_34_fit_1852pkl_vs_gen_4_fit_1558pkl.json",
+      "p1_fitness": 1852,
+      "p2_fitness": 1558,
+      "p1_elo_before": 1852.5759454052447,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1821.3065454326202,
+      "p2_elo_after": 1231.2693999726246
+    },
+    {
+      "match_id": "1ed5864f",
+      "timestamp": 1763691636.3577433,
+      "p1": "gen_8_fit_1614.pkl",
+      "p2": "gen_3_fit_1538.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        17
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691636_1ed5864f_gen_8_fit_1614pkl_vs_gen_3_fit_1538pkl.json",
+      "p1_fitness": 1614,
+      "p2_fitness": 1538,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "dc3b3adf",
+      "timestamp": 1763691637.0068727,
+      "p1": "gen_25_fit_1617.pkl",
+      "p2": "gen_32_fit_1594.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691637_dc3b3adf_gen_25_fit_1617pkl_vs_gen_32_fit_1594pkl.json",
+      "p1_fitness": 1617,
+      "p2_fitness": 1594,
+      "p1_elo_before": 1182.5041932563552,
+      "p2_elo_before": 1216.736306793522,
+      "p1_elo_after": 1168.075558819854,
+      "p2_elo_after": 1231.1649412300233
+    },
+    {
+      "match_id": "23d049f9",
+      "timestamp": 1763691637.6335418,
+      "p1": "gen_48_fit_1797.pkl",
+      "p2": "gen_49_fit_745.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        9,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691637_23d049f9_gen_48_fit_1797pkl_vs_gen_49_fit_745pkl.json",
+      "p1_fitness": 1797,
+      "p2_fitness": 745,
+      "p1_elo_before": 1765.8443269763259,
+      "p2_elo_before": 1198.5304984710244,
+      "p1_elo_after": 1735.0208411934987,
+      "p2_elo_after": 1229.3539842538516
+    },
+    {
+      "match_id": "85883c1c",
+      "timestamp": 1763691638.2977955,
+      "p1": "gen_7_fit_1859.pkl",
+      "p2": "gen_28_fit_1622.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691638_85883c1c_gen_7_fit_1859pkl_vs_gen_28_fit_1622pkl.json",
+      "p1_fitness": 1859,
+      "p2_fitness": 1622,
+      "p1_elo_before": 1859.6476941274946,
+      "p2_elo_before": 1199.263693206478,
+      "p1_elo_after": 1828.3468847034703,
+      "p2_elo_after": 1230.5645026305021
+    },
+    {
+      "match_id": "c6629941",
+      "timestamp": 1763691638.9207103,
+      "p1": "gen_36_fit_592.pkl",
+      "p2": "gen_44_fit_555.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691638_c6629941_gen_36_fit_592pkl_vs_gen_44_fit_555pkl.json",
+      "p1_fitness": 592,
+      "p2_fitness": 555,
+      "p1_elo_before": 1199.263693206478,
+      "p2_elo_before": 1245.949780523943,
+      "p1_elo_after": 1217.4008196433883,
+      "p2_elo_after": 1227.8126540870326
+    },
+    {
+      "match_id": "c2f73507",
+      "timestamp": 1763691639.6223302,
+      "p1": "gen_38_fit_1847.pkl",
+      "p2": "gen_17_fit_597.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        8
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691639_c2f73507_gen_38_fit_1847pkl_vs_gen_17_fit_597pkl.json",
+      "p1_fitness": 1847,
+      "p2_fitness": 597,
+      "p1_elo_before": 1847.3784651193941,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1848.2014435641638,
+      "p2_elo_after": 1215.1770215552303
+    },
+    {
+      "match_id": "10b2c3ea",
+      "timestamp": 1763691640.1984172,
+      "p1": "gen_17_fit_1695.pkl",
+      "p2": "gen_13_fit_517.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691640_10b2c3ea_gen_17_fit_1695pkl_vs_gen_13_fit_517pkl.json",
+      "p1_fitness": 1695,
+      "p2_fitness": 517,
+      "p1_elo_before": 1216.736306793522,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1199.9661669788793,
+      "p2_elo_after": 1216.7701398146428
+    },
+    {
+      "match_id": "bdd003c6",
+      "timestamp": 1763691640.8388665,
+      "p1": "gen_19_fit_1893.pkl",
+      "p2": "gen_19_fit_1766.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691640_bdd003c6_gen_19_fit_1893pkl_vs_gen_19_fit_1766pkl.json",
+      "p1_fitness": 1893,
+      "p2_fitness": 1766,
+      "p1_elo_before": 1862.84903460085,
+      "p2_elo_before": 1785.3453641953888,
+      "p1_elo_after": 1875.3379063826033,
+      "p2_elo_after": 1772.8564924136356
+    },
+    {
+      "match_id": "ca7f38f5",
+      "timestamp": 1763691641.4556434,
+      "p1": "gen_24_fit_1604.pkl",
+      "p2": "gen_49_fit_745.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691641_ca7f38f5_gen_24_fit_1604pkl_vs_gen_49_fit_745pkl.json",
+      "p1_fitness": 1604,
+      "p2_fitness": 745,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1229.3539842538516,
+      "p1_elo_after": 1217.348593637127,
+      "p2_elo_after": 1212.0053906167248
+    },
+    {
+      "match_id": "570a1749",
+      "timestamp": 1763691642.030019,
+      "p1": "gen_12_fit_1845.pkl",
+      "p2": "gen_4_fit_1558.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        13
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691642_570a1749_gen_12_fit_1845pkl_vs_gen_4_fit_1558pkl.json",
+      "p1_fitness": 1845,
+      "p2_fitness": 1558,
+      "p1_elo_before": 1814.2409755297815,
+      "p2_elo_before": 1231.2693999726246,
+      "p1_elo_after": 1815.3195030420695,
+      "p2_elo_after": 1230.1908724603365
+    },
+    {
+      "match_id": "8c953877",
+      "timestamp": 1763691642.614655,
+      "p1": "gen_26_fit_1618.pkl",
+      "p2": "gen_39_fit_571.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        13
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691642_8c953877_gen_26_fit_1618pkl_vs_gen_39_fit_571pkl.json",
+      "p1_fitness": 1618,
+      "p2_fitness": 571,
+      "p1_elo_before": 1216.0,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1231.263693206478,
+      "p2_elo_after": 1184.736306793522
+    },
+    {
+      "match_id": "6e3ca707",
+      "timestamp": 1763691643.1863227,
+      "p1": "gen_16_fit_1697.pkl",
+      "p2": "gen_0_fit_1363.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691643_6e3ca707_gen_16_fit_1697pkl_vs_gen_0_fit_1363pkl.json",
+      "p1_fitness": 1697,
+      "p2_fitness": 1363,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "d94807de",
+      "timestamp": 1763691643.7887268,
+      "p1": "gen_30_fit_1837.pkl",
+      "p2": "gen_7_fit_1588.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691643_d94807de_gen_30_fit_1837pkl_vs_gen_7_fit_1588pkl.json",
+      "p1_fitness": 1837,
+      "p2_fitness": 1588,
+      "p1_elo_before": 1838.1513137319612,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1806.9436027406678,
+      "p2_elo_after": 1231.2077109912934
+    },
+    {
+      "match_id": "b5ebd83f",
+      "timestamp": 1763691644.3670547,
+      "p1": "gen_34_fit_1825.pkl",
+      "p2": "gen_48_fit_615.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691644_b5ebd83f_gen_34_fit_1825pkl_vs_gen_48_fit_615pkl.json",
+      "p1_fitness": 1825,
+      "p2_fitness": 615,
+      "p1_elo_before": 1828.722852499316,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1797.5581774835898,
+      "p2_elo_after": 1231.1646750157263
+    },
+    {
+      "match_id": "89175b38",
+      "timestamp": 1763691644.9664533,
+      "p1": "gen_27_fit_1848.pkl",
+      "p2": "gen_39_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691644_89175b38_gen_27_fit_1848pkl_vs_gen_39_fit_1737pkl.json",
+      "p1_fitness": 1848,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1847.457527416193,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1848.2801410192485,
+      "p2_elo_after": 1215.1773863969445
+    },
+    {
+      "match_id": "ff985422",
+      "timestamp": 1763691645.571902,
+      "p1": "gen_9_fit_1847.pkl",
+      "p2": "gen_36_fit_1835.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691645_ff985422_gen_9_fit_1847pkl_vs_gen_36_fit_1835pkl.json",
+      "p1_fitness": 1847,
+      "p2_fitness": 1835,
+      "p1_elo_before": 1785.18107503644,
+      "p2_elo_before": 1805.6363861508626,
+      "p1_elo_after": 1770.1219900183632,
+      "p2_elo_after": 1820.6954711689393
+    },
+    {
+      "match_id": "79004e74",
+      "timestamp": 1763691646.1733155,
+      "p1": "gen_10_fit_1845.pkl",
+      "p2": "gen_0_fit_1309.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691646_79004e74_gen_10_fit_1845pkl_vs_gen_0_fit_1309pkl.json",
+      "p1_fitness": 1845,
+      "p2_fitness": 1309,
+      "p1_elo_before": 1844.9639952767939,
+      "p2_elo_before": 1304.4361631257016,
+      "p1_elo_after": 1846.3282903100492,
+      "p2_elo_after": 1303.0718680924463
+    },
+    {
+      "match_id": "0836c964",
+      "timestamp": 1763691646.7568393,
+      "p1": "gen_13_fit_1692.pkl",
+      "p2": "gen_16_fit_1644.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691646_0836c964_gen_13_fit_1692pkl_vs_gen_16_fit_1644pkl.json",
+      "p1_fitness": 1692,
+      "p2_fitness": 1644,
+      "p1_elo_before": 1694.4982653533152,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1696.2537650170843,
+      "p2_elo_after": 1198.2445003362309
+    },
+    {
+      "match_id": "8dbd7458",
+      "timestamp": 1763691647.3267162,
+      "p1": "gen_3_fit_1903.pkl",
+      "p2": "gen_14_fit_1665.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        13
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691647_8dbd7458_gen_3_fit_1903pkl_vs_gen_14_fit_1665pkl.json",
+      "p1_fitness": 1903,
+      "p2_fitness": 1665,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1200.736306793522,
+      "p2_elo_after": 1183.263693206478
+    },
+    {
+      "match_id": "ca49e278",
+      "timestamp": 1763691647.8861675,
+      "p1": "gen_21_fit_1734.pkl",
+      "p2": "gen_47_fit_666.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691647_ca49e278_gen_21_fit_1734pkl_vs_gen_47_fit_666pkl.json",
+      "p1_fitness": 1734,
+      "p2_fitness": 666,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1198.7501584767845,
+      "p1_elo_after": 1183.942442919079,
+      "p2_elo_after": 1214.8077155577055
+    },
+    {
+      "match_id": "3d559dfe",
+      "timestamp": 1763691648.4644978,
+      "p1": "gen_46_fit_1757.pkl",
+      "p2": "gen_39_fit_571.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691648_3d559dfe_gen_46_fit_1757pkl_vs_gen_39_fit_571pkl.json",
+      "p1_fitness": 1757,
+      "p2_fitness": 571,
+      "p1_elo_before": 1756.9813906120887,
+      "p2_elo_before": 1184.736306793522,
+      "p1_elo_after": 1726.1261551191233,
+      "p2_elo_after": 1215.5915422864875
+    },
+    {
+      "match_id": "39fe3c5e",
+      "timestamp": 1763691649.0380695,
+      "p1": "gen_6_fit_1849.pkl",
+      "p2": "gen_13_fit_1692.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691649_39fe3c5e_gen_6_fit_1849pkl_vs_gen_13_fit_1692pkl.json",
+      "p1_fitness": 1849,
+      "p2_fitness": 1692,
+      "p1_elo_before": 1819.1525069873821,
+      "p2_elo_before": 1696.2537650170843,
+      "p1_elo_after": 1797.7176231971894,
+      "p2_elo_after": 1717.688648807277
+    },
+    {
+      "match_id": "1df3bd5b",
+      "timestamp": 1763691649.652,
+      "p1": "gen_45_fit_1723.pkl",
+      "p2": "gen_3_fit_1521.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        16
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691649_1df3bd5b_gen_45_fit_1723pkl_vs_gen_3_fit_1521pkl.json",
+      "p1_fitness": 1723,
+      "p2_fitness": 1521,
+      "p1_elo_before": 1231.1330092254593,
+      "p2_elo_before": 1493.661942753074,
+      "p1_elo_after": 1225.348836719253,
+      "p2_elo_after": 1499.4461152592803
+    },
+    {
+      "match_id": "3731f8bd",
+      "timestamp": 1763691650.2073188,
+      "p1": "gen_39_fit_1808.pkl",
+      "p2": "gen_36_fit_596.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        5,
+        19
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691650_3731f8bd_gen_39_fit_1808pkl_vs_gen_36_fit_596pkl.json",
+      "p1_fitness": 1808,
+      "p2_fitness": 596,
+      "p1_elo_before": 1808.2850082609784,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1777.2215712384425,
+      "p2_elo_after": 1231.063437022536
+    },
+    {
+      "match_id": "b92abafb",
+      "timestamp": 1763691650.7489867,
+      "p1": "gen_1_fit_1450.pkl",
+      "p2": "gen_47_fit_659.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691650_b92abafb_gen_1_fit_1450pkl_vs_gen_47_fit_659pkl.json",
+      "p1_fitness": 1450,
+      "p2_fitness": 659,
+      "p1_elo_before": 1448.9845586360389,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1455.147427112137,
+      "p2_elo_after": 1193.837131523902
+    },
+    {
+      "match_id": "6e6c521c",
+      "timestamp": 1763691651.3078744,
+      "p1": "gen_35_fit_1784.pkl",
+      "p2": "gen_26_fit_518.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691651_6e6c521c_gen_35_fit_1784pkl_vs_gen_26_fit_518pkl.json",
+      "p1_fitness": 1784,
+      "p2_fitness": 518,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1169.4387739660467,
+      "p1_elo_after": 1182.5962221767109,
+      "p2_elo_after": 1186.8425517893359
+    },
+    {
+      "match_id": "1f581c70",
+      "timestamp": 1763691651.8858538,
+      "p1": "gen_18_fit_1887.pkl",
+      "p2": "gen_31_fit_617.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691651_1f581c70_gen_18_fit_1887pkl_vs_gen_31_fit_617pkl.json",
+      "p1_fitness": 1887,
+      "p2_fitness": 617,
+      "p1_elo_before": 1887.5773452198596,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1856.1771216259444,
+      "p2_elo_after": 1231.4002235939151
+    },
+    {
+      "match_id": "9d7c413e",
+      "timestamp": 1763691652.4670987,
+      "p1": "gen_9_fit_1636.pkl",
+      "p2": "gen_45_fit_1585.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        13
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691652_9d7c413e_gen_9_fit_1636pkl_vs_gen_45_fit_1585pkl.json",
+      "p1_fitness": 1636,
+      "p2_fitness": 1585,
+      "p1_elo_before": 1216.7060045180456,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1231.9372569474926,
+      "p2_elo_after": 1184.768747570553
+    },
+    {
+      "match_id": "1afb9e63",
+      "timestamp": 1763691653.0238564,
+      "p1": "gen_5_fit_1867.pkl",
+      "p2": "gen_0_fit_1322.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        17
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691653_1afb9e63_gen_5_fit_1867pkl_vs_gen_0_fit_1322pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 1322,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "7f65ada9",
+      "timestamp": 1763691653.6109478,
+      "p1": "gen_43_fit_621.pkl",
+      "p2": "gen_16_fit_523.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691653_7f65ada9_gen_43_fit_621pkl_vs_gen_16_fit_523pkl.json",
+      "p1_fitness": 621,
+      "p2_fitness": 523,
+      "p1_elo_before": 1215.5822117749492,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1199.6014516244563,
+      "p2_elo_after": 1231.9807601504929
+    },
+    {
+      "match_id": "9fefc588",
+      "timestamp": 1763691654.191958,
+      "p1": "model_20251119_093813_fitness2000.pkl",
+      "p2": "gen_40_fit_550.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        8
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691654_9fefc588_model_20251119_093813_fitness2_vs_gen_40_fit_550pkl.json",
+      "p1_fitness": 2000,
+      "p2_fitness": 550,
+      "p1_elo_before": 1199.263693206478,
+      "p2_elo_before": 1218.841682803942,
+      "p1_elo_after": 1216.1643398675208,
+      "p2_elo_after": 1201.941036142899
+    },
+    {
+      "match_id": "48bb8d92",
+      "timestamp": 1763691654.7476072,
+      "p1": "gen_8_fit_1614.pkl",
+      "p2": "gen_36_fit_1563.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691654_48bb8d92_gen_8_fit_1614pkl_vs_gen_36_fit_1563pkl.json",
+      "p1_fitness": 1614,
+      "p2_fitness": 1563,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1231.359624006793,
+      "p1_elo_after": 1202.167582638238,
+      "p2_elo_after": 1213.192041368555
+    },
+    {
+      "match_id": "e0728679",
+      "timestamp": 1763691655.310276,
+      "p1": "gen_27_fit_1633.pkl",
+      "p2": "gen_40_fit_550.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691655_e0728679_gen_27_fit_1633pkl_vs_gen_40_fit_550pkl.json",
+      "p1_fitness": 1633,
+      "p2_fitness": 550,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1201.941036142899,
+      "p1_elo_after": 1216.0893870877771,
+      "p2_elo_after": 1185.851649055122
+    },
+    {
+      "match_id": "2a9430b5",
+      "timestamp": 1763691655.8870225,
+      "p1": "gen_45_fit_1779.pkl",
+      "p2": "gen_31_fit_501.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        0,
+        0
+      ],
+      "duration_frames": 2,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691655_2a9430b5_gen_45_fit_1779pkl_vs_gen_31_fit_501pkl.json",
+      "p1_fitness": 1779,
+      "p2_fitness": 501,
+      "p1_elo_before": 1780.5248674100585,
+      "p2_elo_before": 1231.263693206478,
+      "p1_elo_after": 1781.824988280906,
+      "p2_elo_after": 1229.9635723356305
+    },
+    {
+      "match_id": "757bfc5a",
+      "timestamp": 1763691656.6192625,
+      "p1": "gen_32_fit_1804.pkl",
+      "p2": "gen_49_fit_525.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691656_757bfc5a_gen_32_fit_1804pkl_vs_gen_49_fit_525pkl.json",
+      "p1_fitness": 1804,
+      "p2_fitness": 525,
+      "p1_elo_before": 1804.2130990535316,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1805.171209128361,
+      "p2_elo_after": 1199.0418899251706
+    },
+    {
+      "match_id": "7a169c13",
+      "timestamp": 1763691657.191109,
+      "p1": "gen_44_fit_606.pkl",
+      "p2": "gen_25_fit_536.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691657_7a169c13_gen_44_fit_606pkl_vs_gen_25_fit_536pkl.json",
+      "p1_fitness": 606,
+      "p2_fitness": 536,
+      "p1_elo_before": 1231.213805351677,
+      "p2_elo_before": 1215.0945347708139,
+      "p1_elo_after": 1246.472017663787,
+      "p2_elo_after": 1199.8363224587038
+    },
+    {
+      "match_id": "0bc7b706",
+      "timestamp": 1763691657.7696397,
+      "p1": "gen_29_fit_1764.pkl",
+      "p2": "gen_34_fit_516.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691657_0bc7b706_gen_29_fit_1764pkl_vs_gen_34_fit_516pkl.json",
+      "p1_fitness": 1764,
+      "p2_fitness": 516,
+      "p1_elo_before": 1198.8999910776545,
+      "p2_elo_before": 1245.8278203282016,
+      "p1_elo_after": 1185.048050506363,
+      "p2_elo_after": 1259.679760899493
+    },
+    {
+      "match_id": "a1df540d",
+      "timestamp": 1763691658.376603,
+      "p1": "gen_30_fit_1837.pkl",
+      "p2": "gen_1_fit_1446.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691658_a1df540d_gen_30_fit_1837pkl_vs_gen_1_fit_1446pkl.json",
+      "p1_fitness": 1837,
+      "p2_fitness": 1446,
+      "p1_elo_before": 1806.9436027406678,
+      "p2_elo_before": 1216.0668812021004,
+      "p1_elo_after": 1775.9756985411836,
+      "p2_elo_after": 1247.0347854015845
+    },
+    {
+      "match_id": "7d7400e0",
+      "timestamp": 1763691658.936507,
+      "p1": "gen_19_fit_1598.pkl",
+      "p2": "gen_48_fit_615.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        12
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691658_7d7400e0_gen_19_fit_1598pkl_vs_gen_48_fit_615pkl.json",
+      "p1_fitness": 1598,
+      "p2_fitness": 615,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1231.1646750157263,
+      "p1_elo_after": 1217.4313495307385,
+      "p2_elo_after": 1213.7333254849877
+    },
+    {
+      "match_id": "c3e29aec",
+      "timestamp": 1763691659.543955,
+      "p1": "gen_37_fit_1833.pkl",
+      "p2": "gen_5_fit_1573.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691659_c3e29aec_gen_37_fit_1833pkl_vs_gen_5_fit_1573pkl.json",
+      "p1_fitness": 1833,
+      "p2_fitness": 1573,
+      "p1_elo_before": 1817.7243801639086,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1786.6958954033237,
+      "p2_elo_after": 1247.028484760585
+    },
+    {
+      "match_id": "b1c65d6e",
+      "timestamp": 1763691660.1220937,
+      "p1": "gen_38_fit_616.pkl",
+      "p2": "gen_37_fit_598.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        10,
+        16
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691660_b1c65d6e_gen_38_fit_616pkl_vs_gen_37_fit_598pkl.json",
+      "p1_fitness": 616,
+      "p2_fitness": 598,
+      "p1_elo_before": 1231.263693206478,
+      "p2_elo_before": 1214.4075848220373,
+      "p1_elo_after": 1214.4880491985152,
+      "p2_elo_after": 1231.18322883
+    },
+    {
+      "match_id": "05946993",
+      "timestamp": 1763691660.6597612,
+      "p1": "gen_40_fit_550.pkl",
+      "p2": "gen_28_fit_505.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691660_05946993_gen_40_fit_550pkl_vs_gen_28_fit_505pkl.json",
+      "p1_fitness": 550,
+      "p2_fitness": 505,
+      "p1_elo_before": 1185.851649055122,
+      "p2_elo_before": 1201.4695015289756,
+      "p1_elo_after": 1202.570393692414,
+      "p2_elo_after": 1184.7507568916835
+    },
+    {
+      "match_id": "628fc9ec",
+      "timestamp": 1763691661.2416086,
+      "p1": "gen_35_fit_1825.pkl",
+      "p2": "gen_32_fit_658.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691661_628fc9ec_gen_35_fit_1825pkl_vs_gen_32_fit_658pkl.json",
+      "p1_fitness": 1825,
+      "p2_fitness": 658,
+      "p1_elo_before": 1826.3279929156886,
+      "p2_elo_before": 1184.0,
+      "p1_elo_after": 1795.101915377457,
+      "p2_elo_after": 1215.2260775382315
+    },
+    {
+      "match_id": "820c1602",
+      "timestamp": 1763691661.8376694,
+      "p1": "gen_22_fit_595.pkl",
+      "p2": "gen_16_fit_523.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691661_820c1602_gen_22_fit_595pkl_vs_gen_16_fit_523pkl.json",
+      "p1_fitness": 595,
+      "p2_fitness": 523,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1231.9807601504929,
+      "p1_elo_after": 1217.468622970598,
+      "p2_elo_after": 1214.5121371798948
+    },
+    {
+      "match_id": "24890abf",
+      "timestamp": 1763691662.4034913,
+      "p1": "gen_39_fit_1808.pkl",
+      "p2": "gen_43_fit_1613.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691662_24890abf_gen_39_fit_1808pkl_vs_gen_43_fit_1613pkl.json",
+      "p1_fitness": 1808,
+      "p2_fitness": 1613,
+      "p1_elo_before": 1777.2215712384425,
+      "p2_elo_before": 1243.1147925003168,
+      "p1_elo_after": 1746.6349686557962,
+      "p2_elo_after": 1273.701395082963
+    },
+    {
+      "match_id": "2a89c757",
+      "timestamp": 1763691662.9559872,
+      "p1": "gen_10_fit_1635.pkl",
+      "p2": "gen_4_fit_1535.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691662_2a89c757_gen_10_fit_1635pkl_vs_gen_4_fit_1535pkl.json",
+      "p1_fitness": 1635,
+      "p2_fitness": 1535,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1246.3203685723065,
+      "p1_elo_after": 1218.1205826248354,
+      "p2_elo_after": 1228.1997859474711
+    },
+    {
+      "match_id": "63d5a694",
+      "timestamp": 1763691663.5270052,
+      "p1": "gen_41_fit_597.pkl",
+      "p2": "gen_24_fit_536.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691663_63d5a694_gen_41_fit_597pkl_vs_gen_24_fit_536pkl.json",
+      "p1_fitness": 597,
+      "p2_fitness": 536,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1185.4358728782763,
+      "p1_elo_after": 1183.3296897362338,
+      "p2_elo_after": 1202.1061831420425
+    },
+    {
+      "match_id": "23aeb5d4",
+      "timestamp": 1763691664.0958436,
+      "p1": "gen_18_fit_1581.pkl",
+      "p2": "gen_46_fit_755.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691664_23aeb5d4_gen_18_fit_1581pkl_vs_gen_46_fit_755pkl.json",
+      "p1_fitness": 1581,
+      "p2_fitness": 755,
+      "p1_elo_before": 1199.3359152424287,
+      "p2_elo_before": 1247.177411175246,
+      "p1_elo_after": 1217.5252775208467,
+      "p2_elo_after": 1228.988048896828
+    },
+    {
+      "match_id": "5b908d0d",
+      "timestamp": 1763691664.6740127,
+      "p1": "gen_46_fit_712.pkl",
+      "p2": "gen_36_fit_596.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691664_5b908d0d_gen_46_fit_712pkl_vs_gen_36_fit_596pkl.json",
+      "p1_fitness": 712,
+      "p2_fitness": 596,
+      "p1_elo_before": 1200.883176935475,
+      "p2_elo_before": 1231.063437022536,
+      "p1_elo_after": 1218.2695440087116,
+      "p2_elo_after": 1213.6770699492993
+    },
+    {
+      "match_id": "f433ed7e",
+      "timestamp": 1763691665.2397082,
+      "p1": "gen_8_fit_1867.pkl",
+      "p2": "gen_49_fit_745.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691665_f433ed7e_gen_8_fit_1867pkl_vs_gen_49_fit_745pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 745,
+      "p1_elo_before": 1820.8154432021327,
+      "p2_elo_before": 1212.0053906167248,
+      "p1_elo_after": 1821.7492622661969,
+      "p2_elo_after": 1211.0715715526605
+    },
+    {
+      "match_id": "4e63f63a",
+      "timestamp": 1763691665.8126707,
+      "p1": "gen_31_fit_1585.pkl",
+      "p2": "gen_2_fit_1457.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        9
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691665_4e63f63a_gen_31_fit_1585pkl_vs_gen_2_fit_1457pkl.json",
+      "p1_fitness": 1585,
+      "p2_fitness": 1457,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1455.5271915186088,
+      "p1_elo_after": 1226.0223718021273,
+      "p2_elo_after": 1429.5048197164815
+    },
+    {
+      "match_id": "217a1766",
+      "timestamp": 1763691666.3628778,
+      "p1": "gen_14_fit_1857.pkl",
+      "p2": "gen_2_fit_1503.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        9
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691666_217a1766_gen_14_fit_1857pkl_vs_gen_2_fit_1503pkl.json",
+      "p1_fitness": 1857,
+      "p2_fitness": 1503,
+      "p1_elo_before": 1856.5861784074534,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1857.3004780542908,
+      "p2_elo_after": 1199.2857003531626
+    },
+    {
+      "match_id": "ea32a6dc",
+      "timestamp": 1763691666.9213514,
+      "p1": "gen_23_fit_1590.pkl",
+      "p2": "gen_3_fit_1521.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691666_ea32a6dc_gen_23_fit_1590pkl_vs_gen_3_fit_1521pkl.json",
+      "p1_fitness": 1590,
+      "p2_fitness": 1521,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1499.4461152592803,
+      "p1_elo_after": 1195.1555610065375,
+      "p2_elo_after": 1504.2905542527428
+    },
+    {
+      "match_id": "67fec5e1",
+      "timestamp": 1763691667.4897926,
+      "p1": "gen_23_fit_1787.pkl",
+      "p2": "gen_25_fit_1617.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        13
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691667_67fec5e1_gen_23_fit_1787pkl_vs_gen_25_fit_1617pkl.json",
+      "p1_fitness": 1787,
+      "p2_fitness": 1617,
+      "p1_elo_before": 1786.7733876710029,
+      "p2_elo_before": 1168.075558819854,
+      "p1_elo_after": 1787.6569660403184,
+      "p2_elo_after": 1167.1919804505385
+    },
+    {
+      "match_id": "16f87db9",
+      "timestamp": 1763691668.0472198,
+      "p1": "model_20251119_093813_fitness2000.pkl",
+      "p2": "gen_18_fit_1756.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691668_16f87db9_model_20251119_093813_fitness2_vs_gen_18_fit_1756pkl.json",
+      "p1_fitness": 2000,
+      "p2_fitness": 1756,
+      "p1_elo_before": 1216.1643398675208,
+      "p2_elo_before": 1757.6468052405405,
+      "p1_elo_after": 1246.8072044081869,
+      "p2_elo_after": 1727.0039406998744
+    },
+    {
+      "match_id": "57cda8c2",
+      "timestamp": 1763691668.6279268,
+      "p1": "gen_45_fit_539.pkl",
+      "p2": "gen_22_fit_513.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691668_57cda8c2_gen_45_fit_539pkl_vs_gen_22_fit_513pkl.json",
+      "p1_fitness": 539,
+      "p2_fitness": 513,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1184.7024671725246,
+      "p1_elo_after": 1183.2959774658789,
+      "p2_elo_after": 1201.4064897066457
+    },
+    {
+      "match_id": "0b923c99",
+      "timestamp": 1763691669.2476277,
+      "p1": "gen_30_fit_1586.pkl",
+      "p2": "gen_26_fit_518.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        12
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691669_0b923c99_gen_30_fit_1586pkl_vs_gen_26_fit_518pkl.json",
+      "p1_fitness": 1586,
+      "p2_fitness": 518,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1186.8425517893359,
+      "p1_elo_after": 1215.3943666132384,
+      "p2_elo_after": 1171.4481851760975
+    },
+    {
+      "match_id": "1091f281",
+      "timestamp": 1763691669.8088262,
+      "p1": "gen_30_fit_1586.pkl",
+      "p2": "gen_3_fit_1521.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691669_1091f281_gen_30_fit_1586pkl_vs_gen_3_fit_1521pkl.json",
+      "p1_fitness": 1586,
+      "p2_fitness": 1521,
+      "p1_elo_before": 1215.3943666132384,
+      "p2_elo_before": 1504.2905542527428,
+      "p1_elo_after": 1210.2949427455346,
+      "p2_elo_after": 1509.3899781204466
+    },
+    {
+      "match_id": "0b25dd1c",
+      "timestamp": 1763691670.3789468,
+      "p1": "gen_6_fit_1849.pkl",
+      "p2": "gen_9_fit_1633.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691670_0b25dd1c_gen_6_fit_1849pkl_vs_gen_9_fit_1633pkl.json",
+      "p1_fitness": 1849,
+      "p2_fitness": 1633,
+      "p1_elo_before": 1797.7176231971894,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1798.7111028415054,
+      "p2_elo_after": 1199.006520355684
+    },
+    {
+      "match_id": "86f5f010",
+      "timestamp": 1763691670.9832032,
+      "p1": "gen_46_fit_513.pkl",
+      "p2": "gen_28_fit_505.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691670_86f5f010_gen_46_fit_513pkl_vs_gen_28_fit_505pkl.json",
+      "p1_fitness": 513,
+      "p2_fitness": 505,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1184.7507568916835,
+      "p1_elo_after": 1183.29819699759,
+      "p2_elo_after": 1201.4525598940936
+    },
+    {
+      "match_id": "35b9d973",
+      "timestamp": 1763691671.5753167,
+      "p1": "gen_49_fit_1677.pkl",
+      "p2": "gen_33_fit_584.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691671_35b9d973_gen_49_fit_1677pkl_vs_gen_33_fit_584pkl.json",
+      "p1_fitness": 1677,
+      "p2_fitness": 584,
+      "p1_elo_before": 1677.4481538685743,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1647.3737976637321,
+      "p2_elo_after": 1230.0743562048422
+    },
+    {
+      "match_id": "d74f164e",
+      "timestamp": 1763691672.1745312,
+      "p1": "gen_21_fit_1647.pkl",
+      "p2": "gen_7_fit_1623.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691672_d74f164e_gen_21_fit_1647pkl_vs_gen_7_fit_1623pkl.json",
+      "p1_fitness": 1647,
+      "p2_fitness": 1623,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1168.736306793522,
+      "p2_elo_after": 1215.263693206478
+    },
+    {
+      "match_id": "5abd09f8",
+      "timestamp": 1763691672.7447677,
+      "p1": "gen_11_fit_1621.pkl",
+      "p2": "gen_47_fit_666.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691672_5abd09f8_gen_11_fit_1621pkl_vs_gen_47_fit_666pkl.json",
+      "p1_fitness": 1621,
+      "p2_fitness": 666,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1214.8077155577055,
+      "p1_elo_after": 1216.6815079064934,
+      "p2_elo_after": 1198.126207651212
+    },
+    {
+      "match_id": "dded8976",
+      "timestamp": 1763691673.3432548,
+      "p1": "gen_48_fit_801.pkl",
+      "p2": "gen_40_fit_550.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691673_dded8976_gen_48_fit_801pkl_vs_gen_40_fit_550pkl.json",
+      "p1_fitness": 801,
+      "p2_fitness": 550,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1202.570393692414,
+      "p1_elo_after": 1216.1183688444255,
+      "p2_elo_after": 1186.4520248479885
+    },
+    {
+      "match_id": "bab08e7f",
+      "timestamp": 1763691673.9402065,
+      "p1": "gen_2_fit_1521.pkl",
+      "p2": "gen_1_fit_1480.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691673_bab08e7f_gen_2_fit_1521pkl_vs_gen_1_fit_1480pkl.json",
+      "p1_fitness": 1521,
+      "p2_fitness": 1480,
+      "p1_elo_before": 1231.2604578651828,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1213.8247327800675,
+      "p2_elo_after": 1217.4357250851153
+    },
+    {
+      "match_id": "07bb7426",
+      "timestamp": 1763691674.5385513,
+      "p1": "gen_42_fit_1816.pkl",
+      "p2": "gen_12_fit_1678.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691674_07bb7426_gen_42_fit_1816pkl_vs_gen_12_fit_1678pkl.json",
+      "p1_fitness": 1816,
+      "p2_fitness": 1678,
+      "p1_elo_before": 1815.7335102290372,
+      "p2_elo_before": 1678.0367406202745,
+      "p1_elo_after": 1825.7047337574118,
+      "p2_elo_after": 1668.0655170919
+    },
+    {
+      "match_id": "2b016375",
+      "timestamp": 1763691675.1207438,
+      "p1": "gen_8_fit_1867.pkl",
+      "p2": "gen_29_fit_550.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        15
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691675_2b016375_gen_8_fit_1867pkl_vs_gen_29_fit_550pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 550,
+      "p1_elo_before": 1821.7492622661969,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1822.6178733004338,
+      "p2_elo_after": 1199.131388965763
+    },
+    {
+      "match_id": "39739757",
+      "timestamp": 1763691675.6835554,
+      "p1": "gen_45_fit_1871.pkl",
+      "p2": "gen_32_fit_689.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        8,
+        19
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691675_39739757_gen_45_fit_1871pkl_vs_gen_32_fit_689pkl.json",
+      "p1_fitness": 1871,
+      "p2_fitness": 689,
+      "p1_elo_before": 1870.897754191907,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1839.5567290010952,
+      "p2_elo_after": 1231.341025190812
+    },
+    {
+      "match_id": "46592afc",
+      "timestamp": 1763691676.2319603,
+      "p1": "gen_44_fit_1739.pkl",
+      "p2": "gen_49_fit_831.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        14
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691676_46592afc_gen_44_fit_1739pkl_vs_gen_49_fit_831pkl.json",
+      "p1_fitness": 1739,
+      "p2_fitness": 831,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "67b29d83",
+      "timestamp": 1763691676.8077703,
+      "p1": "gen_11_fit_1743.pkl",
+      "p2": "gen_34_fit_584.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        13
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691676_67b29d83_gen_11_fit_1743pkl_vs_gen_34_fit_584pkl.json",
+      "p1_fitness": 1743,
+      "p2_fitness": 584,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1199.1493409481016,
+      "p1_elo_after": 1200.6972111315063,
+      "p2_elo_after": 1182.4521298165953
+    },
+    {
+      "match_id": "1d57dd32",
+      "timestamp": 1763691677.3751342,
+      "p1": "gen_8_fit_1867.pkl",
+      "p2": "gen_6_fit_1846.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691677_1d57dd32_gen_8_fit_1867pkl_vs_gen_6_fit_1846pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 1846,
+      "p1_elo_before": 1822.6178733004338,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1791.482269035622,
+      "p2_elo_after": 1231.1356042648117
+    },
+    {
+      "match_id": "ef1afc0d",
+      "timestamp": 1763691677.9307518,
+      "p1": "gen_17_fit_1713.pkl",
+      "p2": "gen_25_fit_536.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        11
+      ],
+      "duration_frames": 12,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691677_ef1afc0d_gen_17_fit_1713pkl_vs_gen_25_fit_536pkl.json",
+      "p1_fitness": 1713,
+      "p2_fitness": 536,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1199.8363224587038,
+      "p1_elo_after": 1215.9924623712247,
+      "p2_elo_after": 1183.843860087479
+    },
+    {
+      "match_id": "4ad7cdde",
+      "timestamp": 1763691678.5554876,
+      "p1": "gen_30_fit_512.pkl",
+      "p2": "gen_28_fit_505.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691678_4ad7cdde_gen_30_fit_512pkl_vs_gen_28_fit_505pkl.json",
+      "p1_fitness": 512,
+      "p2_fitness": 505,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1201.4525598940936,
+      "p1_elo_after": 1216.0668924654365,
+      "p2_elo_after": 1185.3856674286571
+    },
+    {
+      "match_id": "5d6dd468",
+      "timestamp": 1763691679.1652815,
+      "p1": "gen_49_fit_745.pkl",
+      "p2": "gen_46_fit_614.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691679_5d6dd468_gen_49_fit_745pkl_vs_gen_46_fit_614pkl.json",
+      "p1_fitness": 745,
+      "p2_fitness": 614,
+      "p1_elo_before": 1211.0715715526605,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1195.298518848347,
+      "p2_elo_after": 1231.7730527043136
+    },
+    {
+      "match_id": "c4f67efe",
+      "timestamp": 1763691679.7473934,
+      "p1": "gen_21_fit_1647.pkl",
+      "p2": "gen_30_fit_512.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691679_c4f67efe_gen_21_fit_1647pkl_vs_gen_30_fit_512pkl.json",
+      "p1_fitness": 1647,
+      "p2_fitness": 512,
+      "p1_elo_before": 1168.736306793522,
+      "p2_elo_before": 1216.0668924654365,
+      "p1_elo_after": 1186.9025766952216,
+      "p2_elo_after": 1197.900622563737
+    },
+    {
+      "match_id": "bd15918d",
+      "timestamp": 1763691680.313895,
+      "p1": "gen_26_fit_1841.pkl",
+      "p2": "gen_39_fit_571.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691680_bd15918d_gen_26_fit_1841pkl_vs_gen_39_fit_571pkl.json",
+      "p1_fitness": 1841,
+      "p2_fitness": 571,
+      "p1_elo_before": 1809.3328136842515,
+      "p2_elo_before": 1215.5915422864875,
+      "p1_elo_after": 1778.348565900525,
+      "p2_elo_after": 1246.575790070214
+    },
+    {
+      "match_id": "dc65e2ce",
+      "timestamp": 1763691680.9147968,
+      "p1": "gen_10_fit_1637.pkl",
+      "p2": "gen_5_fit_1573.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        3,
+        17
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691680_dc65e2ce_gen_10_fit_1637pkl_vs_gen_5_fit_1573pkl.json",
+      "p1_fitness": 1637,
+      "p2_fitness": 1573,
+      "p1_elo_before": 1185.4417105986834,
+      "p2_elo_before": 1247.028484760585,
+      "p1_elo_after": 1172.2485494379034,
+      "p2_elo_after": 1260.2216459213648
+    },
+    {
+      "match_id": "e40d2f80",
+      "timestamp": 1763691681.4475842,
+      "p1": "gen_30_fit_1838.pkl",
+      "p2": "gen_18_fit_1581.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691681_e40d2f80_gen_30_fit_1838pkl_vs_gen_18_fit_1581pkl.json",
+      "p1_fitness": 1838,
+      "p2_fitness": 1581,
+      "p1_elo_before": 1819.2843799100488,
+      "p2_elo_before": 1217.5252775208467,
+      "p1_elo_after": 1788.2557068787853,
+      "p2_elo_after": 1248.55395055211
+    },
+    {
+      "match_id": "7e66b024",
+      "timestamp": 1763691682.029681,
+      "p1": "gen_6_fit_1614.pkl",
+      "p2": "gen_38_fit_1578.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        8
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691682_7e66b024_gen_6_fit_1614pkl_vs_gen_38_fit_1578pkl.json",
+      "p1_fitness": 1614,
+      "p2_fitness": 1578,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "c47e4fb5",
+      "timestamp": 1763691682.578162,
+      "p1": "gen_8_fit_1867.pkl",
+      "p2": "gen_0_fit_1322.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691682_c47e4fb5_gen_8_fit_1867pkl_vs_gen_0_fit_1322pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 1322,
+      "p1_elo_before": 1791.482269035622,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1760.6066412985313,
+      "p2_elo_after": 1246.8756277370908
+    },
+    {
+      "match_id": "cb149290",
+      "timestamp": 1763691683.146948,
+      "p1": "gen_26_fit_1618.pkl",
+      "p2": "gen_45_fit_776.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        16
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691683_cb149290_gen_26_fit_1618pkl_vs_gen_45_fit_776pkl.json",
+      "p1_fitness": 1618,
+      "p2_fitness": 776,
+      "p1_elo_before": 1231.263693206478,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1213.8278203282016,
+      "p2_elo_after": 1217.4358728782763
+    },
+    {
+      "match_id": "27ffc283",
+      "timestamp": 1763691683.7143414,
+      "p1": "gen_1_fit_1416.pkl",
+      "p2": "gen_43_fit_515.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691683_27ffc283_gen_1_fit_1416pkl_vs_gen_43_fit_515pkl.json",
+      "p1_fitness": 1416,
+      "p2_fitness": 515,
+      "p1_elo_before": 1418.081626928996,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1393.17828097614,
+      "p2_elo_after": 1224.903345952856
+    },
+    {
+      "match_id": "2387a60d",
+      "timestamp": 1763691684.3069649,
+      "p1": "gen_6_fit_1614.pkl",
+      "p2": "gen_46_fit_507.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        15,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691684_2387a60d_gen_6_fit_1614pkl_vs_gen_46_fit_507pkl.json",
+      "p1_fitness": 1614,
+      "p2_fitness": 507,
+      "p1_elo_before": 1216.0,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1199.263693206478,
+      "p2_elo_after": 1216.736306793522
+    },
+    {
+      "match_id": "fdb34d49",
+      "timestamp": 1763691684.882513,
+      "p1": "gen_13_fit_1692.pkl",
+      "p2": "gen_14_fit_1630.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        12
+      ],
+      "duration_frames": 19,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691684_fdb34d49_gen_13_fit_1692pkl_vs_gen_14_fit_1630pkl.json",
+      "p1_fitness": 1692,
+      "p2_fitness": 1630,
+      "p1_elo_before": 1717.688648807277,
+      "p2_elo_before": 1168.1599263103378,
+      "p1_elo_after": 1718.986850032503,
+      "p2_elo_after": 1166.8617250851119
+    },
+    {
+      "match_id": "d202ee92",
+      "timestamp": 1763691685.4288552,
+      "p1": "gen_3_fit_1877.pkl",
+      "p2": "gen_0_fit_1340.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        16
+      ],
+      "duration_frames": 60,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691685_d202ee92_gen_3_fit_1877pkl_vs_gen_0_fit_1340pkl.json",
+      "p1_fitness": 1877,
+      "p2_fitness": 1340,
+      "p1_elo_before": 1845.3129807132718,
+      "p2_elo_before": 1191.2614944495938,
+      "p1_elo_after": 1814.0375412968697,
+      "p2_elo_after": 1222.536933865996
+    },
+    {
+      "match_id": "b7d04077",
+      "timestamp": 1763691686.0194402,
+      "p1": "gen_31_fit_1764.pkl",
+      "p2": "gen_27_fit_557.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691686_b7d04077_gen_31_fit_1764pkl_vs_gen_27_fit_557pkl.json",
+      "p1_fitness": 1764,
+      "p2_fitness": 557,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "8463f655",
+      "timestamp": 1763691898.5364573,
+      "p1": "gen_8_fit_1843.pkl",
+      "p2": "gen_31_fit_1708.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        10
+      ],
+      "duration_frames": 19,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691898_8463f655_gen_8_fit_1843pkl_vs_gen_31_fit_1708pkl.json",
+      "p1_fitness": 1843,
+      "p2_fitness": 1708,
+      "p1_elo_before": 1231.5388414885392,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1246.09040050746,
+      "p2_elo_after": 1185.4484409810793
+    },
+    {
+      "match_id": "6ed51ea9",
+      "timestamp": 1763691899.0799668,
+      "p1": "gen_21_fit_1578.pkl",
+      "p2": "gen_5_fit_1559.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        11
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691899_6ed51ea9_gen_21_fit_1578pkl_vs_gen_5_fit_1559pkl.json",
+      "p1_fitness": 1578,
+      "p2_fitness": 1559,
+      "p1_elo_before": 1184.736306793522,
+      "p2_elo_before": 1213.0614488495812,
+      "p1_elo_after": 1202.037845491373,
+      "p2_elo_after": 1195.7599101517303
+    },
+    {
+      "match_id": "e919e7ac",
+      "timestamp": 1763691899.6395211,
+      "p1": "gen_3_fit_1903.pkl",
+      "p2": "gen_2_fit_1473.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691899_e919e7ac_gen_3_fit_1903pkl_vs_gen_2_fit_1473pkl.json",
+      "p1_fitness": 1903,
+      "p2_fitness": 1473,
+      "p1_elo_before": 1200.736306793522,
+      "p2_elo_before": 1184.736306793522,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1201.4726135870442
+    },
+    {
+      "match_id": "45b920b4",
+      "timestamp": 1763691900.2144437,
+      "p1": "gen_20_fit_1593.pkl",
+      "p2": "gen_3_fit_1521.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        18
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691900_45b920b4_gen_20_fit_1593pkl_vs_gen_3_fit_1521pkl.json",
+      "p1_fitness": 1593,
+      "p2_fitness": 1521,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1509.3899781204466,
+      "p1_elo_after": 1195.386217588688,
+      "p2_elo_after": 1514.0037605317586
+    },
+    {
+      "match_id": "d90953c5",
+      "timestamp": 1763691900.7849104,
+      "p1": "gen_32_fit_1594.pkl",
+      "p2": "gen_38_fit_1578.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        12
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691900_d90953c5_gen_32_fit_1594pkl_vs_gen_38_fit_1578pkl.json",
+      "p1_fitness": 1594,
+      "p2_fitness": 1578,
+      "p1_elo_before": 1231.1649412300233,
+      "p2_elo_before": 1184.0,
+      "p1_elo_after": 1245.006160187244,
+      "p2_elo_after": 1170.1587810427793
+    },
+    {
+      "match_id": "fa842e48",
+      "timestamp": 1763691901.3532085,
+      "p1": "gen_12_fit_1903.pkl",
+      "p2": "gen_24_fit_591.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        9
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691901_fa842e48_gen_12_fit_1903pkl_vs_gen_24_fit_591pkl.json",
+      "p1_fitness": 1903,
+      "p2_fitness": 591,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1216.736306793522,
+      "p2_elo_after": 1199.263693206478
+    },
+    {
+      "match_id": "47f7976a",
+      "timestamp": 1763691901.9009745,
+      "p1": "gen_41_fit_1851.pkl",
+      "p2": "gen_38_fit_1578.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691901_47f7976a_gen_41_fit_1851pkl_vs_gen_38_fit_1578pkl.json",
+      "p1_fitness": 1851,
+      "p2_fitness": 1578,
+      "p1_elo_before": 1851.073493721071,
+      "p2_elo_before": 1170.1587810427793,
+      "p1_elo_after": 1851.6962639121002,
+      "p2_elo_after": 1169.53601085175
+    },
+    {
+      "match_id": "d9712c2f",
+      "timestamp": 1763691902.4761496,
+      "p1": "gen_45_fit_1701.pkl",
+      "p2": "gen_35_fit_652.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        12
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691902_d9712c2f_gen_45_fit_1701pkl_vs_gen_35_fit_652pkl.json",
+      "p1_fitness": 1701,
+      "p2_fitness": 652,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1230.5612260339533,
+      "p1_elo_after": 1217.4037778232891,
+      "p2_elo_after": 1213.1574482106641
+    },
+    {
+      "match_id": "3761f8af",
+      "timestamp": 1763691903.0535152,
+      "p1": "gen_29_fit_1829.pkl",
+      "p2": "gen_48_fit_1753.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691903_3761f8af_gen_29_fit_1829pkl_vs_gen_48_fit_1753pkl.json",
+      "p1_fitness": 1829,
+      "p2_fitness": 1753,
+      "p1_elo_before": 1828.3747842643306,
+      "p2_elo_before": 1216.736306793522,
+      "p1_elo_after": 1829.2939554420354,
+      "p2_elo_after": 1215.8171356158173
+    },
+    {
+      "match_id": "e25cef80",
+      "timestamp": 1763691903.7291067,
+      "p1": "gen_3_fit_1903.pkl",
+      "p2": "gen_45_fit_1871.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691903_e25cef80_gen_3_fit_1903pkl_vs_gen_45_fit_1871pkl.json",
+      "p1_fitness": 1903,
+      "p2_fitness": 1871,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1839.5567290010952,
+      "p1_elo_after": 1183.2815501737107,
+      "p2_elo_after": 1840.2751788273845
+    },
+    {
+      "match_id": "09d0b30c",
+      "timestamp": 1763691904.3338861,
+      "p1": "gen_18_fit_1887.pkl",
+      "p2": "gen_29_fit_1613.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691904_09d0b30c_gen_18_fit_1887pkl_vs_gen_29_fit_1613pkl.json",
+      "p1_fitness": 1887,
+      "p2_fitness": 1613,
+      "p1_elo_before": 1856.1771216259444,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1856.8930675546712,
+      "p2_elo_after": 1199.2840540712732
+    },
+    {
+      "match_id": "dd0135a4",
+      "timestamp": 1763691904.9307876,
+      "p1": "gen_12_fit_1786.pkl",
+      "p2": "gen_22_fit_513.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691904_dd0135a4_gen_12_fit_1786pkl_vs_gen_22_fit_513pkl.json",
+      "p1_fitness": 1786,
+      "p2_fitness": 513,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1201.4064897066457,
+      "p1_elo_after": 1184.0647708908193,
+      "p2_elo_after": 1217.3417188158264
+    },
+    {
+      "match_id": "224479c8",
+      "timestamp": 1763691905.5321636,
+      "p1": "gen_38_fit_1759.pkl",
+      "p2": "gen_13_fit_1757.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        11,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691905_224479c8_gen_38_fit_1759pkl_vs_gen_13_fit_1757pkl.json",
+      "p1_fitness": 1759,
+      "p2_fitness": 1757,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "b70db780",
+      "timestamp": 1763691906.23817,
+      "p1": "gen_46_fit_1757.pkl",
+      "p2": "gen_32_fit_1594.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691906_b70db780_gen_46_fit_1757pkl_vs_gen_32_fit_1594pkl.json",
+      "p1_fitness": 1757,
+      "p2_fitness": 1594,
+      "p1_elo_before": 1726.1261551191233,
+      "p2_elo_before": 1245.006160187244,
+      "p1_elo_after": 1696.013899969962,
+      "p2_elo_after": 1275.1184153364052
+    },
+    {
+      "match_id": "bed62042",
+      "timestamp": 1763691906.8309782,
+      "p1": "gen_46_fit_1757.pkl",
+      "p2": "gen_31_fit_1708.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        12
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691906_bed62042_gen_46_fit_1757pkl_vs_gen_31_fit_1708pkl.json",
+      "p1_fitness": 1757,
+      "p2_fitness": 1708,
+      "p1_elo_before": 1696.013899969962,
+      "p2_elo_before": 1185.4484409810793,
+      "p1_elo_after": 1697.6221095266228,
+      "p2_elo_after": 1183.8402314244186
+    },
+    {
+      "match_id": "f9d80c79",
+      "timestamp": 1763691907.395709,
+      "p1": "gen_24_fit_1604.pkl",
+      "p2": "gen_30_fit_574.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691907_f9d80c79_gen_24_fit_1604pkl_vs_gen_30_fit_574pkl.json",
+      "p1_fitness": 1604,
+      "p2_fitness": 574,
+      "p1_elo_before": 1217.348593637127,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1232.550324714582,
+      "p2_elo_after": 1184.7982689225448
+    },
+    {
+      "match_id": "68a770f2",
+      "timestamp": 1763691907.9382594,
+      "p1": "gen_29_fit_1831.pkl",
+      "p2": "gen_25_fit_1698.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691907_68a770f2_gen_29_fit_1831pkl_vs_gen_25_fit_1698pkl.json",
+      "p1_fitness": 1831,
+      "p2_fitness": 1698,
+      "p1_elo_before": 1771.981373263292,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1741.127814582164,
+      "p2_elo_after": 1230.8535586811279
+    },
+    {
+      "match_id": "afe615b7",
+      "timestamp": 1763691908.516323,
+      "p1": "gen_23_fit_1855.pkl",
+      "p2": "gen_3_fit_1763.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691908_afe615b7_gen_23_fit_1855pkl_vs_gen_3_fit_1763pkl.json",
+      "p1_fitness": 1855,
+      "p2_fitness": 1763,
+      "p1_elo_before": 1855.52725923461,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1824.2458282131659,
+      "p2_elo_after": 1231.2814310214442
+    },
+    {
+      "match_id": "07bd784b",
+      "timestamp": 1763691909.1152833,
+      "p1": "gen_28_fit_1779.pkl",
+      "p2": "gen_11_fit_1681.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691909_07bd784b_gen_28_fit_1779pkl_vs_gen_11_fit_1681pkl.json",
+      "p1_fitness": 1779,
+      "p2_fitness": 1681,
+      "p1_elo_before": 1231.328877105394,
+      "p2_elo_before": 1680.896835952594,
+      "p1_elo_after": 1229.0914419504056,
+      "p2_elo_after": 1683.1342711075824
+    },
+    {
+      "match_id": "5ef5f0b3",
+      "timestamp": 1763691909.7085314,
+      "p1": "gen_49_fit_1719.pkl",
+      "p2": "gen_39_fit_1578.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691909_5ef5f0b3_gen_49_fit_1719pkl_vs_gen_39_fit_1578pkl.json",
+      "p1_fitness": 1719,
+      "p2_fitness": 1578,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1192.6674966650903,
+      "p1_elo_after": 1183.6623758676365,
+      "p2_elo_after": 1209.0051207974539
+    },
+    {
+      "match_id": "df65f90b",
+      "timestamp": 1763691910.3005552,
+      "p1": "gen_30_fit_1837.pkl",
+      "p2": "gen_29_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691910_df65f90b_gen_30_fit_1837pkl_vs_gen_29_fit_1737pkl.json",
+      "p1_fitness": 1837,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1775.9756985411836,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1777.0969934080047,
+      "p2_elo_after": 1198.878705133179
+    },
+    {
+      "match_id": "2081bbff",
+      "timestamp": 1763691910.8749764,
+      "p1": "gen_36_fit_1764.pkl",
+      "p2": "gen_49_fit_1590.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691910_2081bbff_gen_36_fit_1764pkl_vs_gen_49_fit_1590pkl.json",
+      "p1_fitness": 1764,
+      "p2_fitness": 1590,
+      "p1_elo_before": 1199.2828115228679,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1183.315839225883,
+      "p2_elo_after": 1215.9669722969847
+    },
+    {
+      "match_id": "9715da97",
+      "timestamp": 1763691911.4613829,
+      "p1": "gen_40_fit_1818.pkl",
+      "p2": "gen_13_fit_517.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691911_9715da97_gen_40_fit_1818pkl_vs_gen_13_fit_517pkl.json",
+      "p1_fitness": 1818,
+      "p2_fitness": 517,
+      "p1_elo_before": 1817.4588798178006,
+      "p2_elo_before": 1216.7701398146428,
+      "p1_elo_after": 1818.4360267784418,
+      "p2_elo_after": 1215.7929928540016
+    },
+    {
+      "match_id": "86168d79",
+      "timestamp": 1763691912.1463797,
+      "p1": "gen_5_fit_1943.pkl",
+      "p2": "gen_17_fit_1695.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691912_86168d79_gen_5_fit_1943pkl_vs_gen_17_fit_1695pkl.json",
+      "p1_fitness": 1943,
+      "p2_fitness": 1695,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1199.9661669788793,
+      "p1_elo_after": 1215.9984419318032,
+      "p2_elo_after": 1183.967725047076
+    },
+    {
+      "match_id": "dde24416",
+      "timestamp": 1763691912.7291956,
+      "p1": "gen_36_fit_1736.pkl",
+      "p2": "gen_6_fit_1614.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691912_dde24416_gen_36_fit_1736pkl_vs_gen_6_fit_1614pkl.json",
+      "p1_fitness": 1736,
+      "p2_fitness": 1614,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1199.263693206478,
+      "p1_elo_after": 1183.9660918698307,
+      "p2_elo_after": 1215.2976013366472
+    },
+    {
+      "match_id": "d5d6dea9",
+      "timestamp": 1763691913.3079011,
+      "p1": "gen_34_fit_1825.pkl",
+      "p2": "gen_43_fit_585.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691913_d5d6dea9_gen_34_fit_1825pkl_vs_gen_43_fit_585pkl.json",
+      "p1_fitness": 1825,
+      "p2_fitness": 585,
+      "p1_elo_before": 1797.5581774835898,
+      "p2_elo_before": 1213.8142215280277,
+      "p1_elo_after": 1766.6320808856185,
+      "p2_elo_after": 1244.740318125999
+    },
+    {
+      "match_id": "ad8a2d50",
+      "timestamp": 1763691913.8970795,
+      "p1": "gen_27_fit_1848.pkl",
+      "p2": "gen_49_fit_1588.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        8,
+        18
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691913_ad8a2d50_gen_27_fit_1848pkl_vs_gen_49_fit_1588pkl.json",
+      "p1_fitness": 1848,
+      "p2_fitness": 1588,
+      "p1_elo_before": 1848.2801410192485,
+      "p2_elo_before": 1231.113581086199,
+      "p1_elo_after": 1817.1713244240423,
+      "p2_elo_after": 1262.2223976814053
+    },
+    {
+      "match_id": "8d717c27",
+      "timestamp": 1763691914.4538436,
+      "p1": "gen_23_fit_1855.pkl",
+      "p2": "gen_31_fit_543.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691914_8d717c27_gen_23_fit_1855pkl_vs_gen_31_fit_543pkl.json",
+      "p1_fitness": 1855,
+      "p2_fitness": 543,
+      "p1_elo_before": 1824.2458282131659,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1825.102377121152,
+      "p2_elo_after": 1199.143451092014
+    },
+    {
+      "match_id": "32d2c71d",
+      "timestamp": 1763691915.0277941,
+      "p1": "gen_14_fit_1890.pkl",
+      "p2": "gen_42_fit_1721.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691915_32d2c71d_gen_14_fit_1890pkl_vs_gen_42_fit_1721pkl.json",
+      "p1_fitness": 1890,
+      "p2_fitness": 1721,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "5acb82f9",
+      "timestamp": 1763691915.5958004,
+      "p1": "gen_39_fit_1808.pkl",
+      "p2": "gen_11_fit_1793.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        10,
+        18
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691915_5acb82f9_gen_39_fit_1808pkl_vs_gen_11_fit_1793pkl.json",
+      "p1_fitness": 1808,
+      "p2_fitness": 1793,
+      "p1_elo_before": 1746.6349686557962,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1715.9540772558562,
+      "p2_elo_after": 1230.68089139994
+    },
+    {
+      "match_id": "3d8746e3",
+      "timestamp": 1763691916.1554363,
+      "p1": "gen_2_fit_1931.pkl",
+      "p2": "gen_40_fit_1847.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691916_3d8746e3_gen_2_fit_1931pkl_vs_gen_40_fit_1847pkl.json",
+      "p1_fitness": 1931,
+      "p2_fitness": 1847,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1845.5797719778598,
+      "p1_elo_after": 1231.2400888268007,
+      "p2_elo_after": 1814.339683151059
+    },
+    {
+      "match_id": "9259544e",
+      "timestamp": 1763691916.747072,
+      "p1": "gen_26_fit_1841.pkl",
+      "p2": "gen_42_fit_685.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691916_9259544e_gen_26_fit_1841pkl_vs_gen_42_fit_685pkl.json",
+      "p1_fitness": 1841,
+      "p2_fitness": 685,
+      "p1_elo_before": 1778.348565900525,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1747.5579036648505,
+      "p2_elo_after": 1246.7906622356745
+    },
+    {
+      "match_id": "a3f38dd0",
+      "timestamp": 1763691917.391428,
+      "p1": "gen_17_fit_1878.pkl",
+      "p2": "gen_47_fit_591.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691917_a3f38dd0_gen_17_fit_1878pkl_vs_gen_47_fit_591pkl.json",
+      "p1_fitness": 1878,
+      "p2_fitness": 591,
+      "p1_elo_before": 1877.7607161790218,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1846.3946705198086,
+      "p2_elo_after": 1231.3660456592131
+    },
+    {
+      "match_id": "727ec41e",
+      "timestamp": 1763691917.9485795,
+      "p1": "gen_10_fit_1924.pkl",
+      "p2": "gen_46_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691917_727ec41e_gen_10_fit_1924pkl_vs_gen_46_fit_1737pkl.json",
+      "p1_fitness": 1924,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1199.3077548043066,
+      "p1_elo_after": 1215.9681209728187,
+      "p2_elo_after": 1183.3396338314878
+    },
+    {
+      "match_id": "849b8404",
+      "timestamp": 1763691918.5364163,
+      "p1": "gen_40_fit_1818.pkl",
+      "p2": "gen_23_fit_1710.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        11,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691918_849b8404_gen_40_fit_1818pkl_vs_gen_23_fit_1710pkl.json",
+      "p1_fitness": 1818,
+      "p2_fitness": 1710,
+      "p1_elo_before": 1818.4360267784418,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1787.320900902273,
+      "p2_elo_after": 1231.1151258761688
+    },
+    {
+      "match_id": "6fb7461f",
+      "timestamp": 1763691919.160414,
+      "p1": "gen_45_fit_1723.pkl",
+      "p2": "gen_24_fit_1609.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        8
+      ],
+      "duration_frames": 46,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691919_6fb7461f_gen_45_fit_1723pkl_vs_gen_24_fit_1609pkl.json",
+      "p1_fitness": 1723,
+      "p2_fitness": 1609,
+      "p1_elo_before": 1225.348836719253,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1240.1835465803022,
+      "p2_elo_after": 1185.165290138951
+    },
+    {
+      "match_id": "120f665a",
+      "timestamp": 1763691919.7392826,
+      "p1": "gen_43_fit_1584.pkl",
+      "p2": "gen_42_fit_1580.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        8,
+        17
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691919_120f665a_gen_43_fit_1584pkl_vs_gen_42_fit_1580pkl.json",
+      "p1_fitness": 1584,
+      "p2_fitness": 1580,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "fe5c9e12",
+      "timestamp": 1763691920.2964165,
+      "p1": "gen_2_fit_1867.pkl",
+      "p2": "gen_23_fit_1590.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691920_fe5c9e12_gen_2_fit_1867pkl_vs_gen_23_fit_1590pkl.json",
+      "p1_fitness": 1867,
+      "p2_fitness": 1590,
+      "p1_elo_before": 1867.3091830944807,
+      "p2_elo_before": 1195.1555610065375,
+      "p1_elo_after": 1835.9635081791102,
+      "p2_elo_after": 1226.501235921908
+    },
+    {
+      "match_id": "e86fac70",
+      "timestamp": 1763691921.0732927,
+      "p1": "gen_12_fit_1845.pkl",
+      "p2": "gen_45_fit_1723.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        11
+      ],
+      "duration_frames": 127,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691921_e86fac70_gen_12_fit_1845pkl_vs_gen_45_fit_1723pkl.json",
+      "p1_fitness": 1845,
+      "p2_fitness": 1723,
+      "p1_elo_before": 1815.3195030420695,
+      "p2_elo_before": 1240.1835465803022,
+      "p1_elo_after": 1816.446040028377,
+      "p2_elo_after": 1239.0570095939947
+    },
+    {
+      "match_id": "22414a22",
+      "timestamp": 1763691921.856224,
+      "p1": "gen_24_fit_1604.pkl",
+      "p2": "gen_34_fit_602.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        10
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691921_22414a22_gen_24_fit_1604pkl_vs_gen_34_fit_602pkl.json",
+      "p1_fitness": 1604,
+      "p2_fitness": 602,
+      "p1_elo_before": 1232.550324714582,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1247.0556972510783,
+      "p2_elo_after": 1185.4946274635038
+    },
+    {
+      "match_id": "b6d987a3",
+      "timestamp": 1763691922.4503758,
+      "p1": "gen_12_fit_1724.pkl",
+      "p2": "gen_28_fit_1651.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        11,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691922_b6d987a3_gen_12_fit_1724pkl_vs_gen_28_fit_1651pkl.json",
+      "p1_fitness": 1724,
+      "p2_fitness": 1651,
+      "p1_elo_before": 1231.1044119750088,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1213.6758154925658,
+      "p2_elo_after": 1217.428596482443
+    },
+    {
+      "match_id": "942476b8",
+      "timestamp": 1763691923.0155284,
+      "p1": "gen_10_fit_1845.pkl",
+      "p2": "gen_46_fit_513.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691923_942476b8_gen_10_fit_1845pkl_vs_gen_46_fit_513pkl.json",
+      "p1_fitness": 1845,
+      "p2_fitness": 513,
+      "p1_elo_before": 1846.3282903100492,
+      "p2_elo_before": 1183.29819699759,
+      "p1_elo_after": 1847.017138948504,
+      "p2_elo_after": 1182.609348359135
+    },
+    {
+      "match_id": "0765a8ae",
+      "timestamp": 1763691923.6197,
+      "p1": "gen_23_fit_1757.pkl",
+      "p2": "gen_25_fit_1617.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691923_0765a8ae_gen_23_fit_1757pkl_vs_gen_25_fit_1617pkl.json",
+      "p1_fitness": 1757,
+      "p2_fitness": 1617,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1167.1919804505385,
+      "p1_elo_after": 1182.4936096244462,
+      "p2_elo_after": 1184.6983708260923
+    },
+    {
+      "match_id": "744d2502",
+      "timestamp": 1763691924.1993911,
+      "p1": "gen_20_fit_1769.pkl",
+      "p2": "gen_42_fit_1580.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        10,
+        17
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691924_744d2502_gen_20_fit_1769pkl_vs_gen_42_fit_1580pkl.json",
+      "p1_fitness": 1769,
+      "p2_fitness": 1580,
+      "p1_elo_before": 1768.5751395469272,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1737.851673469788,
+      "p2_elo_after": 1246.7234660771392
+    },
+    {
+      "match_id": "d34acabb",
+      "timestamp": 1763691924.8054037,
+      "p1": "gen_37_fit_1833.pkl",
+      "p2": "gen_39_fit_1740.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        7,
+        17
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691924_d34acabb_gen_37_fit_1833pkl_vs_gen_39_fit_1740pkl.json",
+      "p1_fitness": 1833,
+      "p2_fitness": 1740,
+      "p1_elo_before": 1786.6958954033237,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1755.7523017715105,
+      "p2_elo_after": 1230.9435936318132
+    },
+    {
+      "match_id": "593aa8e2",
+      "timestamp": 1763691925.3545,
+      "p1": "gen_24_fit_1833.pkl",
+      "p2": "gen_22_fit_1689.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691925_593aa8e2_gen_24_fit_1833pkl_vs_gen_22_fit_1689pkl.json",
+      "p1_fitness": 1833,
+      "p2_fitness": 1689,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "d021acc4",
+      "timestamp": 1763691925.9474196,
+      "p1": "gen_37_fit_915.pkl",
+      "p2": "gen_30_fit_574.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        15
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691925_d021acc4_gen_37_fit_915pkl_vs_gen_30_fit_574pkl.json",
+      "p1_fitness": 915,
+      "p2_fitness": 574,
+      "p1_elo_before": 1245.6182764381338,
+      "p2_elo_before": 1184.7982689225448,
+      "p1_elo_after": 1258.84567502202,
+      "p2_elo_after": 1171.5708703386586
+    },
+    {
+      "match_id": "99b92997",
+      "timestamp": 1763691926.541947,
+      "p1": "gen_4_fit_1764.pkl",
+      "p2": "gen_15_fit_1725.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691926_99b92997_gen_4_fit_1764pkl_vs_gen_15_fit_1725pkl.json",
+      "p1_fitness": 1764,
+      "p2_fitness": 1725,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1726.6861466103023,
+      "p1_elo_after": 1198.5277568982488,
+      "p2_elo_after": 1728.1583897120536
+    },
+    {
+      "match_id": "93c21e4f",
+      "timestamp": 1763691927.148333,
+      "p1": "gen_47_fit_1739.pkl",
+      "p2": "gen_28_fit_653.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        12
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691927_93c21e4f_gen_47_fit_1739pkl_vs_gen_28_fit_653pkl.json",
+      "p1_fitness": 1739,
+      "p2_fitness": 653,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "ddecd3be",
+      "timestamp": 1763691927.832626,
+      "p1": "gen_13_fit_1734.pkl",
+      "p2": "gen_39_fit_1610.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691927_ddecd3be_gen_13_fit_1734pkl_vs_gen_39_fit_1610pkl.json",
+      "p1_fitness": 1734,
+      "p2_fitness": 1610,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "f78e65d5",
+      "timestamp": 1763691928.419635,
+      "p1": "gen_44_fit_1604.pkl",
+      "p2": "gen_4_fit_1558.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691928_f78e65d5_gen_44_fit_1604pkl_vs_gen_4_fit_1558pkl.json",
+      "p1_fitness": 1604,
+      "p2_fitness": 1558,
+      "p1_elo_before": 1184.0,
+      "p2_elo_before": 1230.1908724603365,
+      "p1_elo_after": 1170.1147235738733,
+      "p2_elo_after": 1244.0761488864632
+    },
+    {
+      "match_id": "ec910261",
+      "timestamp": 1763691929.0148745,
+      "p1": "gen_21_fit_1647.pkl",
+      "p2": "gen_32_fit_601.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691929_ec910261_gen_21_fit_1647pkl_vs_gen_32_fit_601pkl.json",
+      "p1_fitness": 1647,
+      "p2_fitness": 601,
+      "p1_elo_before": 1186.9025766952216,
+      "p2_elo_before": 1199.1071441852307,
+      "p1_elo_after": 1203.4643867365041,
+      "p2_elo_after": 1182.5453341439481
+    },
+    {
+      "match_id": "5e8cd98c",
+      "timestamp": 1763691929.6077874,
+      "p1": "gen_17_fit_1713.pkl",
+      "p2": "gen_0_fit_1340.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        11
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691929_5e8cd98c_gen_17_fit_1713pkl_vs_gen_0_fit_1340pkl.json",
+      "p1_fitness": 1713,
+      "p2_fitness": 1340,
+      "p1_elo_before": 1215.9924623712247,
+      "p2_elo_before": 1222.536933865996,
+      "p1_elo_after": 1232.2938107813122,
+      "p2_elo_after": 1206.2355854559084
+    },
+    {
+      "match_id": "9cf54c60",
+      "timestamp": 1763691930.1807482,
+      "p1": "gen_5_fit_1559.pkl",
+      "p2": "gen_39_fit_512.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        15
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691930_9cf54c60_gen_5_fit_1559pkl_vs_gen_39_fit_512pkl.json",
+      "p1_fitness": 1559,
+      "p2_fitness": 512,
+      "p1_elo_before": 1195.7599101517303,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1211.9551638119042,
+      "p2_elo_after": 1183.8047463398261
+    },
+    {
+      "match_id": "855918db",
+      "timestamp": 1763691930.776266,
+      "p1": "gen_32_fit_601.pkl",
+      "p2": "gen_34_fit_584.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691930_855918db_gen_32_fit_601pkl_vs_gen_34_fit_584pkl.json",
+      "p1_fitness": 601,
+      "p2_fitness": 584,
+      "p1_elo_before": 1182.5453341439481,
+      "p2_elo_before": 1182.4521298165953,
+      "p1_elo_after": 1166.5410419261557,
+      "p2_elo_after": 1198.4564220343877
+    },
+    {
+      "match_id": "b53fe5aa",
+      "timestamp": 1763691931.3554745,
+      "p1": "gen_21_fit_1861.pkl",
+      "p2": "gen_8_fit_1616.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        19
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691931_b53fe5aa_gen_21_fit_1861pkl_vs_gen_8_fit_1616pkl.json",
+      "p1_fitness": 1861,
+      "p2_fitness": 1616,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1623.0505476138599,
+      "p1_elo_after": 1197.4232937080078,
+      "p2_elo_after": 1625.627253905852
+    },
+    {
+      "match_id": "1c307c80",
+      "timestamp": 1763691931.9787855,
+      "p1": "gen_37_fit_1589.pkl",
+      "p2": "gen_39_fit_597.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        7,
+        19
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691931_1c307c80_gen_37_fit_1589pkl_vs_gen_39_fit_597pkl.json",
+      "p1_fitness": 1589,
+      "p2_fitness": 597,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "015f62cf",
+      "timestamp": 1763691932.5480735,
+      "p1": "gen_29_fit_1737.pkl",
+      "p2": "gen_39_fit_512.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 40,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691932_015f62cf_gen_29_fit_1737pkl_vs_gen_39_fit_512pkl.json",
+      "p1_fitness": 1737,
+      "p2_fitness": 512,
+      "p1_elo_before": 1198.878705133179,
+      "p2_elo_before": 1183.8047463398261,
+      "p1_elo_after": 1214.1849589191106,
+      "p2_elo_after": 1168.4984925538945
+    },
+    {
+      "match_id": "d81eecf0",
+      "timestamp": 1763691933.1476061,
+      "p1": "gen_46_fit_1737.pkl",
+      "p2": "gen_39_fit_571.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        16
+      ],
+      "duration_frames": 40,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691933_d81eecf0_gen_46_fit_1737pkl_vs_gen_39_fit_571pkl.json",
+      "p1_fitness": 1737,
+      "p2_fitness": 571,
+      "p1_elo_before": 1183.3396338314878,
+      "p2_elo_before": 1246.575790070214,
+      "p1_elo_after": 1202.2200301550022,
+      "p2_elo_after": 1227.6953937466997
+    },
+    {
+      "match_id": "3792d7c9",
+      "timestamp": 1763691933.7403176,
+      "p1": "gen_37_fit_1758.pkl",
+      "p2": "gen_44_fit_1604.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691933_3792d7c9_gen_37_fit_1758pkl_vs_gen_44_fit_1604pkl.json",
+      "p1_fitness": 1758,
+      "p2_fitness": 1604,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1170.1147235738733,
+      "p1_elo_after": 1182.6271164244674,
+      "p2_elo_after": 1187.487607149406
+    },
+    {
+      "match_id": "1e0ff7c5",
+      "timestamp": 1763691934.3170183,
+      "p1": "gen_28_fit_1779.pkl",
+      "p2": "gen_47_fit_1609.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691934_1e0ff7c5_gen_28_fit_1779pkl_vs_gen_47_fit_1609pkl.json",
+      "p1_fitness": 1779,
+      "p2_fitness": 1609,
+      "p1_elo_before": 1229.0914419504056,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1243.7548537006576,
+      "p2_elo_after": 1185.336588249748
+    },
+    {
+      "match_id": "79a1144e",
+      "timestamp": 1763691934.8982785,
+      "p1": "gen_13_fit_1899.pkl",
+      "p2": "gen_27_fit_1768.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691934_79a1144e_gen_13_fit_1899pkl_vs_gen_27_fit_1768pkl.json",
+      "p1_fitness": 1899,
+      "p2_fitness": 1768,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1184.736306793522,
+      "p2_elo_after": 1231.263693206478
+    },
+    {
+      "match_id": "f987ab9d",
+      "timestamp": 1763691935.4656682,
+      "p1": "gen_21_fit_1871.pkl",
+      "p2": "gen_20_fit_1769.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        12
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691935_f987ab9d_gen_21_fit_1871pkl_vs_gen_20_fit_1769pkl.json",
+      "p1_fitness": 1871,
+      "p2_fitness": 1769,
+      "p1_elo_before": 1870.8405769541544,
+      "p2_elo_before": 1737.851673469788,
+      "p1_elo_after": 1880.9987675052687,
+      "p2_elo_after": 1727.6934829186737
+    },
+    {
+      "match_id": "bb040f1c",
+      "timestamp": 1763691936.0475793,
+      "p1": "gen_45_fit_1871.pkl",
+      "p2": "gen_36_fit_536.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691936_bb040f1c_gen_45_fit_1871pkl_vs_gen_36_fit_536pkl.json",
+      "p1_fitness": 1871,
+      "p2_fitness": 536,
+      "p1_elo_before": 1840.2751788273845,
+      "p2_elo_before": 1218.1205467764157,
+      "p1_elo_after": 1841.1418201538575,
+      "p2_elo_after": 1217.2539054499427
+    },
+    {
+      "match_id": "d472a598",
+      "timestamp": 1763691936.6513402,
+      "p1": "gen_14_fit_1857.pkl",
+      "p2": "gen_40_fit_585.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691936_d472a598_gen_14_fit_1857pkl_vs_gen_40_fit_585pkl.json",
+      "p1_fitness": 1857,
+      "p2_fitness": 585,
+      "p1_elo_before": 1857.3004780542908,
+      "p2_elo_before": 1216.0,
+      "p1_elo_after": 1858.0788800356165,
+      "p2_elo_after": 1215.2215980186743
+    },
+    {
+      "match_id": "0c4a97e3",
+      "timestamp": 1763691937.2298782,
+      "p1": "gen_27_fit_1848.pkl",
+      "p2": "gen_23_fit_1589.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        19,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691937_0c4a97e3_gen_27_fit_1848pkl_vs_gen_23_fit_1589pkl.json",
+      "p1_fitness": 1848,
+      "p2_fitness": 1589,
+      "p1_elo_before": 1817.1713244240423,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1818.0624840677008,
+      "p2_elo_after": 1199.1088403563415
+    },
+    {
+      "match_id": "304c8536",
+      "timestamp": 1763691937.8301277,
+      "p1": "gen_27_fit_1768.pkl",
+      "p2": "gen_48_fit_1678.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691937_304c8536_gen_27_fit_1768pkl_vs_gen_48_fit_1678pkl.json",
+      "p1_fitness": 1768,
+      "p2_fitness": 1678,
+      "p1_elo_before": 1231.263693206478,
+      "p2_elo_before": 1678.8267145144002,
+      "p1_elo_after": 1229.0021210336545,
+      "p2_elo_after": 1681.0882866872237
+    },
+    {
+      "match_id": "fab80c35",
+      "timestamp": 1763691938.486235,
+      "p1": "gen_7_fit_1838.pkl",
+      "p2": "gen_32_fit_601.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        11,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691938_fab80c35_gen_7_fit_1838pkl_vs_gen_32_fit_601pkl.json",
+      "p1_fitness": 1838,
+      "p2_fitness": 601,
+      "p1_elo_before": 1231.0354689639596,
+      "p2_elo_before": 1166.5410419261557,
+      "p1_elo_after": 1212.0990418558104,
+      "p2_elo_after": 1185.477469034305
+    },
+    {
+      "match_id": "8ff8f767",
+      "timestamp": 1763691939.0881903,
+      "p1": "gen_38_fit_1842.pkl",
+      "p2": "gen_22_fit_595.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        10
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691939_8ff8f767_gen_38_fit_1842pkl_vs_gen_22_fit_595pkl.json",
+      "p1_fitness": 1842,
+      "p2_fitness": 595,
+      "p1_elo_before": 1810.2179973179477,
+      "p2_elo_before": 1217.468622970598,
+      "p1_elo_after": 1811.2393802367517,
+      "p2_elo_after": 1216.447240051794
+    },
+    {
+      "match_id": "db746efd",
+      "timestamp": 1763691939.6769352,
+      "p1": "gen_20_fit_1885.pkl",
+      "p2": "gen_23_fit_1589.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        11
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691939_db746efd_gen_20_fit_1885pkl_vs_gen_23_fit_1589pkl.json",
+      "p1_fitness": 1885,
+      "p2_fitness": 1589,
+      "p1_elo_before": 1853.6265197294,
+      "p2_elo_before": 1199.1088403563415,
+      "p1_elo_after": 1854.3491823251052,
+      "p2_elo_after": 1198.3861777606362
+    },
+    {
+      "match_id": "2b3f8d89",
+      "timestamp": 1763691940.2348561,
+      "p1": "gen_35_fit_1784.pkl",
+      "p2": "gen_28_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        12
+      ],
+      "duration_frames": 134,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691940_2b3f8d89_gen_35_fit_1784pkl_vs_gen_28_fit_1737pkl.json",
+      "p1_fitness": 1784,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1182.5962221767109,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1199.3970260789856,
+      "p2_elo_after": 1183.1991960977252
+    },
+    {
+      "match_id": "aa07616c",
+      "timestamp": 1763691940.9080374,
+      "p1": "gen_26_fit_1801.pkl",
+      "p2": "gen_30_fit_1715.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 50,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691940_aa07616c_gen_26_fit_1801pkl_vs_gen_30_fit_1715pkl.json",
+      "p1_fitness": 1801,
+      "p2_fitness": 1715,
+      "p1_elo_before": 1801.4134191346066,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1770.3866220419854,
+      "p2_elo_after": 1231.026797092621
+    },
+    {
+      "match_id": "50a29e00",
+      "timestamp": 1763691941.51146,
+      "p1": "gen_19_fit_1865.pkl",
+      "p2": "gen_21_fit_1578.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        0,
+        0
+      ],
+      "duration_frames": 33,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691941_50a29e00_gen_19_fit_1865pkl_vs_gen_21_fit_1578pkl.json",
+      "p1_fitness": 1865,
+      "p2_fitness": 1578,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1202.037845491373,
+      "p1_elo_after": 1216.0938451768284,
+      "p2_elo_after": 1185.9440003145446
+    },
+    {
+      "match_id": "c68d170e",
+      "timestamp": 1763691942.1916175,
+      "p1": "gen_36_fit_1764.pkl",
+      "p2": "gen_16_fit_1699.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        6
+      ],
+      "duration_frames": 89,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691942_c68d170e_gen_36_fit_1764pkl_vs_gen_16_fit_1699pkl.json",
+      "p1_fitness": 1764,
+      "p2_fitness": 1699,
+      "p1_elo_before": 1183.315839225883,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1200.0835831740264,
+      "p2_elo_after": 1183.2322560518567
+    },
+    {
+      "match_id": "870e1ddf",
+      "timestamp": 1763691942.7596126,
+      "p1": "gen_18_fit_1866.pkl",
+      "p2": "gen_20_fit_1648.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        17,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691942_870e1ddf_gen_18_fit_1866pkl_vs_gen_20_fit_1648pkl.json",
+      "p1_fitness": 1866,
+      "p2_fitness": 1648,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "fda91748",
+      "timestamp": 1763691943.3389995,
+      "p1": "gen_38_fit_584.pkl",
+      "p2": "gen_45_fit_539.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691943_fda91748_gen_38_fit_584pkl_vs_gen_45_fit_539pkl.json",
+      "p1_fitness": 584,
+      "p2_fitness": 539,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1183.2959774658789,
+      "p1_elo_after": 1183.2313434925006,
+      "p2_elo_after": 1200.0646339733782
+    },
+    {
+      "match_id": "db3ff4b6",
+      "timestamp": 1763691943.9272501,
+      "p1": "gen_1_fit_1750.pkl",
+      "p2": "gen_46_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691943_db3ff4b6_gen_1_fit_1750pkl_vs_gen_46_fit_1737pkl.json",
+      "p1_fitness": 1750,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1202.2200301550022,
+      "p1_elo_after": 1216.1022347754395,
+      "p2_elo_after": 1186.1177953795627
+    },
+    {
+      "match_id": "88331be2",
+      "timestamp": 1763691944.512912,
+      "p1": "gen_44_fit_1696.pkl",
+      "p2": "gen_44_fit_552.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        12
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691944_88331be2_gen_44_fit_1696pkl_vs_gen_44_fit_552pkl.json",
+      "p1_fitness": 1696,
+      "p2_fitness": 552,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1231.263693206478,
+      "p1_elo_after": 1217.4358728782763,
+      "p2_elo_after": 1213.8278203282016
+    },
+    {
+      "match_id": "bce425d6",
+      "timestamp": 1763691945.0764651,
+      "p1": "gen_12_fit_1645.pkl",
+      "p2": "gen_7_fit_1600.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        16
+      ],
+      "duration_frames": 4,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691945_bce425d6_gen_12_fit_1645pkl_vs_gen_7_fit_1600pkl.json",
+      "p1_fitness": 1645,
+      "p2_fitness": 1600,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1599.6035533001102,
+      "p1_elo_after": 1197.0848680667857,
+      "p2_elo_after": 1602.5186852333245
+    },
+    {
+      "match_id": "8e99b1c8",
+      "timestamp": 1763691945.6245918,
+      "p1": "gen_1_fit_1450.pkl",
+      "p2": "gen_14_fit_580.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691945_8e99b1c8_gen_1_fit_1450pkl_vs_gen_14_fit_580pkl.json",
+      "p1_fitness": 1450,
+      "p2_fitness": 580,
+      "p1_elo_before": 1455.147427112137,
+      "p2_elo_before": 1168.736306793522,
+      "p1_elo_after": 1428.3084736629517,
+      "p2_elo_after": 1195.5752602427074
+    },
+    {
+      "match_id": "6ec9a8fc",
+      "timestamp": 1763691946.2158496,
+      "p1": "gen_8_fit_1794.pkl",
+      "p2": "gen_14_fit_1749.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        8,
+        18
+      ],
+      "duration_frames": 7,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691946_6ec9a8fc_gen_8_fit_1794pkl_vs_gen_14_fit_1749pkl.json",
+      "p1_fitness": 1794,
+      "p2_fitness": 1749,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1184.0,
+      "p2_elo_after": 1216.0
+    },
+    {
+      "match_id": "5a15e90f",
+      "timestamp": 1763691946.8304005,
+      "p1": "gen_9_fit_1933.pkl",
+      "p2": "gen_21_fit_1647.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691946_5a15e90f_gen_9_fit_1933pkl_vs_gen_21_fit_1647pkl.json",
+      "p1_fitness": 1933,
+      "p2_fitness": 1647,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1203.4643867365041,
+      "p1_elo_after": 1184.1595356177716,
+      "p2_elo_after": 1219.3048511187326
+    },
+    {
+      "match_id": "ee7e9b14",
+      "timestamp": 1763691947.4087183,
+      "p1": "gen_12_fit_1678.pkl",
+      "p2": "gen_44_fit_555.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691947_ee7e9b14_gen_12_fit_1678pkl_vs_gen_44_fit_555pkl.json",
+      "p1_fitness": 1678,
+      "p2_fitness": 555,
+      "p1_elo_before": 1668.0655170919,
+      "p2_elo_before": 1227.8126540870326,
+      "p1_elo_after": 1638.4171454484965,
+      "p2_elo_after": 1257.461025730436
+    },
+    {
+      "match_id": "51bb9ba7",
+      "timestamp": 1763691947.9734194,
+      "p1": "gen_11_fit_1621.pkl",
+      "p2": "gen_20_fit_1593.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        13,
+        17
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691947_51bb9ba7_gen_11_fit_1621pkl_vs_gen_20_fit_1593pkl.json",
+      "p1_fitness": 1621,
+      "p2_fitness": 1593,
+      "p1_elo_before": 1216.6815079064934,
+      "p2_elo_before": 1195.386217588688,
+      "p1_elo_after": 1199.7020497827305,
+      "p2_elo_after": 1212.3656757124509
+    },
+    {
+      "match_id": "747d494c",
+      "timestamp": 1763691948.5468276,
+      "p1": "gen_27_fit_1809.pkl",
+      "p2": "gen_22_fit_1744.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691948_747d494c_gen_27_fit_1809pkl_vs_gen_22_fit_1744pkl.json",
+      "p1_fitness": 1809,
+      "p2_fitness": 1744,
+      "p1_elo_before": 1809.5058595205408,
+      "p2_elo_before": 1227.6506543732423,
+      "p1_elo_after": 1810.5911045267655,
+      "p2_elo_after": 1226.5654093670175
+    },
+    {
+      "match_id": "aaf2f151",
+      "timestamp": 1763691949.1338902,
+      "p1": "gen_42_fit_1580.pkl",
+      "p2": "gen_35_fit_652.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        14
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691949_aaf2f151_gen_42_fit_1580pkl_vs_gen_35_fit_652pkl.json",
+      "p1_fitness": 1580,
+      "p2_fitness": 652,
+      "p1_elo_before": 1246.7234660771392,
+      "p2_elo_before": 1213.1574482106641,
+      "p1_elo_after": 1261.1824851694955,
+      "p2_elo_after": 1198.6984291183078
+    },
+    {
+      "match_id": "bae063af",
+      "timestamp": 1763691949.701426,
+      "p1": "gen_15_fit_1883.pkl",
+      "p2": "gen_10_fit_1794.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        13
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691949_bae063af_gen_15_fit_1883pkl_vs_gen_10_fit_1794pkl.json",
+      "p1_fitness": 1883,
+      "p2_fitness": 1794,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1216.0,
+      "p2_elo_after": 1184.0
+    },
+    {
+      "match_id": "5751726a",
+      "timestamp": 1763691950.260029,
+      "p1": "gen_19_fit_1766.pkl",
+      "p2": "gen_46_fit_507.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691950_5751726a_gen_19_fit_1766pkl_vs_gen_46_fit_507pkl.json",
+      "p1_fitness": 1766,
+      "p2_fitness": 507,
+      "p1_elo_before": 1772.8564924136356,
+      "p2_elo_before": 1216.736306793522,
+      "p1_elo_after": 1742.1082488924908,
+      "p2_elo_after": 1247.4845503146669
+    },
+    {
+      "match_id": "511929f9",
+      "timestamp": 1763691950.8345692,
+      "p1": "gen_35_fit_1735.pkl",
+      "p2": "gen_13_fit_517.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691950_511929f9_gen_35_fit_1735pkl_vs_gen_13_fit_517pkl.json",
+      "p1_fitness": 1735,
+      "p2_fitness": 517,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1215.7929928540016,
+      "p1_elo_after": 1184.7267936911533,
+      "p2_elo_after": 1231.0661991628483
+    },
+    {
+      "match_id": "b1afba06",
+      "timestamp": 1763691951.4277635,
+      "p1": "gen_27_fit_1768.pkl",
+      "p2": "gen_8_fit_1614.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        17
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691951_b1afba06_gen_27_fit_1768pkl_vs_gen_8_fit_1614pkl.json",
+      "p1_fitness": 1768,
+      "p2_fitness": 1614,
+      "p1_elo_before": 1229.0021210336545,
+      "p2_elo_before": 1202.167582638238,
+      "p1_elo_after": 1243.7687963227552,
+      "p2_elo_after": 1187.4009073491372
+    },
+    {
+      "match_id": "55bb6a8b",
+      "timestamp": 1763691952.072739,
+      "p1": "gen_0_fit_1918.pkl",
+      "p2": "gen_31_fit_617.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        16,
+        12
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691952_55bb6a8b_gen_0_fit_1918pkl_vs_gen_31_fit_617pkl.json",
+      "p1_fitness": 1918,
+      "p2_fitness": 617,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1231.4002235939151,
+      "p1_elo_after": 1217.4421094778247,
+      "p2_elo_after": 1213.9581141160904
+    },
+    {
+      "match_id": "11850f76",
+      "timestamp": 1763691952.649163,
+      "p1": "gen_12_fit_1724.pkl",
+      "p2": "gen_31_fit_543.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        10,
+        18
+      ],
+      "duration_frames": 39,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691952_11850f76_gen_12_fit_1724pkl_vs_gen_31_fit_543pkl.json",
+      "p1_fitness": 1724,
+      "p2_fitness": 543,
+      "p1_elo_before": 1213.6758154925658,
+      "p2_elo_before": 1199.143451092014,
+      "p1_elo_after": 1197.0069653944622,
+      "p2_elo_after": 1215.8123011901175
+    },
+    {
+      "match_id": "baa56005",
+      "timestamp": 1763691953.211511,
+      "p1": "gen_47_fit_1722.pkl",
+      "p2": "gen_44_fit_1604.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691953_baa56005_gen_47_fit_1722pkl_vs_gen_44_fit_1604pkl.json",
+      "p1_fitness": 1722,
+      "p2_fitness": 1604,
+      "p1_elo_before": 1711.9311708718035,
+      "p2_elo_before": 1187.487607149406,
+      "p1_elo_after": 1681.4216518956307,
+      "p2_elo_after": 1217.9971261255787
+    },
+    {
+      "match_id": "22114037",
+      "timestamp": 1763691953.7930083,
+      "p1": "gen_7_fit_1838.pkl",
+      "p2": "gen_33_fit_584.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        12,
+        18
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691953_22114037_gen_7_fit_1838pkl_vs_gen_33_fit_584pkl.json",
+      "p1_fitness": 1838,
+      "p2_fitness": 584,
+      "p1_elo_before": 1212.0990418558104,
+      "p2_elo_before": 1230.0743562048422,
+      "p1_elo_after": 1196.926097869782,
+      "p2_elo_after": 1245.2473001908704
+    },
+    {
+      "match_id": "e9487439",
+      "timestamp": 1763691954.391753,
+      "p1": "gen_5_fit_1843.pkl",
+      "p2": "gen_43_fit_515.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        18,
+        19
+      ],
+      "duration_frames": 41,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691954_e9487439_gen_5_fit_1843pkl_vs_gen_43_fit_515pkl.json",
+      "p1_fitness": 1843,
+      "p2_fitness": 515,
+      "p1_elo_before": 1843.264283841795,
+      "p2_elo_before": 1224.903345952856,
+      "p1_elo_after": 1812.149529948659,
+      "p2_elo_after": 1256.018099845992
+    },
+    {
+      "match_id": "410cf78b",
+      "timestamp": 1763691955.0599265,
+      "p1": "gen_19_fit_1766.pkl",
+      "p2": "gen_10_fit_1651.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        17
+      ],
+      "duration_frames": 38,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691955_410cf78b_gen_19_fit_1766pkl_vs_gen_10_fit_1651pkl.json",
+      "p1_fitness": 1766,
+      "p2_fitness": 1651,
+      "p1_elo_before": 1742.1082488924908,
+      "p2_elo_before": 1651.492397910097,
+      "p1_elo_after": 1722.0273503132553,
+      "p2_elo_after": 1671.5732964893325
+    },
+    {
+      "match_id": "f2a620ab",
+      "timestamp": 1763691955.63856,
+      "p1": "gen_9_fit_1802.pkl",
+      "p2": "gen_47_fit_1722.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        11
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691955_f2a620ab_gen_9_fit_1802pkl_vs_gen_47_fit_1722pkl.json",
+      "p1_fitness": 1802,
+      "p2_fitness": 1722,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1681.4216518956307,
+      "p1_elo_after": 1230.1153374362416,
+      "p2_elo_after": 1651.3063144593891
+    },
+    {
+      "match_id": "5f436267",
+      "timestamp": 1763691956.208234,
+      "p1": "gen_3_fit_1521.pkl",
+      "p2": "gen_0_fit_1361.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        14
+      ],
+      "duration_frames": 43,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691956_5f436267_gen_3_fit_1521pkl_vs_gen_0_fit_1361pkl.json",
+      "p1_fitness": 1521,
+      "p2_fitness": 1361,
+      "p1_elo_before": 1514.0037605317586,
+      "p2_elo_before": 1378.818684108338,
+      "p1_elo_after": 1524.0744989725977,
+      "p2_elo_after": 1368.747945667499
+    },
+    {
+      "match_id": "6645565a",
+      "timestamp": 1763691956.861321,
+      "p1": "gen_40_fit_1720.pkl",
+      "p2": "gen_14_fit_580.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        10
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691956_6645565a_gen_40_fit_1720pkl_vs_gen_14_fit_580pkl.json",
+      "p1_fitness": 1720,
+      "p2_fitness": 580,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1195.5752602427074,
+      "p1_elo_after": 1215.796244219558,
+      "p2_elo_after": 1179.7790160231493
+    },
+    {
+      "match_id": "ddb3fa71",
+      "timestamp": 1763691957.4557548,
+      "p1": "gen_41_fit_597.pkl",
+      "p2": "gen_30_fit_574.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        17,
+        16
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691957_ddb3fa71_gen_41_fit_597pkl_vs_gen_30_fit_574pkl.json",
+      "p1_fitness": 597,
+      "p2_fitness": 574,
+      "p1_elo_before": 1183.3296897362338,
+      "p2_elo_before": 1171.5708703386586,
+      "p1_elo_after": 1166.7883827566461,
+      "p2_elo_after": 1188.1121773182463
+    },
+    {
+      "match_id": "78112bc5",
+      "timestamp": 1763691958.0551698,
+      "p1": "gen_11_fit_1913.pkl",
+      "p2": "gen_46_fit_507.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        16,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691958_78112bc5_gen_11_fit_1913pkl_vs_gen_46_fit_507pkl.json",
+      "p1_fitness": 1913,
+      "p2_fitness": 507,
+      "p1_elo_before": 1200,
+      "p2_elo_before": 1247.4845503146669,
+      "p1_elo_after": 1186.173229844871,
+      "p2_elo_after": 1261.3113204697959
+    },
+    {
+      "match_id": "1137716f",
+      "timestamp": 1763691958.6631892,
+      "p1": "gen_18_fit_1715.pkl",
+      "p2": "gen_9_fit_1633.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        14
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691958_1137716f_gen_18_fit_1715pkl_vs_gen_9_fit_1633pkl.json",
+      "p1_fitness": 1715,
+      "p2_fitness": 1633,
+      "p1_elo_before": 1243.5260519607157,
+      "p2_elo_before": 1199.006520355684,
+      "p1_elo_after": 1257.4869994528951,
+      "p2_elo_after": 1185.0455728635045
+    },
+    {
+      "match_id": "fcfd60e8",
+      "timestamp": 1763691959.259757,
+      "p1": "gen_29_fit_1737.pkl",
+      "p2": "gen_46_fit_555.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        11,
+        17
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691959_fcfd60e8_gen_29_fit_1737pkl_vs_gen_46_fit_555pkl.json",
+      "p1_fitness": 1737,
+      "p2_fitness": 555,
+      "p1_elo_before": 1214.1849589191106,
+      "p2_elo_before": 1184.736306793522,
+      "p1_elo_after": 1196.8320367369886,
+      "p2_elo_after": 1202.0892289756441
+    },
+    {
+      "match_id": "58bcd2a3",
+      "timestamp": 1763691959.91488,
+      "p1": "gen_3_fit_1763.pkl",
+      "p2": "gen_18_fit_1661.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        19,
+        13
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691959_58bcd2a3_gen_3_fit_1763pkl_vs_gen_18_fit_1661pkl.json",
+      "p1_fitness": 1763,
+      "p2_fitness": 1661,
+      "p1_elo_before": 1231.2814310214442,
+      "p2_elo_before": 1231.30009598481,
+      "p1_elo_after": 1247.2822905747714,
+      "p2_elo_after": 1215.2992364314828
+    },
+    {
+      "match_id": "d773c000",
+      "timestamp": 1763691960.4876454,
+      "p1": "gen_29_fit_1831.pkl",
+      "p2": "gen_36_fit_1610.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        14,
+        19
+      ],
+      "duration_frames": 9,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691960_d773c000_gen_29_fit_1831pkl_vs_gen_36_fit_1610pkl.json",
+      "p1_fitness": 1831,
+      "p2_fitness": 1610,
+      "p1_elo_before": 1741.127814582164,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1710.487605655567,
+      "p2_elo_after": 1230.640208926597
+    },
+    {
+      "match_id": "3f8e58fa",
+      "timestamp": 1763691961.1549704,
+      "p1": "gen_29_fit_1831.pkl",
+      "p2": "gen_31_fit_543.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        15
+      ],
+      "duration_frames": 11,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691961_3f8e58fa_gen_29_fit_1831pkl_vs_gen_31_fit_543pkl.json",
+      "p1_fitness": 1831,
+      "p2_fitness": 543,
+      "p1_elo_before": 1710.487605655567,
+      "p2_elo_before": 1215.8123011901175,
+      "p1_elo_after": 1712.2414151699365,
+      "p2_elo_after": 1214.058491675748
+    },
+    {
+      "match_id": "87427cf2",
+      "timestamp": 1763691962.1663952,
+      "p1": "gen_3_fit_1903.pkl",
+      "p2": "gen_28_fit_1622.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        9,
+        19
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691962_87427cf2_gen_3_fit_1903pkl_vs_gen_28_fit_1622pkl.json",
+      "p1_fitness": 1903,
+      "p2_fitness": 1622,
+      "p1_elo_before": 1183.2815501737107,
+      "p2_elo_before": 1230.5645026305021,
+      "p1_elo_after": 1169.445666655448,
+      "p2_elo_after": 1244.400386148765
+    },
+    {
+      "match_id": "64c400cf",
+      "timestamp": 1763691962.780073,
+      "p1": "gen_45_fit_1779.pkl",
+      "p2": "gen_48_fit_1609.pkl",
+      "match_type": "tournament",
+      "winner": "p1",
+      "final_score": [
+        18,
+        10
+      ],
+      "duration_frames": 8,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691962_64c400cf_gen_45_fit_1779pkl_vs_gen_48_fit_1609pkl.json",
+      "p1_fitness": 1779,
+      "p2_fitness": 1609,
+      "p1_elo_before": 1781.824988280906,
+      "p2_elo_before": 1200,
+      "p1_elo_after": 1782.9104156699639,
+      "p2_elo_after": 1198.914572610942
+    },
+    {
+      "match_id": "5c799767",
+      "timestamp": 1763691963.4643342,
+      "p1": "gen_25_fit_1793.pkl",
+      "p2": "gen_46_fit_1737.pkl",
+      "match_type": "tournament",
+      "winner": "p2",
+      "final_score": [
+        6,
+        18
+      ],
+      "duration_frames": 10,
+      "file_path": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\data\\logs\\matches\\match_1763691963_5c799767_gen_25_fit_1793pkl_vs_gen_46_fit_1737pkl.json",
+      "p1_fitness": 1793,
+      "p2_fitness": 1737,
+      "p1_elo_before": 1811.0300202102103,
+      "p2_elo_before": 1186.1177953795627,
+      "p1_elo_after": 1779.8833770718654,
+      "p2_elo_after": 1217.2644385179076
     }
   ],
   "version": "1.0"
