@@ -117,7 +117,7 @@ min_species_size   = 1
         # We can just create a reproduction object and create_new
         
         reproduction = neat.DefaultReproduction(self.neat_config.reproduction_config,
-                                                self.neat_config.reproduction_reporters,
+                                                pop.reporters,
                                                 self.neat_config.stagnation_config)
         
         # Create a dictionary of genomes
