@@ -105,15 +105,29 @@ survival_threshold = 0.2
 min_species_size   = 1
 """)
         
-        # Create dummy genomes
+        # Create dummy genomes using Population to handle innovation tracking
         self.neat_config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                   self.config_path)
         
-        self.g1 = self.neat_config.genome_type(1)
-        self.g1.configure_new(self.neat_config.genome_config)
-        self.g2 = self.neat_config.genome_type(2)
-        self.g2.configure_new(self.neat_config.genome_config)
+        pop = neat.Population(self.neat_config)
+        # Run for 0 generations just to initialize
+        # Actually, we just need to access the population
+        # But Population doesn't expose genomes directly until run?
+        # We can just create a reproduction object and create_new
+        
+        reproduction = neat.DefaultReproduction(self.neat_config.reproduction_config,
+                                                self.neat_config.reproduction_reporters,
+                                                self.neat_config.stagnation_config)
+        
+        # Create a dictionary of genomes
+        genomes = reproduction.create_new(self.neat_config.genome_type, 
+                                          self.neat_config.genome_config, 
+                                          2)
+        
+        genome_list = list(genomes.values())
+        self.g1 = genome_list[0]
+        self.g2 = genome_list[1]
         
         self.p1_path = "test_p1.pkl"
         self.p2_path = "test_p2.pkl"
