@@ -35,6 +35,7 @@ class LeagueState(BaseState):
         self.show_visuals = config.TOURNAMENT_VISUAL_DEFAULT
         self.min_fitness_threshold = config.TOURNAMENT_MIN_FITNESS_DEFAULT
         self.similarity_threshold = config.TOURNAMENT_SIMILARITY_THRESHOLD
+        self.record_matches = False # Default to OFF
         
         # Deletion Tracking
         self.deleted_models = []
@@ -175,18 +176,20 @@ class LeagueState(BaseState):
         self.analyzer = MatchAnalyzer()
         
         # Initialize Match Recorder with metadata
-        metadata = {
-            "p1_fitness": self.model_stats[p1_path]["fitness"],
-            "p2_fitness": self.model_stats[p2_path]["fitness"],
-            "p1_elo_before": self.model_stats[p1_path]["elo"],
-            "p2_elo_before": self.model_stats[p2_path]["elo"]
-        }
-        self.recorder = MatchRecorder(
-            os.path.basename(p1_path), 
-            os.path.basename(p2_path),
-            match_type="tournament",
-            metadata=metadata
-        )
+        self.recorder = None
+        if self.record_matches:
+            metadata = {
+                "p1_fitness": self.model_stats[p1_path]["fitness"],
+                "p2_fitness": self.model_stats[p2_path]["fitness"],
+                "p1_elo_before": self.model_stats[p1_path]["elo"],
+                "p2_elo_before": self.model_stats[p2_path]["elo"]
+            }
+            self.recorder = MatchRecorder(
+                os.path.basename(p1_path), 
+                os.path.basename(p2_path),
+                match_type="tournament",
+                metadata=metadata
+            )
         
         if not self.show_visuals:
             # FAST MODE: Send command to run full match in background
@@ -199,7 +202,7 @@ class LeagueState(BaseState):
                 "neat_config_path": config_path,
                 "metadata": metadata
             }
-            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
+            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config, "record_match": self.record_matches})
             return
 
         # VISUAL MODE: Load Genomes locally
@@ -389,6 +392,11 @@ class LeagueState(BaseState):
                 if toggle_rect.collidepoint(event.pos):
                     self.show_visuals = not self.show_visuals
             
+            # Toggle Recording
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.record_matches = not self.record_matches
+
             # Speed up if visuals off
             if not self.show_visuals:
                 # Parallel engine handles speed, but we can call update multiple times per frame if we want even faster?
@@ -441,7 +449,8 @@ class LeagueState(BaseState):
                 
                 # Update Analyzer
                 self.analyzer.update(state)
-                self.recorder.record_frame(state)
+                if self.recorder:
+                    self.recorder.record_frame(state)
                 
                 # AI 1 (Left)
                 inputs1 = (
@@ -481,7 +490,7 @@ class LeagueState(BaseState):
                         game.score_left, 
                         game.score_right, 
                         self.analyzer.get_stats(), 
-                        self.recorder.save()
+                        self.recorder.save() if self.recorder else None
                     )
             else:
                 self.start_next_match()
@@ -559,6 +568,11 @@ class LeagueState(BaseState):
         pygame.draw.rect(screen, color, toggle_rect)
         toggle_text = self.small_font.render("Visuals: " + ("ON" if self.show_visuals else "OFF"), True, config.WHITE)
         screen.blit(toggle_text, (toggle_rect.centerx - toggle_text.get_width()//2, toggle_rect.centery - toggle_text.get_height()//2))
+
+        # Recording Status
+        rec_text = f"Recording: {'ON' if self.record_matches else 'OFF'} (Press R)"
+        rec_surf = self.small_font.render(rec_text, True, config.RED if self.record_matches else config.GRAY)
+        screen.blit(rec_surf, (config.SCREEN_WIDTH - 250, 60))
 
     def draw_results(self, screen):
         screen.fill(config.BLACK)
