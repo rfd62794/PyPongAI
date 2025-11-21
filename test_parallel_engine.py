@@ -25,14 +25,16 @@ class TestParallelEngine(unittest.TestCase):
         self.assertIsNotNone(state)
         self.assertIn("ball_x", state)
         
-        # Send move
-        engine.update(left_move="UP")
-        time.sleep(0.1)
+        # Send move multiple times to ensure movement
+        for _ in range(10):
+            engine.update(left_move="UP")
+            time.sleep(0.01)
         
         # Fetch new state
         engine.update()
         
         new_state = engine.get_state()
+        print(f"DEBUG: Old Y: {state['paddle_left_y']}, New Y: {new_state['paddle_left_y']}")
         self.assertNotEqual(state["paddle_left_y"], new_state["paddle_left_y"])
         
         engine.stop()
