@@ -12,6 +12,7 @@ from model_manager import get_fitness_from_filename, delete_models
 import elo_manager
 from match_recorder import MatchRecorder
 import match_database
+from parallel_engine import ParallelGameEngine
 
 class MatchAnalyzer:
     def __init__(self):
@@ -224,10 +225,9 @@ class LeagueState(BaseState):
             return
 
         # Choose engine based on visuals setting
-        if self.show_visuals:
-            game_instance = game_engine.Game()
-        else:
-            game_instance = game_simulator.GameSimulator()
+        target_fps = 60 if self.show_visuals else 0
+        game_instance = ParallelGameEngine(visual_mode=self.show_visuals, target_fps=target_fps)
+        game_instance.start()
 
         self.current_match = {
             "p1": p1_path,
@@ -358,6 +358,9 @@ class LeagueState(BaseState):
             match_metadata["p2_elo_after"] = self.model_stats[p2]["elo"]
             match_database.index_match(match_metadata)
         
+        # Clean up engine
+        match["game"].stop()
+        
         self.completed_matches += 1
         self.start_next_match()
 
@@ -446,6 +449,14 @@ class LeagueState(BaseState):
             
             # Speed up if visuals off
             if not self.show_visuals:
+                # Parallel engine handles speed, but we can call update multiple times per frame if we want even faster?
+                # Actually, the parallel engine loop runs as fast as possible if target_fps=0.
+                # But we need to pump events here.
+                # Let's just call update once per frame here, and let the parallel engine handle the physics loop?
+                # Wait, if we only call update once here, we only get one state update per frame.
+                # If the parallel engine is running freely, it might be producing states faster than we consume.
+                # But our update() logic sends commands. If we don't send commands, the AI doesn't move.
+                # So we need to run this loop fast.
                 for _ in range(10):
                     if self.current_match:
                         self.update(0)
