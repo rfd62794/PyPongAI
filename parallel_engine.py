@@ -42,8 +42,6 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
 
         # Update Game
         score_data = game.update(left_move, right_move)
-        if left_move:
-            print(f"DEBUG: Paddle Left Y: {game.left_paddle.rect.y}, Speed: {game.left_paddle.speed}")
         
         # Get State
         state = game.get_state()

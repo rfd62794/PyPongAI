@@ -29,6 +29,9 @@ class TestParallelEngine(unittest.TestCase):
         engine.update(left_move="UP")
         time.sleep(0.1)
         
+        # Fetch new state
+        engine.update()
+        
         new_state = engine.get_state()
         self.assertNotEqual(state["paddle_left_y"], new_state["paddle_left_y"])
         
