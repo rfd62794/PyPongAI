@@ -4,13 +4,7 @@ import config
 import game_engine
 import game_simulator
 import neat
-import pickle
-import os
-from match_analyzer import MatchAnalyzer
-from match_recorder import MatchRecorder
-import match_database
-
-def _run_fast_match(match_config):
+def _run_fast_match(match_config, record_match=False):
     """
     Runs a complete match in the background process at maximum speed.
     """
@@ -35,12 +29,14 @@ def _run_fast_match(match_config):
     # Initialize Game Components
     game = game_simulator.GameSimulator()
     analyzer = MatchAnalyzer()
-    recorder = MatchRecorder(
-        os.path.basename(p1_path), 
-        os.path.basename(p2_path),
-        match_type="tournament",
-        metadata=metadata
-    )
+    recorder = None
+    if record_match:
+        recorder = MatchRecorder(
+            os.path.basename(p1_path), 
+            os.path.basename(p2_path),
+            match_type="tournament",
+            metadata=metadata
+        )
     
     # Run Match Loop
     target_score = config.MAX_SCORE
@@ -51,7 +47,8 @@ def _run_fast_match(match_config):
         
         # Update Analyzer & Recorder
         analyzer.update(state)
-        recorder.record_frame(state)
+        if recorder:
+            recorder.record_frame(state)
         
         # AI 1 (Left)
         inputs1 = (
@@ -92,7 +89,9 @@ def _run_fast_match(match_config):
             
     # Compile Results
     stats = analyzer.get_stats()
-    match_metadata = recorder.save()
+    match_metadata = None
+    if recorder:
+        match_metadata = recorder.save()
     
     # We don't index here because the main process handles ELO updates and then re-indexes if needed.
     # Actually, the main process expects to handle ELO updates.
@@ -139,7 +138,7 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
                         right_move = cmd["action"]
                 elif cmd["type"] == "PLAY_MATCH":
                     # Run a full match and return result
-                    result = _run_fast_match(cmd["config"])
+                    result = _run_fast_match(cmd["config"], record_match=cmd.get("record_match", False))
                     output_queue.put({"type": "MATCH_RESULT", "data": result})
                     # We continue the loop, but effectively we just waited for the match to finish
                     
@@ -268,11 +267,11 @@ class ParallelGameEngine:
             "game_over": False
         }
         
-    def play_match(self, match_config):
+    def play_match(self, match_config, record_match=False):
         """
         Sends a command to play a full match and waits for the result.
         """
-        self.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
+        self.input_queue.put({"type": "PLAY_MATCH", "config": match_config, "record_match": record_match})
         
         # Wait for result
         while True:
