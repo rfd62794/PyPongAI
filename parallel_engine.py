@@ -4,6 +4,10 @@ import config
 import game_engine
 import game_simulator
 import neat
+import pickle
+import os
+from match_analyzer import MatchAnalyzer
+from match_recorder import MatchRecorder
 def _run_fast_match(match_config, record_match=False):
     """
     Runs a complete match in the background process at maximum speed.
