@@ -4,7 +4,7 @@ import pickle
 import os
 import config
 from states.base import BaseState
-from game_engine import Game
+from parallel_engine import ParallelGameEngine
 from game_recorder import GameRecorder
 from human_rival import HumanRival
 
@@ -22,7 +22,8 @@ class GameState(BaseState):
 
     def enter(self, model_path=None, **kwargs):
         self.model_path = model_path
-        self.game = Game()
+        self.game = ParallelGameEngine(visual_mode=True, target_fps=config.FPS)
+        self.game.start()
         self.recorder = GameRecorder()
         self.game_over = False
         
@@ -50,8 +51,10 @@ class GameState(BaseState):
                     # For now, just restart with same model
                     self.enter(model_path=self.model_path)
                 elif event.key == pygame.K_m:
+                    self.game.stop()
                     self.manager.change_state("menu")
                 elif event.key == pygame.K_q:
+                    self.game.stop()
                     self.manager.running = False
         else:
             # In-game input is handled in update via key polling, 
@@ -64,33 +67,39 @@ class GameState(BaseState):
 
         # Human Input
         keys = pygame.key.get_pressed()
+        right_move = None
         if keys[pygame.K_UP]:
-            self.game.right_paddle.move(up=True)
+            right_move = "UP"
         if keys[pygame.K_DOWN]:
-            self.game.right_paddle.move(up=False)
+            right_move = "DOWN"
 
         # AI Input
         if self.net:
+            # Get state from parallel engine
+            state = self.game.get_state()
+            
             inputs = (
-                self.game.left_paddle.rect.y / config.SCREEN_HEIGHT,
-                self.game.ball.rect.x / config.SCREEN_WIDTH,
-                self.game.ball.rect.y / config.SCREEN_HEIGHT,
-                self.game.ball.vel_x / config.BALL_MAX_SPEED,
-                self.game.ball.vel_y / config.BALL_MAX_SPEED,
-                (self.game.left_paddle.rect.y - self.game.ball.rect.y) / config.SCREEN_HEIGHT,
-                1.0 if self.game.ball.vel_x < 0 else 0.0,
-                self.game.right_paddle.rect.y / config.SCREEN_HEIGHT
+                state["paddle_left_y"] / config.SCREEN_HEIGHT,
+                state["ball_x"] / config.SCREEN_WIDTH,
+                state["ball_y"] / config.SCREEN_HEIGHT,
+                state["ball_vel_x"] / config.BALL_MAX_SPEED,
+                state["ball_vel_y"] / config.BALL_MAX_SPEED,
+                (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+                1.0 if state["ball_vel_x"] < 0 else 0.0,
+                state["paddle_right_y"] / config.SCREEN_HEIGHT
             )
             output = self.net.activate(inputs)
             decision = output.index(max(output))
             
             if decision == 0:
-                self.game.left_paddle.move(up=True)
+                left_move = "UP"
             elif decision == 1:
-                self.game.left_paddle.move(up=False)
+                left_move = "DOWN"
+            else:
+                left_move = None
 
         # Update Game
-        score_data = self.game.update()
+        score_data = self.game.update(left_move, right_move)
         
         # Check Game Over
         if self.game.score_left >= config.MAX_SCORE or self.game.score_right >= config.MAX_SCORE:
@@ -107,6 +116,7 @@ class GameState(BaseState):
             
         self.rival_sys.update_match_result(final_score_human, final_score_ai, won)
         self.recorder.save_recording()
+        self.game.stop()
 
     def draw(self, screen):
         self.game.draw(screen)
