@@ -167,7 +167,8 @@ class LeagueState(BaseState):
             "game": game_instance,
             "net1": None,
             "net2": None,
-            "is_visual": self.show_visuals
+            "is_visual": self.show_visuals,
+            "waiting_for_result": not self.show_visuals
         }
         
         # Initialize Match Analyzer
@@ -187,7 +188,21 @@ class LeagueState(BaseState):
             metadata=metadata
         )
         
-        # Load Genomes
+        if not self.show_visuals:
+            # FAST MODE: Send command to run full match in background
+            local_dir = os.path.dirname(os.path.dirname(__file__))
+            config_path = os.path.join(local_dir, 'neat_config.txt')
+            
+            match_config = {
+                "p1_path": p1_path,
+                "p2_path": p2_path,
+                "neat_config_path": config_path,
+                "metadata": metadata
+            }
+            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
+            return
+
+        # VISUAL MODE: Load Genomes locally
         try:
             with open(p1_path, "rb") as f:
                 g1 = pickle.load(f)
@@ -227,11 +242,8 @@ class LeagueState(BaseState):
             delete_models([loser_path])
             elo_manager.remove_elo(os.path.basename(loser_path))
 
-    def finish_match(self):
+    def finish_match(self, score1, score2, stats, match_metadata):
         match = self.current_match
-        score1 = match["game"].score_left
-        score2 = match["game"].score_right
-        
         p1 = match["p1"]
         p2 = match["p2"]
         
@@ -268,8 +280,6 @@ class LeagueState(BaseState):
             self.check_for_shutout(p1, score1, score2)
             
         # Consolidate Analyzer Stats
-        stats = self.analyzer.get_stats()
-        
         self.model_stats[p1]["hits"] += stats["left"]["hits"]
         self.model_stats[p2]["hits"] += stats["right"]["hits"]
         
@@ -283,7 +293,6 @@ class LeagueState(BaseState):
         self.model_stats[p2]["reaction_count"] += stats["right"]["reaction_count"]
         
         # Save Match Recording and index it
-        match_metadata = self.recorder.save()
         if match_metadata:
             # Add post-match ELO to metadata
             match_metadata["p1_elo_after"] = self.model_stats[p1]["elo"]
@@ -291,7 +300,8 @@ class LeagueState(BaseState):
             match_database.index_match(match_metadata)
         
         # Clean up engine
-        match["game"].stop()
+        if match["game"]:
+            match["game"].stop()
         
         self.completed_matches += 1
         self.start_next_match()
@@ -404,6 +414,26 @@ class LeagueState(BaseState):
         if self.mode == "RUNNING":
             if self.current_match:
                 game = self.current_match["game"]
+                
+                # Check for fast match result
+                if self.current_match.get("waiting_for_result"):
+                    try:
+                        while not game.output_queue.empty():
+                            msg = game.output_queue.get_nowait()
+                            if msg.get("type") == "MATCH_RESULT":
+                                data = msg["data"]
+                                self.finish_match(
+                                    data["score_left"], 
+                                    data["score_right"], 
+                                    data["stats"], 
+                                    data["match_metadata"]
+                                )
+                                return
+                    except Exception:
+                        pass
+                    return
+
+                # VISUAL MODE UPDATE
                 net1 = self.current_match["net1"]
                 net2 = self.current_match["net2"]
                 
@@ -447,7 +477,12 @@ class LeagueState(BaseState):
                 
                 target_score = config.VISUAL_MAX_SCORE if self.show_visuals else config.MAX_SCORE
                 if game.score_left >= target_score or game.score_right >= target_score:
-                    self.finish_match()
+                    self.finish_match(
+                        game.score_left, 
+                        game.score_right, 
+                        self.analyzer.get_stats(), 
+                        self.recorder.save()
+                    )
             else:
                 self.start_next_match()
 
