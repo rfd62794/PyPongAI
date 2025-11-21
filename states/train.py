@@ -12,6 +12,7 @@ from states.base import BaseState
 from model_manager import get_best_model, get_fitness_from_filename
 from opponents import get_rule_based_move
 import training_logger
+from parallel_engine import ParallelGameEngine
 
 class UIProgressReporter(neat.reporting.BaseReporter):
     def __init__(self, screen, logger=None):
@@ -135,7 +136,8 @@ class VisualReporter(neat.reporting.BaseReporter):
         print("Visualizing best genome... (Press SPACE to skip)")
         
         clock = pygame.time.Clock()
-        game = game_engine.Game()
+        game = ParallelGameEngine(visual_mode=True, target_fps=config.FPS)
+        game.start()
         
         # Create Network
         net = neat.nn.FeedForwardNetwork.create(genome, self.config_neat)
@@ -186,6 +188,8 @@ class VisualReporter(neat.reporting.BaseReporter):
             # Check end condition (quick match to VISUAL_MAX_SCORE)
             if game.score_left >= config.VISUAL_MAX_SCORE or game.score_right >= config.VISUAL_MAX_SCORE:
                 running = False
+        
+        game.stop()
 
 class TrainState(BaseState):
     def __init__(self, manager):
