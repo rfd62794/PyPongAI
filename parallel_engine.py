@@ -16,6 +16,9 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
         game = game_simulator.GameSimulator()
         clock = None
 
+    # Signal that we are ready
+    output_queue.put({"type": "READY"})
+
     running = True
     while running:
         # Process all available commands
@@ -84,6 +87,19 @@ class ParallelGameEngine:
                 args=(self.input_queue, self.output_queue, self.visual_mode, self.target_fps)
             )
             self.process.start()
+            
+            # Wait for ready signal
+            print("Waiting for engine to start...")
+            while True:
+                try:
+                    msg = self.output_queue.get(timeout=5.0)
+                    if msg.get("type") == "READY":
+                        print("Engine started.")
+                        break
+                except multiprocessing.queues.Empty:
+                    print("Engine start timed out.")
+                    self.stop()
+                    break
 
     def stop(self):
         if self.process:
@@ -109,7 +125,10 @@ class ParallelGameEngine:
         new_state = None
         try:
             while not self.output_queue.empty():
-                new_state = self.output_queue.get_nowait()
+                item = self.output_queue.get_nowait()
+                if item.get("type") == "READY":
+                    continue
+                new_state = item
         except multiprocessing.queues.Empty:
             pass
             
