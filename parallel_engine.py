@@ -3,6 +3,107 @@ import time
 import config
 import game_engine
 import game_simulator
+import neat
+import pickle
+import os
+from match_analyzer import MatchAnalyzer
+from match_recorder import MatchRecorder
+import match_database
+
+def _run_fast_match(match_config):
+    """
+    Runs a complete match in the background process at maximum speed.
+    """
+    p1_path = match_config["p1_path"]
+    p2_path = match_config["p2_path"]
+    neat_config_path = match_config["neat_config_path"]
+    metadata = match_config["metadata"]
+    
+    # Load Genomes and Config
+    config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                              neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                              neat_config_path)
+                              
+    with open(p1_path, "rb") as f:
+        g1 = pickle.load(f)
+    with open(p2_path, "rb") as f:
+        g2 = pickle.load(f)
+        
+    net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
+    net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
+    
+    # Initialize Game Components
+    game = game_simulator.GameSimulator()
+    analyzer = MatchAnalyzer()
+    recorder = MatchRecorder(
+        os.path.basename(p1_path), 
+        os.path.basename(p2_path),
+        match_type="tournament",
+        metadata=metadata
+    )
+    
+    # Run Match Loop
+    target_score = config.MAX_SCORE
+    running = True
+    
+    while running:
+        state = game.get_state()
+        
+        # Update Analyzer & Recorder
+        analyzer.update(state)
+        recorder.record_frame(state)
+        
+        # AI 1 (Left)
+        inputs1 = (
+            state["paddle_left_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] < 0 else 0.0,
+            state["paddle_right_y"] / config.SCREEN_HEIGHT
+        )
+        out1 = net1.activate(inputs1)
+        act1 = out1.index(max(out1))
+        left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+        
+        # AI 2 (Right)
+        inputs2 = (
+            state["paddle_right_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] > 0 else 0.0,
+            state["paddle_left_y"] / config.SCREEN_HEIGHT
+        )
+        out2 = net2.activate(inputs2)
+        act2 = out2.index(max(out2))
+        right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+        
+        # Update Game
+        game.update(left_move, right_move)
+        
+        # Check End Condition
+        if game.score_left >= target_score or game.score_right >= target_score:
+            running = False
+            
+    # Compile Results
+    stats = analyzer.get_stats()
+    match_metadata = recorder.save()
+    
+    # We don't index here because the main process handles ELO updates and then re-indexes if needed.
+    # Actually, the main process expects to handle ELO updates.
+    # But we can return the match_metadata so the main process can index it properly after ELO updates.
+    
+    return {
+        "score_left": game.score_left,
+        "score_right": game.score_right,
+        "stats": stats,
+        "match_metadata": match_metadata
+    }
 
 def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     """
@@ -34,15 +135,26 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
                 elif cmd["type"] == "MOVE":
                     if cmd["paddle"] == "left":
                         left_move = cmd["action"]
-                        print(f"DEBUG: Processing LEFT {left_move}")
                     elif cmd["paddle"] == "right":
                         right_move = cmd["action"]
+                elif cmd["type"] == "PLAY_MATCH":
+                    # Run a full match and return result
+                    result = _run_fast_match(cmd["config"])
+                    output_queue.put({"type": "MATCH_RESULT", "data": result})
+                    # We continue the loop, but effectively we just waited for the match to finish
+                    
             except multiprocessing.queues.Empty:
                 break
         
         if not running:
             break
 
+        # Only update the continuous game loop if NOT in a blocking match command (which we just handled synchronously above)
+        # But wait, if we handled PLAY_MATCH, we already finished it.
+        # The standard update loop below is for the "interactive" mode (visual or frame-by-frame).
+        # If we are just a worker for PLAY_MATCH, we might not need this loop to run constantly.
+        # But for backward compatibility with visual mode, we keep it.
+        
         # Update Game
         score_data = game.update(left_move, right_move)
         
@@ -54,9 +166,6 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
             state.update(score_data)
             
         # Send state back to main process
-        # clear old state to prevent backlog if main process is slow? 
-        # For now, just put it. If queue is full, we might want to drop frames or block.
-        # Let's assume the main process consumes fast enough.
         if not output_queue.full():
             output_queue.put(state)
             
@@ -64,7 +173,6 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
         if visual_mode and target_fps > 0:
             clock.tick(target_fps)
         elif not visual_mode and target_fps > 0:
-            # Manual sleep for non-visual if requested
             time.sleep(1.0 / target_fps)
 
 class ParallelGameEngine:
@@ -121,13 +229,15 @@ class ParallelGameEngine:
             self.input_queue.put({"type": "MOVE", "paddle": "right", "action": right_move})
             
         # Get latest state
-        # We want to drain the queue to get the absolute latest state
         new_state = None
         try:
             while not self.output_queue.empty():
                 item = self.output_queue.get_nowait()
                 if item.get("type") == "READY":
                     continue
+                if item.get("type") == "MATCH_RESULT":
+                    # This shouldn't happen in normal update loop, but just in case
+                    continue 
                 new_state = item
         except multiprocessing.queues.Empty:
             pass
@@ -137,9 +247,6 @@ class ParallelGameEngine:
             self.score_left = new_state["score_left"]
             self.score_right = new_state["score_right"]
             
-            # Check for events to return
-            # The game engine returns a dict if event, None if not.
-            # Our state always exists. We need to check if "scored" or "hit" keys are present.
             if "scored" in new_state or "hit_left" in new_state or "hit_right" in new_state:
                 return new_state
             return None
@@ -149,7 +256,6 @@ class ParallelGameEngine:
     def get_state(self):
         if self.latest_state:
             return self.latest_state
-        # Return default state if nothing received yet
         return {
             "ball_x": config.SCREEN_WIDTH // 2,
             "ball_y": config.SCREEN_HEIGHT // 2,
@@ -161,34 +267,19 @@ class ParallelGameEngine:
             "score_right": 0,
             "game_over": False
         }
-
-    def draw(self, screen):
+        
+    def play_match(self, match_config):
         """
-        Draws the game state to the screen.
+        Sends a command to play a full match and waits for the result.
         """
-        if not self.latest_state:
-            return
-
-        screen.fill(config.BLACK)
+        self.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
         
-        # Draw Net
-        game_engine.pygame.draw.line(screen, config.WHITE, (config.SCREEN_WIDTH // 2, 0), (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT), 2)
-        
-        # Draw Scores
-        if game_engine.pygame.font.get_init():
-            font = game_engine.pygame.font.Font(None, 74)
-            text_left = font.render(str(self.score_left), 1, config.WHITE)
-            screen.blit(text_left, (config.SCREEN_WIDTH // 4, 10))
-            text_right = font.render(str(self.score_right), 1, config.WHITE)
-            screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4, 10))
-        
-        # Draw Paddles
-        left_rect = game_engine.pygame.Rect(10, self.latest_state["paddle_left_y"], config.PADDLE_WIDTH, config.PADDLE_HEIGHT)
-        right_rect = game_engine.pygame.Rect(config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH, self.latest_state["paddle_right_y"], config.PADDLE_WIDTH, config.PADDLE_HEIGHT)
-        
-        game_engine.pygame.draw.rect(screen, config.WHITE, left_rect)
-        game_engine.pygame.draw.rect(screen, config.WHITE, right_rect)
-        
-        # Draw Ball
-        ball_rect = game_engine.pygame.Rect(self.latest_state["ball_x"], self.latest_state["ball_y"], config.BALL_RADIUS * 2, config.BALL_RADIUS * 2)
-        game_engine.pygame.draw.ellipse(screen, config.WHITE, ball_rect)
+        # Wait for result
+        while True:
+            try:
+                msg = self.output_queue.get(timeout=30.0) # 30s timeout for a match
+                if msg.get("type") == "MATCH_RESULT":
+                    return msg["data"]
+            except multiprocessing.queues.Empty:
+                print("Match timed out!")
+                return None
