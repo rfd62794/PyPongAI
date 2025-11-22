@@ -517,26 +517,26 @@ class LeagueState(BaseState):
                     match_result = game.check_match_result()
                     if match_result:
                         print(f"Match result received via check_match_result()")
-                    try:
-                        data = match_result["data"]
-                        if not data:
-                            print("Error: Match result data is None!")
-                            return
-                        # Check if match had an error
-                        if data.get("error"):
-                            print(f"Match error: {data['error']} - skipping match")
-                            self.completed_matches += 1
-                            if self.completed_matches >= self.total_matches:
-                                self.finish_tournament()
-                            else:
-                                self.start_next_match()
-                            return
-                        self.finish_match(
-                            data.get("score_left", 0), 
-                            data.get("score_right", 0), 
-                            data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
-                            data.get("match_metadata")
-                        )
+                        try:
+                            data = match_result["data"]
+                            if not data:
+                                print("Error: Match result data is None!")
+                                return
+                            # Check if match had an error
+                            if data.get("error"):
+                                print(f"Match error: {data['error']} - skipping match")
+                                self.completed_matches += 1
+                                if self.completed_matches >= self.total_matches:
+                                    self.finish_tournament()
+                                else:
+                                    self.start_next_match()
+                                return
+                            self.finish_match(
+                                data.get("score_left", 0), 
+                                data.get("score_right", 0), 
+                                data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
+                                data.get("match_metadata")
+                            )
                         except Exception as e:
                             print(f"Error processing match result: {e}")
                             import traceback
