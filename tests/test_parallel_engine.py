@@ -1,7 +1,7 @@
 import unittest
 import time
 from match.parallel_engine import ParallelGameEngine
-import config
+from core import config
 
 class TestParallelEngine(unittest.TestCase):
     def test_engine_starts_and_stops(self):

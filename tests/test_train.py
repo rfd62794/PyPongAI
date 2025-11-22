@@ -3,7 +3,7 @@ import patch_neat
 import neat
 import os
 from ai import ai_module
-import config
+from core import config
 
 def test_training():
     print("Starting test training...")

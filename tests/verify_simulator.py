@@ -1,4 +1,10 @@
-import game_simulator
+import sys
+import os
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core import simulator as game_simulator
 import config
 
 def test_simulator():

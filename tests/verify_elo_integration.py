@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from ai import ai_module
-import config
+from core import config
 
 class MockGenome:
     def __init__(self, key):
