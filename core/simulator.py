@@ -6,7 +6,7 @@ rendering overhead while maintaining identical game physics to the visual versio
 """
 
 import random
-import config
+from . import config
 
 
 class Rect:

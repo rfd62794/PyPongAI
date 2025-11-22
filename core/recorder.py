@@ -1,7 +1,7 @@
 import csv
 import os
 import datetime
-import config
+from . import config
 
 class GameRecorder:
     def __init__(self):

@@ -1,7 +1,7 @@
 # game_engine.py
 import pygame
 import random
-import config
+from . import config
 
 class Paddle:
     def __init__(self, x, y):
