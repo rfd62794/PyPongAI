@@ -1,5 +1,6 @@
 import multiprocessing
 import time
+import pygame
 from core import config
 from core import engine as game_engine
 from core import simulator as game_simulator
@@ -196,6 +197,7 @@ class ParallelGameEngine:
         # Mimic Game attributes for compatibility where possible
         self.score_left = 0
         self.score_right = 0
+        self._score_font = None
         
     def start(self):
         if self.process is None:
@@ -305,3 +307,38 @@ class ParallelGameEngine:
             except multiprocessing.queues.Empty:
                 print("Match timed out!")
                 return None
+
+    def draw(self, screen):
+        """Renders the latest state to the provided Pygame surface."""
+        if not self.visual_mode:
+            return
+        state = self.get_state()
+        if not state:
+            return
+
+        screen.fill(config.BLACK)
+        pygame.draw.line(screen, config.WHITE,
+                         (config.SCREEN_WIDTH // 2, 0),
+                         (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT), 2)
+
+        # Draw paddles
+        pygame.draw.rect(screen, config.WHITE,
+                         (10, int(state["paddle_left_y"]), config.PADDLE_WIDTH, config.PADDLE_HEIGHT))
+        pygame.draw.rect(screen, config.WHITE,
+                         (config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH,
+                          int(state["paddle_right_y"]),
+                          config.PADDLE_WIDTH, config.PADDLE_HEIGHT))
+
+        # Draw ball (state provides top-left corner)
+        ball_center = (int(state["ball_x"]) + config.BALL_RADIUS,
+                       int(state["ball_y"]) + config.BALL_RADIUS)
+        pygame.draw.circle(screen, config.WHITE, ball_center, config.BALL_RADIUS)
+
+        # Draw scores
+        if pygame.font.get_init():
+            if self._score_font is None:
+                self._score_font = pygame.font.Font(None, 74)
+            text_left = self._score_font.render(str(state["score_left"]), True, config.WHITE)
+            text_right = self._score_font.render(str(state["score_right"]), True, config.WHITE)
+            screen.blit(text_left, (config.SCREEN_WIDTH // 4 - text_left.get_width() // 2, 10))
+            screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4 - text_right.get_width() // 2, 10))
