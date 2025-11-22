@@ -204,6 +204,9 @@ class LeagueState(BaseState):
                 
             delete_models([loser_path])
             elo_manager.remove_elo(os.path.basename(loser_path))
+            
+            # Remove all matches involving this deleted model from the queue
+            self.remove_matches_with_model(loser_path)
 
     def finish_match(self, score1, score2, stats, match_metadata):
         if not self.current_match:
@@ -213,6 +216,17 @@ class LeagueState(BaseState):
         match = self.current_match
         p1 = match["p1"]
         p2 = match["p2"]
+        
+        # Check if this match had an error (e.g., missing file)
+        if match_metadata and match_metadata.get("error"):
+            print(f"Match had error: {match_metadata['error']}")
+            # Skip stats update for errored matches, just move to next
+            self.completed_matches += 1
+            if self.completed_matches >= self.total_matches:
+                self.finish_tournament()
+            else:
+                self.start_next_match()
+            return
         
         # Update Stats
         self.model_stats[p1]["points_scored"] += score1
@@ -289,6 +303,19 @@ class LeagueState(BaseState):
                 else:
                     self.finish_tournament()
 
+    def remove_matches_with_model(self, model_path):
+        """Remove all matches from the queue that involve a deleted model."""
+        initial_count = len(self.match_queue)
+        self.match_queue = [
+            match for match in self.match_queue 
+            if match[0] != model_path and match[1] != model_path
+        ]
+        removed = initial_count - len(self.match_queue)
+        if removed > 0:
+            print(f"Removed {removed} matches involving deleted model {os.path.basename(model_path)}")
+            # Update total_matches to reflect the removed matches
+            self.total_matches = len(self.match_queue) + self.completed_matches
+
     def prune_similar_models(self):
         """Prunes models that are too similar in fitness."""
         fitness_groups = {}
@@ -319,6 +346,40 @@ class LeagueState(BaseState):
         if self.match_queue:
             self.match_queue.pop(0)
         
+        # Skip matches with deleted models and find a valid match
+        while self.match_queue:
+            p1_path = self.match_queue[0][0]
+            p2_path = self.match_queue[0][1]
+            
+            # Check if either model has been deleted or doesn't exist
+            if p1_path in self.deleted_models or p2_path in self.deleted_models:
+                print(f"Skipping match: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)} (model deleted)")
+                self.match_queue.pop(0)
+                self.completed_matches += 1  # Count skipped matches as completed
+                continue
+            
+            # Check if files actually exist
+            if not os.path.exists(p1_path) or not os.path.exists(p2_path):
+                missing = []
+                if not os.path.exists(p1_path):
+                    missing.append(os.path.basename(p1_path))
+                if not os.path.exists(p2_path):
+                    missing.append(os.path.basename(p2_path))
+                print(f"Skipping match: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)} (file(s) missing: {', '.join(missing)})")
+                # Mark as deleted if not already
+                if not os.path.exists(p1_path) and p1_path not in self.deleted_models:
+                    self.deleted_models.append(p1_path)
+                    self.deletion_reasons[p1_path] = "File not found"
+                if not os.path.exists(p2_path) and p2_path not in self.deleted_models:
+                    self.deleted_models.append(p2_path)
+                    self.deletion_reasons[p2_path] = "File not found"
+                self.match_queue.pop(0)
+                self.completed_matches += 1  # Count skipped matches as completed
+                continue
+            
+            # Found a valid match
+            break
+        
         if not self.match_queue:
             self.finish_tournament()
             return
@@ -335,9 +396,7 @@ class LeagueState(BaseState):
             game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
             game_instance.start()
         
-        # Setup next match
-        p1_path = self.match_queue[0][0]
-        p2_path = self.match_queue[0][1]
+        # Setup next match (p1_path and p2_path are already set from the loop above)
         
         self.current_match = {
             "p1": p1_path,

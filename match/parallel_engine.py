@@ -25,21 +25,56 @@ def _run_fast_match(match_config, record_match=False):
     neat_config_path = match_config["neat_config_path"]
     metadata = match_config.get("metadata")
     
-    # Load Agents using Factory
-    agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
-    agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
-    
-    # Run Match using Simulator
-    simulator = MatchSimulator(
-        agent1, 
-        agent2, 
-        p1_name=os.path.basename(p1_path), 
-        p2_name=os.path.basename(p2_path),
-        record_match=record_match,
-        metadata=metadata
-    )
-    
-    return simulator.run()
+    try:
+        # Check if files exist before trying to load
+        if not os.path.exists(p1_path):
+            raise FileNotFoundError(f"Model file not found: {p1_path}")
+        if not os.path.exists(p2_path):
+            raise FileNotFoundError(f"Model file not found: {p2_path}")
+        
+        # Load Agents using Factory
+        agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
+        agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
+        
+        # Run Match using Simulator
+        simulator = MatchSimulator(
+            agent1, 
+            agent2, 
+            p1_name=os.path.basename(p1_path), 
+            p2_name=os.path.basename(p2_path),
+            record_match=record_match,
+            metadata=metadata
+        )
+        
+        return simulator.run()
+    except FileNotFoundError as e:
+        # Return a result indicating the match couldn't be run due to missing file
+        print(f"Error in _run_fast_match: {e}")
+        return {
+            "score_left": 0,
+            "score_right": 0,
+            "stats": {
+                "left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0},
+                "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}
+            },
+            "match_metadata": metadata,
+            "error": str(e)
+        }
+    except Exception as e:
+        # Catch any other errors and return a safe result
+        print(f"Error in _run_fast_match: {e}")
+        import traceback
+        traceback.print_exc()
+        return {
+            "score_left": 0,
+            "score_right": 0,
+            "stats": {
+                "left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0},
+                "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}
+            },
+            "match_metadata": metadata,
+            "error": str(e)
+        }
 
 def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     """
