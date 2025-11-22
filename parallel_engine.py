@@ -20,8 +20,8 @@ def _run_fast_match(match_config, record_match=False):
     metadata = match_config["metadata"]
     
     # Load Agents using Factory
-    net1 = AgentFactory.create_agent(p1_path, neat_config_path)
-    net2 = AgentFactory.create_agent(p2_path, neat_config_path)
+    agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
+    agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
     
     # Initialize Game Components
     game = game_simulator.GameSimulator()
