@@ -16,9 +16,14 @@ from .recorder import MatchRecorder
 from ai.agent_factory import AgentFactory
 from .simulator import MatchSimulator
 
+# Agent cache for parallel process (avoids reloading same models)
+_agent_cache = {}
+_cache_max_size = 50  # Limit cache size
+
 def _run_fast_match(match_config, record_match=False):
     """
     Runs a complete match in the background process at maximum speed.
+    Uses agent caching to avoid reloading the same models.
     """
     p1_path = match_config["p1_path"]
     p2_path = match_config["p2_path"]
@@ -32,9 +37,27 @@ def _run_fast_match(match_config, record_match=False):
         if not os.path.exists(p2_path):
             raise FileNotFoundError(f"Model file not found: {p2_path}")
         
-        # Load Agents using Factory
-        agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
-        agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
+        # Load Agents using Factory with caching
+        cache_key1 = (p1_path, neat_config_path)
+        cache_key2 = (p2_path, neat_config_path)
+        
+        if cache_key1 in _agent_cache:
+            agent1 = _agent_cache[cache_key1]
+        else:
+            agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
+            # Add to cache (with size limit)
+            if len(_agent_cache) >= _cache_max_size:
+                # Remove oldest entry (simple FIFO)
+                _agent_cache.pop(next(iter(_agent_cache)))
+            _agent_cache[cache_key1] = agent1
+        
+        if cache_key2 in _agent_cache:
+            agent2 = _agent_cache[cache_key2]
+        else:
+            agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
+            if len(_agent_cache) >= _cache_max_size:
+                _agent_cache.pop(next(iter(_agent_cache)))
+            _agent_cache[cache_key2] = agent2
         
         # Run Match using Simulator
         simulator = MatchSimulator(
