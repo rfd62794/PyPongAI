@@ -118,7 +118,7 @@ class SettingsState(BaseState):
             # Reset button
             if self.btn_reset.collidepoint((mx, my)):
                 self.settings = {
-                    "MAX_SCORE": 20,
+                    "MAX_SCORE": 99,
                     "VISUAL_MAX_SCORE": 5,
                     "ELO_K_FACTOR": 32,
                     "NOVELTY_WEIGHT": 0.1,
