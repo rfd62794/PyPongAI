@@ -2,7 +2,7 @@
 import csv
 import os
 import datetime
-import config
+from core import config
 
 class HumanRecorder:
     def __init__(self):

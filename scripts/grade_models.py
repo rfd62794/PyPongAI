@@ -1,7 +1,7 @@
 import os
 import pickle
 import neat
-import config
+from core import config
 from game_engine import Game
 import sys
 

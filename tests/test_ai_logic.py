@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch, MagicMock
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import config
+from core import config
 from utils import elo_manager
 from ai_module import calculate_expected_score, calculate_new_rating
 from opponents import get_rule_based_move
