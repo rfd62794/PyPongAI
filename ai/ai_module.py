@@ -441,10 +441,10 @@ def eval_genomes_self_play(genomes, config_neat):
             else:
                 g2_id, g2 = genome_list[j+1]
             
-            net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
-            net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
+            net1 = _create_network(g1, config_neat)
+            net2 = _create_network(g2, config_neat)
             
-            game = game_simulator.GameSimulator()
+            game = game_simulator.GameSimulator(ball_speed=get_curriculum_ball_speed())
             run = True
             frame_count = 0
             max_frames = 10000 
