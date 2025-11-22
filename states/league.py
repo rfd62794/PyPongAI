@@ -468,13 +468,21 @@ class LeagueState(BaseState):
                     match_result = game.check_match_result()
                     if match_result:
                         print(f"Match result received via check_match_result()")
-                        data = match_result["data"]
-                        self.finish_match(
-                            data["score_left"], 
-                            data["score_right"], 
-                            data["stats"], 
-                            data.get("match_metadata")
-                        )
+                        try:
+                            data = match_result["data"]
+                            if not data:
+                                print("Error: Match result data is None!")
+                                return
+                            self.finish_match(
+                                data.get("score_left", 0), 
+                                data.get("score_right", 0), 
+                                data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
+                                data.get("match_metadata")
+                            )
+                        except Exception as e:
+                            print(f"Error processing match result: {e}")
+                            import traceback
+                            traceback.print_exc()
                         return
                     
                     # Also check queue directly as fallback
@@ -483,13 +491,21 @@ class LeagueState(BaseState):
                             msg = game.output_queue.get_nowait()
                             if msg.get("type") == "MATCH_RESULT":
                                 print(f"Match result received via queue")
-                                data = msg["data"]
-                                self.finish_match(
-                                    data["score_left"], 
-                                    data["score_right"], 
-                                    data["stats"], 
-                                    data.get("match_metadata")
-                                )
+                                try:
+                                    data = msg["data"]
+                                    if not data:
+                                        print("Error: Match result data is None!")
+                                        continue
+                                    self.finish_match(
+                                        data.get("score_left", 0), 
+                                        data.get("score_right", 0), 
+                                        data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
+                                        data.get("match_metadata")
+                                    )
+                                except Exception as e:
+                                    print(f"Error processing match result from queue: {e}")
+                                    import traceback
+                                    traceback.print_exc()
                                 return
                             elif msg.get("type") == "READY":
                                 continue
@@ -497,7 +513,7 @@ class LeagueState(BaseState):
                                 # Regular state update, ignore it
                                 pass
                     except Exception as e:
-                        print(f"Error checking match result: {e}")
+                        print(f"Error checking match result queue: {e}")
                         import traceback
                         traceback.print_exc()
                     return
