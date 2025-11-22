@@ -6,10 +6,15 @@ import game_simulator
 import neat
 import pickle
 import os
-from match_analyzer import MatchAnalyzer
-from match_recorder import MatchRecorder
+import sys
+
+# Add root directory to path so we can import modules from root
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from .analyzer import MatchAnalyzer
+from .recorder import MatchRecorder
 from agent_factory import AgentFactory
-from match_simulator import MatchSimulator
+from .simulator import MatchSimulator
 
 def _run_fast_match(match_config, record_match=False):
     """

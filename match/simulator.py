@@ -1,7 +1,7 @@
 import config
 import game_simulator
-from match_analyzer import MatchAnalyzer
-from match_recorder import MatchRecorder
+from .analyzer import MatchAnalyzer
+from .recorder import MatchRecorder
 import os
 
 class MatchSimulator:
