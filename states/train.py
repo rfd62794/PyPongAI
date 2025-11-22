@@ -4,7 +4,7 @@ import os
 import pickle
 import datetime
 import config
-import ai_module
+from ai import ai_module
 import game_engine
 import sys
 import itertools

@@ -27,7 +27,7 @@ class LobbyState(BaseState):
         screen.blit(text_surf, text_rect)
 
     def get_best_model(self):
-        import model_manager
+        from ai import model_manager
         return model_manager.get_best_model_by_elo()
 
     def handle_input(self, event):

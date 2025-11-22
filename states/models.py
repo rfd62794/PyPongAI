@@ -1,7 +1,7 @@
 import pygame
 import os
 import config
-import model_manager
+from ai import model_manager
 from utils import elo_manager
 from states.base import BaseState
 
