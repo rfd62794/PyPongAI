@@ -3,7 +3,7 @@ import pygame
 import neat
 import os
 import pickle
-import config
+from core import config
 from game_engine import Game
 from human_rival import HumanRival
 import sys

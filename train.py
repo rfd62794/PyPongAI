@@ -10,7 +10,7 @@ import os
 import neat
 import pickle
 from ai import ai_module
-import config
+from core import config
 import datetime
 from validation import validate_genome
 

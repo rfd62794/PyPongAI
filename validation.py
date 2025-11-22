@@ -5,8 +5,8 @@ against opponents and recording match statistics.
 """
 
 import neat
-import config
-import game_engine
+from core import config
+from core import engine as game_engine
 from opponents import get_rule_based_move
 
 
