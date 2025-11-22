@@ -1,15 +1,3 @@
-# analytics.py
-import os
-import csv
-import datetime
-import config
-import pandas as pd
-
-def create_log_file(log_dir):
-    """
-    Creates a new log file with a timestamp in the filename.
-    Returns the absolute path to the created file.
-    """
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"game_log_{timestamp}.csv"
     filepath = os.path.join(log_dir, filename)

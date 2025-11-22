@@ -1,17 +1,3 @@
-"""League history tracking for PyPongAI.
-
-Persistent storage for season champions and all-time ELO leaders.
-"""
-
-import json
-import os
-import datetime
-import config
-
-
-LEAGUE_HISTORY_FILE = os.path.join(config.DATA_DIR, "league_history.json")
-
-
 def load_league_history():
     """Loads league history from persistent storage.
     

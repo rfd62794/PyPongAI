@@ -1,6 +1,6 @@
 import json
 import os
-import config
+from core import config
 
 ELO_FILE = os.path.join(config.MODEL_DIR, "elo_ratings.json")
 
