@@ -48,34 +48,10 @@ def _run_fast_match(match_config, record_match=False):
             recorder.record_frame(state)
         
         # AI 1 (Left)
-        inputs1 = (
-            state["paddle_left_y"] / config.SCREEN_HEIGHT,
-            state["ball_x"] / config.SCREEN_WIDTH,
-            state["ball_y"] / config.SCREEN_HEIGHT,
-            state["ball_vel_x"] / config.BALL_MAX_SPEED,
-            state["ball_vel_y"] / config.BALL_MAX_SPEED,
-            (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-            1.0 if state["ball_vel_x"] < 0 else 0.0,
-            state["paddle_right_y"] / config.SCREEN_HEIGHT
-        )
-        out1 = net1.activate(inputs1)
-        act1 = out1.index(max(out1))
-        left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+        left_move = agent1.get_move(state, "left")
         
         # AI 2 (Right)
-        inputs2 = (
-            state["paddle_right_y"] / config.SCREEN_HEIGHT,
-            state["ball_x"] / config.SCREEN_WIDTH,
-            state["ball_y"] / config.SCREEN_HEIGHT,
-            state["ball_vel_x"] / config.BALL_MAX_SPEED,
-            state["ball_vel_y"] / config.BALL_MAX_SPEED,
-            (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-            1.0 if state["ball_vel_x"] > 0 else 0.0,
-            state["paddle_left_y"] / config.SCREEN_HEIGHT
-        )
-        out2 = net2.activate(inputs2)
-        act2 = out2.index(max(out2))
-        right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+        right_move = agent2.get_move(state, "right")
         
         # Update Game
         game.update(left_move, right_move)
