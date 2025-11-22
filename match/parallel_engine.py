@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from .analyzer import MatchAnalyzer
 from .recorder import MatchRecorder
-from agent_factory import AgentFactory
+from ai.agent_factory import AgentFactory
 from .simulator import MatchSimulator
 
 def _run_fast_match(match_config, record_match=False):
