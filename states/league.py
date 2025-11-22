@@ -130,9 +130,69 @@ class LeagueState(BaseState):
         for i in range(len(self.models)):
             for j in range(i + 1, len(self.models)):
                 self.match_queue.append((self.models[i], self.models[j]))
+
+        # Choose engine based on visuals setting
+        target_fps = 60 if self.show_visuals else 0
+        game_instance = ParallelGameEngine(visual_mode=self.show_visuals, target_fps=target_fps)
+        game_instance.start()
+
+        self.current_match = {
+            "p1": self.match_queue[0][0],
+            "p2": self.match_queue[0][1],
+            "game": game_instance,
+            "net1": None,
+            "net2": None,
+            "is_visual": self.show_visuals,
+            "waiting_for_result": not self.show_visuals
+        }
         
-        self.total_matches = len(self.match_queue)
-        self.start_next_match()
+        # Initialize Match Analyzer
+        self.analyzer = MatchAnalyzer()
+        
+        # Initialize Match Recorder with metadata
+        self.recorder = None
+        if self.record_matches:
+            metadata = {
+                "p1_fitness": self.model_stats[self.match_queue[0][0]]["fitness"],
+                "p2_fitness": self.model_stats[self.match_queue[0][1]]["fitness"],
+                "p1_elo_before": self.model_stats[self.match_queue[0][0]]["elo"],
+                "p2_elo_before": self.model_stats[self.match_queue[0][1]]["elo"]
+            }
+            self.recorder = MatchRecorder(
+                os.path.basename(self.match_queue[0][0]), 
+                os.path.basename(self.match_queue[0][1]),
+                match_type="tournament",
+                metadata=metadata
+            )
+        
+        if not self.show_visuals:
+            # FAST MODE: Send command to run full match in background
+            local_dir = os.path.dirname(os.path.dirname(__file__))
+            config_path = os.path.join(local_dir, 'neat_config.txt')
+            
+            match_config = {
+                "p1_path": self.match_queue[0][0],
+                "p2_path": self.match_queue[0][1],
+                "neat_config_path": config_path,
+                "metadata": metadata
+            }
+            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config, "record_match": self.record_matches})
+            return
+
+        # VISUAL MODE: Load Genomes locally
+        try:
+            # We need the neat_config path. It's usually in the root.
+            neat_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "neat_config.txt")
+            
+            agent1 = AgentFactory.create_agent(self.match_queue[0][0], neat_config_path)
+            agent2 = AgentFactory.create_agent(self.match_queue[0][1], neat_config_path)
+            
+            self.current_match["agent1"] = agent1
+            self.current_match["agent2"] = agent2
+            
+        except Exception as e:
+            print(f"Error loading models: {e}")
+            self.start_next_match()
 
     def calculate_elo_change(self, rating_a, rating_b, score_a, score_b):
         """Calculates ELO change based on match outcome."""
