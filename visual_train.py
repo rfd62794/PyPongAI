@@ -4,9 +4,9 @@ import pygame
 import neat
 import os
 import pickle
-import game_engine
+from core import engine as game_engine
 from ai import ai_module
-import config
+from core import config
 import datetime
 from model_manager import get_best_model
 

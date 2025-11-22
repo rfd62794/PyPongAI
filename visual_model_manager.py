@@ -1,7 +1,7 @@
 import pygame
 import sys
 import os
-import config
+from core import config
 from ai import model_manager
 
 def show_model_manager():
