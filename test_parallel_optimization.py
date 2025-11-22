@@ -5,7 +5,7 @@ import os
 import neat
 import pickle
 import config
-from parallel_engine import ParallelGameEngine
+from match.parallel_engine import ParallelGameEngine
 
 class TestParallelOptimization(unittest.TestCase):
     def setUp(self):

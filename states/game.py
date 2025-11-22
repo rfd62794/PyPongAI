@@ -4,7 +4,7 @@ import pickle
 import os
 import config
 from states.base import BaseState
-from parallel_engine import ParallelGameEngine
+from match.parallel_engine import ParallelGameEngine
 from game_recorder import GameRecorder
 from human_rival import HumanRival
 

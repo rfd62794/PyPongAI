@@ -1,6 +1,6 @@
 import unittest
 import time
-from parallel_engine import ParallelGameEngine
+from match.parallel_engine import ParallelGameEngine
 import config
 
 class TestParallelEngine(unittest.TestCase):

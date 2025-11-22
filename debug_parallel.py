@@ -1,5 +1,5 @@
 import time
-from parallel_engine import ParallelGameEngine
+from match.parallel_engine import ParallelGameEngine
 
 def test():
     print("Starting Engine...")
