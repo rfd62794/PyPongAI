@@ -449,6 +449,7 @@ class LeagueState(BaseState):
                     # Check for match result using the dedicated method
                     match_result = game.check_match_result()
                     if match_result:
+                        print(f"Match result received via check_match_result()")
                         data = match_result["data"]
                         self.finish_match(
                             data["score_left"], 
@@ -463,6 +464,7 @@ class LeagueState(BaseState):
                         while not game.output_queue.empty():
                             msg = game.output_queue.get_nowait()
                             if msg.get("type") == "MATCH_RESULT":
+                                print(f"Match result received via queue")
                                 data = msg["data"]
                                 self.finish_match(
                                     data["score_left"], 
@@ -471,8 +473,15 @@ class LeagueState(BaseState):
                                     data.get("match_metadata")
                                 )
                                 return
+                            elif msg.get("type") == "READY":
+                                continue
+                            else:
+                                # Regular state update, ignore it
+                                pass
                     except Exception as e:
                         print(f"Error checking match result: {e}")
+                        import traceback
+                        traceback.print_exc()
                     return
 
                 # Fast mode only - visual mode is disabled for tournaments
@@ -547,7 +556,10 @@ class LeagueState(BaseState):
             screen.blit(match_text, (config.SCREEN_WIDTH//2 - match_text.get_width()//2, bar_y + 40))
         
         # Overlay Info
-        info = f"Match {self.completed_matches + 1} / {self.total_matches}"
+        if self.total_matches > 0:
+            info = f"Match {self.completed_matches + 1} / {self.total_matches}"
+        else:
+            info = f"Match {self.completed_matches + 1} / ?"
         info_surf = self.small_font.render(info, True, config.WHITE)
         screen.blit(info_surf, (10, 10))
         

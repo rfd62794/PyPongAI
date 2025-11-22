@@ -57,10 +57,13 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     output_queue.put({"type": "READY"})
 
     running = True
+    just_finished_match = False
+    
     while running:
         # Process all available commands
         left_move = None
         right_move = None
+        just_finished_match = False
         
         while not input_queue.empty():
             try:
@@ -77,7 +80,9 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
                     # Run a full match and return result
                     result = _run_fast_match(cmd["config"], record_match=cmd.get("record_match", False))
                     output_queue.put({"type": "MATCH_RESULT", "data": result})
-                    # We continue the loop, but effectively we just waited for the match to finish
+                    just_finished_match = True
+                    # Skip regular update loop after match to preserve MATCH_RESULT in queue
+                    break
                     
             except multiprocessing.queues.Empty:
                 break
@@ -85,13 +90,18 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
         if not running:
             break
 
-        # Only update the continuous game loop if NOT in a blocking match command (which we just handled synchronously above)
-        # But wait, if we handled PLAY_MATCH, we already finished it.
-        # The standard update loop below is for the "interactive" mode (visual or frame-by-frame).
-        # If we are just a worker for PLAY_MATCH, we might not need this loop to run constantly.
-        # But for backward compatibility with visual mode, we keep it.
-        
-        # Update Game
+        # Skip regular game loop if we just finished a match (to preserve MATCH_RESULT in queue)
+        if just_finished_match:
+            continue
+
+        # Only update the continuous game loop if in visual mode or if we have moves to process
+        # In fast mode (non-visual), we only process PLAY_MATCH commands, no regular game loop
+        if not visual_mode and not left_move and not right_move:
+            # In fast mode with no moves, just wait a bit to avoid busy-waiting
+            time.sleep(0.001)
+            continue
+
+        # Update Game (only in visual mode or when processing moves)
         score_data = game.update(left_move, right_move)
         
         # Get State
@@ -101,9 +111,13 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
         if score_data:
             state.update(score_data)
             
-        # Send state back to main process
-        if not output_queue.full():
-            output_queue.put(state)
+        # Send state back to main process (only in visual mode)
+        # In fast mode, we don't send regular state updates - only MATCH_RESULT
+        if visual_mode and not output_queue.full():
+            try:
+                output_queue.put(state)
+            except:
+                pass
             
         # Frame Rate Control
         if visual_mode and target_fps > 0:
