@@ -142,8 +142,10 @@ class GameState(BaseState):
         # Draw Right Paddle
         pygame.draw.rect(screen, config.WHITE, (config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH, int(state["paddle_right_y"]), config.PADDLE_WIDTH, config.PADDLE_HEIGHT))
         
-        # Draw Ball
-        pygame.draw.circle(screen, config.WHITE, (int(state["ball_x"]), int(state["ball_y"])), config.BALL_RADIUS)
+        # Draw Ball (state stores top-left corner, but circle needs center)
+        ball_center_x = int(state["ball_x"]) + config.BALL_RADIUS
+        ball_center_y = int(state["ball_y"]) + config.BALL_RADIUS
+        pygame.draw.circle(screen, config.WHITE, (ball_center_x, ball_center_y), config.BALL_RADIUS)
         
         if self.game_over:
             # Overlay
