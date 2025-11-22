@@ -1,12 +1,5 @@
 import multiprocessing
 import time
-import neat
-import pickle
-import os
-import sys
-
-import multiprocessing
-import time
 from core import config
 from core import engine as game_engine
 from core import simulator as game_simulator
