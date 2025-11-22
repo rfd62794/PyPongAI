@@ -29,7 +29,7 @@ def validate_genome(genome, config_neat, generation=0, record_matches=True):
             - win_rate: Fraction of games won (0.0 to 1.0).
     """
     from match_recorder import MatchRecorder
-    import match_database
+    from match import database as match_database
     
     net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
     

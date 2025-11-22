@@ -4,7 +4,7 @@ from core import config
 from states.base import BaseState
 from utils import elo_manager
 from ai.model_manager import get_fitness_from_filename
-import match_database
+from match import database as match_database
 
 class AnalyticsState(BaseState):
     def __init__(self, manager):
