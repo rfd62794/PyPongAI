@@ -1,7 +1,7 @@
 import pickle
 import neat
 import os
-import config
+from core import config
 
 class NeatAgent:
     def __init__(self, net):
