@@ -1,3 +1,19 @@
+"""
+League History Manager
+
+Manages league history data including tournament results, player statistics,
+and historical records.
+"""
+
+import json
+import os
+import datetime
+from core import config
+
+
+LEAGUE_HISTORY_FILE = os.path.join(config.DATA_DIR, "league_history.json")
+
+
 def load_league_history():
     """Loads league history from persistent storage.
     

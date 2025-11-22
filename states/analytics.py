@@ -2,7 +2,7 @@ import pygame
 import os
 import config
 from states.base import BaseState
-import elo_manager
+from utils import elo_manager
 from model_manager import get_fitness_from_filename
 import match_database
 
