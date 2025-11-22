@@ -145,8 +145,14 @@ class LeagueState(BaseState):
         
         # Initialize concurrent executor if enabled
         if self.use_concurrent and not self.show_visuals:
-            self.concurrent_executor = ConcurrentMatchExecutor(visual_mode=False)
-            print(f"Using concurrent execution with {self.concurrent_executor.max_workers} workers")
+            try:
+                self.concurrent_executor = ConcurrentMatchExecutor(visual_mode=False)
+                print(f"Using concurrent execution with {self.concurrent_executor.max_workers} workers")
+            except Exception as e:
+                print(f"Failed to initialize concurrent executor: {e}")
+                print("Falling back to sequential execution")
+                self.use_concurrent = False
+                self.concurrent_executor = None
             # Process matches in batches concurrently
             self.process_matches_concurrently()
         else:
