@@ -8,6 +8,8 @@ import pickle
 import os
 from match_analyzer import MatchAnalyzer
 from match_recorder import MatchRecorder
+from agent_factory import AgentFactory
+
 def _run_fast_match(match_config, record_match=False):
     """
     Runs a complete match in the background process at maximum speed.
@@ -17,18 +19,9 @@ def _run_fast_match(match_config, record_match=False):
     neat_config_path = match_config["neat_config_path"]
     metadata = match_config["metadata"]
     
-    # Load Genomes and Config
-    config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                              neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                              neat_config_path)
-                              
-    with open(p1_path, "rb") as f:
-        g1 = pickle.load(f)
-    with open(p2_path, "rb") as f:
-        g2 = pickle.load(f)
-        
-    net1 = neat.nn.FeedForwardNetwork.create(g1, config_neat)
-    net2 = neat.nn.FeedForwardNetwork.create(g2, config_neat)
+    # Load Agents using Factory
+    net1 = AgentFactory.create_agent(p1_path, neat_config_path)
+    net2 = AgentFactory.create_agent(p2_path, neat_config_path)
     
     # Initialize Game Components
     game = game_simulator.GameSimulator()
