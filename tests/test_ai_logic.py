@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core import config
 from utils import elo_manager
-from ai_module import calculate_expected_score, calculate_new_rating
-from opponents import get_rule_based_move
+from ai.ai_module import calculate_expected_score, calculate_new_rating
+from ai.opponents import get_rule_based_move
 
 
 class TestELOCalculations(unittest.TestCase):
@@ -89,7 +89,7 @@ class TestELOCalculations(unittest.TestCase):
 class TestELOManager(unittest.TestCase):
     """Tests for elo_manager module."""
     
-    @patch('elo_manager.ELO_FILE', 'test_elo_ratings.json')
+    @patch('utils.elo_manager.ELO_FILE', 'test_elo_ratings.json')
     @patch('os.path.exists')
     @patch('builtins.open', create=True)
     def test_update_elo(self, mock_open, mock_exists):
@@ -104,7 +104,7 @@ class TestELOManager(unittest.TestCase):
         # Verify file was opened for writing
         mock_open.assert_called()
     
-    @patch('elo_manager.load_elo_ratings')
+    @patch('utils.elo_manager.load_elo_ratings')
     def test_get_elo_existing(self, mock_load):
         """Test get_elo returns stored rating."""
         mock_load.return_value = {"model1.pkl": 1300}
@@ -166,7 +166,7 @@ class TestRuleBasedAI(unittest.TestCase):
 class TestFitnessRewards(unittest.TestCase):
     """Tests for fitness reward mechanisms."""
     
-    @patch('ai_module.game_simulator.GameSimulator')
+    @patch('ai.ai_module.game_simulator.GameSimulator')
     @patch('neat.nn.FeedForwardNetwork')
     def test_survival_rewards(self, mock_network_class, mock_game_class):
         """Test survival time contributes to fitness."""
