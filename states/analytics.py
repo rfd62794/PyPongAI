@@ -1,6 +1,6 @@
 import pygame
 import os
-import config
+from core import config
 from states.base import BaseState
 from utils import elo_manager
 from model_manager import get_fitness_from_filename
