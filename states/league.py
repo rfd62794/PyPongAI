@@ -15,6 +15,7 @@ import match_database
 from parallel_engine import ParallelGameEngine
 
 from match_analyzer import MatchAnalyzer
+from agent_factory import AgentFactory
 
 class LeagueState(BaseState):
     def __init__(self, manager):
