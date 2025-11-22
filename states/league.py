@@ -185,13 +185,14 @@ class LeagueState(BaseState):
 
         # VISUAL MODE: Load Genomes locally
         try:
-            with open(p1_path, "rb") as f:
-                g1 = pickle.load(f)
-            with open(p2_path, "rb") as f:
-                g2 = pickle.load(f)
-                
-            self.current_match["net1"] = neat.nn.FeedForwardNetwork.create(g1, self.config_neat)
-            self.current_match["net2"] = neat.nn.FeedForwardNetwork.create(g2, self.config_neat)
+            # We need the neat_config path. It's usually in the root.
+            neat_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "neat_config.txt")
+            
+            agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
+            agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
+            
+            self.current_match["agent1"] = agent1
+            self.current_match["agent2"] = agent2
             
         except Exception as e:
             print(f"Error loading models: {e}")
@@ -420,8 +421,8 @@ class LeagueState(BaseState):
                     return
 
                 # VISUAL MODE UPDATE
-                net1 = self.current_match["net1"]
-                net2 = self.current_match["net2"]
+                agent1 = self.current_match["agent1"]
+                agent2 = self.current_match["agent2"]
                 
                 state = game.get_state()
                 
@@ -431,34 +432,10 @@ class LeagueState(BaseState):
                     self.recorder.record_frame(state)
                 
                 # AI 1 (Left)
-                inputs1 = (
-                    state["paddle_left_y"] / config.SCREEN_HEIGHT,
-                    state["ball_x"] / config.SCREEN_WIDTH,
-                    state["ball_y"] / config.SCREEN_HEIGHT,
-                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                    (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] < 0 else 0.0,
-                    state["paddle_right_y"] / config.SCREEN_HEIGHT
-                )
-                out1 = net1.activate(inputs1)
-                act1 = out1.index(max(out1))
-                left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
+                left_move = agent1.get_move(state, "left")
                 
                 # AI 2 (Right)
-                inputs2 = (
-                    state["paddle_right_y"] / config.SCREEN_HEIGHT,
-                    state["ball_x"] / config.SCREEN_WIDTH,
-                    state["ball_y"] / config.SCREEN_HEIGHT,
-                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                    (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] > 0 else 0.0,
-                    state["paddle_left_y"] / config.SCREEN_HEIGHT
-                )
-                out2 = net2.activate(inputs2)
-                act2 = out2.index(max(out2))
-                right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
+                right_move = agent2.get_move(state, "right")
                 
                 game.update(left_move, right_move)
                 
