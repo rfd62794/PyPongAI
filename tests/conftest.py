@@ -1,6 +1,6 @@
 # Test Suite Configuration
 
-This file contains shared configuration and utilities for the test suite.
+"""This file contains shared configuration and utilities for the test suite."""
 
 import os
 import sys
