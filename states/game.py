@@ -102,7 +102,8 @@ class GameState(BaseState):
         score_data = self.game.update(left_move, right_move)
         
         # Check Game Over
-        if self.game.score_left >= config.MAX_SCORE or self.game.score_right >= config.MAX_SCORE:
+        if (self.game.score_left >= config.VISUAL_MAX_SCORE or
+                self.game.score_right >= config.VISUAL_MAX_SCORE):
             self.game_over = True
             self.handle_game_over()
 
