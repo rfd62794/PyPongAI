@@ -3,16 +3,16 @@ import neat
 import os
 import pickle
 import datetime
-import config
-import ai_module
-import game_engine
+from core import config
+from ai import ai_module
+from core import engine as game_engine
 import sys
 import itertools
 from states.base import BaseState
-from model_manager import get_best_model, get_fitness_from_filename
-from opponents import get_rule_based_move
+from ai.model_manager import get_best_model, get_fitness_from_filename
+from ai.opponents import get_rule_based_move
 import training_logger
-from parallel_engine import ParallelGameEngine
+from match.parallel_engine import ParallelGameEngine
 
 class UIProgressReporter(neat.reporting.BaseReporter):
     def __init__(self, screen, logger=None):

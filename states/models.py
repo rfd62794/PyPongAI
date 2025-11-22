@@ -1,8 +1,8 @@
 import pygame
 import os
-import config
-import model_manager
-import elo_manager
+from core import config
+from ai import model_manager
+from utils import elo_manager
 from states.base import BaseState
 
 class ModelState(BaseState):
@@ -65,7 +65,7 @@ class ModelState(BaseState):
                 list_y += 50
 
     def draw(self, screen):
-        import elo_manager
+        from utils import elo_manager
         elo_ratings = elo_manager.load_elo_ratings()
         
         screen.fill(config.BLACK)

@@ -2,7 +2,7 @@ import pygame
 import sys
 import os
 import subprocess
-import config
+from core import config
 
 # Initialize Pygame
 pygame.init()

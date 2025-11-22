@@ -1,8 +1,8 @@
 import pygame
 import sys
 import os
-import config
-import model_manager
+from core import config
+from ai import model_manager
 
 def show_model_manager():
     pygame.init()

@@ -2,10 +2,10 @@ import pygame
 import neat
 import pickle
 import os
-import config
+from core import config
 from states.base import BaseState
-from parallel_engine import ParallelGameEngine
-from game_recorder import GameRecorder
+from match.parallel_engine import ParallelGameEngine
+from core.recorder import GameRecorder
 from human_rival import HumanRival
 
 class GameState(BaseState):
@@ -119,7 +119,33 @@ class GameState(BaseState):
         self.game.stop()
 
     def draw(self, screen):
-        self.game.draw(screen)
+        # Draw game elements using state from ParallelGameEngine
+        state = self.game.get_state()
+        
+        # Clear screen
+        screen.fill(config.BLACK)
+        
+        # Draw Net
+        pygame.draw.line(screen, config.WHITE, (config.SCREEN_WIDTH // 2, 0), (config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT), 2)
+        
+        # Draw Scores
+        if pygame.font.get_init():
+            font = pygame.font.Font(None, 74)
+            text_left = font.render(str(state["score_left"]), 1, config.WHITE)
+            screen.blit(text_left, (config.SCREEN_WIDTH // 4, 10))
+            text_right = font.render(str(state["score_right"]), 1, config.WHITE)
+            screen.blit(text_right, (config.SCREEN_WIDTH * 3 // 4, 10))
+        
+        # Draw Left Paddle
+        pygame.draw.rect(screen, config.WHITE, (10, int(state["paddle_left_y"]), config.PADDLE_WIDTH, config.PADDLE_HEIGHT))
+        
+        # Draw Right Paddle
+        pygame.draw.rect(screen, config.WHITE, (config.SCREEN_WIDTH - 10 - config.PADDLE_WIDTH, int(state["paddle_right_y"]), config.PADDLE_WIDTH, config.PADDLE_HEIGHT))
+        
+        # Draw Ball (state stores top-left corner, but circle needs center)
+        ball_center_x = int(state["ball_x"]) + config.BALL_RADIUS
+        ball_center_y = int(state["ball_y"]) + config.BALL_RADIUS
+        pygame.draw.circle(screen, config.WHITE, (ball_center_x, ball_center_y), config.BALL_RADIUS)
         
         if self.game_over:
             # Overlay

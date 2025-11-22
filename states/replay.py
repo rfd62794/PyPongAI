@@ -1,7 +1,7 @@
 import pygame
 import os
 import json
-import config
+from core import config
 from states.base import BaseState
 
 class ReplayState(BaseState):

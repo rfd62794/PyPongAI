@@ -1,7 +1,7 @@
 import os
 import csv
 import datetime
-import config
+from core import config
 
 class TrainingLogger:
     def __init__(self):

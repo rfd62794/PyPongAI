@@ -2,87 +2,20 @@ import pygame
 import neat
 import os
 import pickle
-import config
-import game_engine
-import game_simulator
+from core import config
+from core import engine as game_engine
+from core import simulator as game_simulator
 import sys
 import math
 from states.base import BaseState
-from model_manager import get_fitness_from_filename, delete_models
-import elo_manager
-from match_recorder import MatchRecorder
-import match_database
-from parallel_engine import ParallelGameEngine
-
-class MatchAnalyzer:
-    def __init__(self):
-        self.stats = {
-            "left": {"hits": 0, "distance": 0, "reaction_frames": [], "last_ball_vel_x": 0, "last_paddle_y": 0, "bounce_frame": None},
-            "right": {"hits": 0, "distance": 0, "reaction_frames": [], "last_ball_vel_x": 0, "last_paddle_y": 0, "bounce_frame": None}
-        }
-        self.rally_length = 0
-        self.rallies = []
-        self.frame_count = 0
-        
-    def update(self, game_state):
-        self.frame_count += 1
-        ball_vel_x = game_state["ball_vel_x"]
-        
-        # Initialize last_paddle_y on first frame
-        if self.frame_count == 1:
-             self.stats["left"]["last_paddle_y"] = game_state["paddle_left_y"]
-             self.stats["right"]["last_paddle_y"] = game_state["paddle_right_y"]
-             
-        # Distance Tracking
-        dist_left = abs(game_state["paddle_left_y"] - self.stats["left"]["last_paddle_y"])
-        self.stats["left"]["distance"] += dist_left
-        self.stats["left"]["last_paddle_y"] = game_state["paddle_left_y"]
-        
-        dist_right = abs(game_state["paddle_right_y"] - self.stats["right"]["last_paddle_y"])
-        self.stats["right"]["distance"] += dist_right
-        self.stats["right"]["last_paddle_y"] = game_state["paddle_right_y"]
-
-        # Hit Detection & Bounce Recording
-        if ball_vel_x > 0 and self.stats["left"]["last_ball_vel_x"] < 0:
-            self.stats["left"]["hits"] += 1
-            self.stats["right"]["bounce_frame"] = self.frame_count # Ball heading to Right
-            
-        elif ball_vel_x < 0 and self.stats["right"]["last_ball_vel_x"] > 0:
-            self.stats["right"]["hits"] += 1
-            self.stats["left"]["bounce_frame"] = self.frame_count # Ball heading to Left
-            
-        self.stats["left"]["last_ball_vel_x"] = ball_vel_x
-        self.stats["right"]["last_ball_vel_x"] = ball_vel_x
-        
-        # Reaction Time Logic
-        if ball_vel_x < 0 and self.stats["left"]["bounce_frame"] is not None:
-            if dist_left > 0.5: # Significant movement
-                reaction = self.frame_count - self.stats["left"]["bounce_frame"]
-                self.stats["left"]["reaction_frames"].append(reaction)
-                self.stats["left"]["bounce_frame"] = None 
-        
-        if ball_vel_x > 0 and self.stats["right"]["bounce_frame"] is not None:
-            if dist_right > 0.5:
-                reaction = self.frame_count - self.stats["right"]["bounce_frame"]
-                self.stats["right"]["reaction_frames"].append(reaction)
-                self.stats["right"]["bounce_frame"] = None
-
-    def get_stats(self):
-        return {
-            "left": {
-                "hits": self.stats["left"]["hits"],
-                "reaction_sum": sum(self.stats["left"]["reaction_frames"]),
-                "reaction_count": len(self.stats["left"]["reaction_frames"]),
-                "distance": self.stats["left"]["distance"]
-            },
-            "right": {
-                "hits": self.stats["right"]["hits"],
-                "reaction_sum": sum(self.stats["right"]["reaction_frames"]),
-                "reaction_count": len(self.stats["right"]["reaction_frames"]),
-                "distance": self.stats["right"]["distance"]
-            },
-            "rallies": self.rallies
-        }
+from ai.model_manager import get_fitness_from_filename, delete_models
+from utils import elo_manager
+from match.recorder import MatchRecorder
+from match import database as match_database
+from match.parallel_engine import ParallelGameEngine
+from match.analyzer import MatchAnalyzer
+from match.concurrent_executor import ConcurrentMatchExecutor
+from ai.agent_factory import AgentFactory
 
 class LeagueState(BaseState):
     def __init__(self, manager):
@@ -103,11 +36,17 @@ class LeagueState(BaseState):
         self.show_visuals = config.TOURNAMENT_VISUAL_DEFAULT
         self.min_fitness_threshold = config.TOURNAMENT_MIN_FITNESS_DEFAULT
         self.similarity_threshold = config.TOURNAMENT_SIMILARITY_THRESHOLD
+        self.record_matches = False # Default to OFF
         
         # Deletion Tracking
         self.deleted_models = []
         self.deletion_reasons = {} # {path: reason}
         self.shutout_deletions = 0
+        
+        # Concurrent execution
+        self.use_concurrent = True  # Use concurrent execution when visual mode is off
+        self.concurrent_executor = None
+        self.batch_size = 10  # Process matches in batches
         
         # Dashboard Button
         self.dashboard_button = pygame.Rect(config.SCREEN_WIDTH - 220, config.SCREEN_HEIGHT - 60, 200, 40)
@@ -198,76 +137,67 @@ class LeagueState(BaseState):
             for j in range(i + 1, len(self.models)):
                 self.match_queue.append((self.models[i], self.models[j]))
         
-        import random
-        random.shuffle(self.match_queue)
-        
         self.total_matches = len(self.match_queue)
+        print(f"Tournament: {self.total_matches} matches scheduled for {len(self.models)} models")
         
-        # Setup NEAT config
-        local_dir = os.path.dirname(os.path.dirname(__file__))
-        config_path = os.path.join(local_dir, 'neat_config.txt')
-        self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                                  neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                                  config_path)
-                                  
-        self.start_next_match()
+        # Force fast mode for tournaments (visual mode is too slow for round-robin)
+        self.show_visuals = False
+        
+        # Initialize concurrent executor if enabled
+        if self.use_concurrent and not self.show_visuals:
+            try:
+                self.concurrent_executor = ConcurrentMatchExecutor(visual_mode=False)
+                print(f"Using concurrent execution with {self.concurrent_executor.max_workers} workers")
+            except Exception as e:
+                print(f"Failed to initialize concurrent executor: {e}")
+                print("Falling back to sequential execution")
+                self.use_concurrent = False
+                self.concurrent_executor = None
+            # Process matches in batches concurrently
+            self.process_matches_concurrently()
+        else:
+            # Sequential execution (fallback or visual mode)
+            target_fps = 0
+            game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+            game_instance.start()
 
-    def start_next_match(self):
-        if not self.match_queue:
-            self.finish_tournament()
-            return
+            self.current_match = {
+                "p1": self.match_queue[0][0],
+                "p2": self.match_queue[0][1],
+                "game": game_instance,
+                "net1": None,
+                "net2": None,
+                "is_visual": self.show_visuals,
+                "waiting_for_result": not self.show_visuals
+            }
             
-        p1_path, p2_path = self.match_queue.pop(0)
-        
-        # Check if models still exist (might have been deleted)
-        if p1_path in self.deleted_models or p2_path in self.deleted_models:
-            self.start_next_match()
-            return
-
-        # Choose engine based on visuals setting
-        target_fps = 60 if self.show_visuals else 0
-        game_instance = ParallelGameEngine(visual_mode=self.show_visuals, target_fps=target_fps)
-        game_instance.start()
-
-        self.current_match = {
-            "p1": p1_path,
-            "p2": p2_path,
-            "game": game_instance,
-            "net1": None,
-            "net2": None,
-            "is_visual": self.show_visuals
-        }
-        
-        # Initialize Match Analyzer
-        self.analyzer = MatchAnalyzer()
-        
-        # Initialize Match Recorder with metadata
-        metadata = {
-            "p1_fitness": self.model_stats[p1_path]["fitness"],
-            "p2_fitness": self.model_stats[p2_path]["fitness"],
-            "p1_elo_before": self.model_stats[p1_path]["elo"],
-            "p2_elo_before": self.model_stats[p2_path]["elo"]
-        }
-        self.recorder = MatchRecorder(
-            os.path.basename(p1_path), 
-            os.path.basename(p2_path),
-            match_type="tournament",
-            metadata=metadata
-        )
-        
-        # Load Genomes
-        try:
-            with open(p1_path, "rb") as f:
-                g1 = pickle.load(f)
-            with open(p2_path, "rb") as f:
-                g2 = pickle.load(f)
-                
-            self.current_match["net1"] = neat.nn.FeedForwardNetwork.create(g1, self.config_neat)
-            self.current_match["net2"] = neat.nn.FeedForwardNetwork.create(g2, self.config_neat)
+            # FAST MODE: Send command to run full match in background
+            local_dir = os.path.dirname(os.path.dirname(__file__))
+            config_path = os.path.join(local_dir, 'neat_config.txt')
             
-        except Exception as e:
-            print(f"Error loading models: {e}")
-            self.start_next_match()
+            p1_path = self.match_queue[0][0]
+            p2_path = self.match_queue[0][1]
+            
+            match_config = {
+                "p1_path": p1_path,
+                "p2_path": p2_path,
+                "neat_config_path": config_path
+            }
+            
+            # Add metadata if recording
+            if self.record_matches:
+                match_config["metadata"] = {
+                    "p1_fitness": self.model_stats[p1_path]["fitness"],
+                    "p2_fitness": self.model_stats[p2_path]["fitness"],
+                    "p1_elo_before": self.model_stats[p1_path]["elo"],
+                    "p2_elo_before": self.model_stats[p2_path]["elo"]
+                }
+            
+            game_instance.input_queue.put({
+                "type": "PLAY_MATCH", 
+                "config": match_config,
+                "record_match": self.record_matches
+            })
 
     def calculate_elo_change(self, rating_a, rating_b, score_a, score_b):
         """Calculates ELO change based on match outcome."""
@@ -294,14 +224,32 @@ class LeagueState(BaseState):
                 
             delete_models([loser_path])
             elo_manager.remove_elo(os.path.basename(loser_path))
+            
+            # Remove all matches involving this deleted model from the queue
+            self.remove_matches_with_model(loser_path)
 
-    def finish_match(self):
-        match = self.current_match
-        score1 = match["game"].score_left
-        score2 = match["game"].score_right
+    def finish_match(self, score1, score2, stats, match_metadata, p1=None, p2=None):
+        """Finish processing a match result.
         
-        p1 = match["p1"]
-        p2 = match["p2"]
+        Args:
+            score1: Score for player 1
+            score2: Score for player 2
+            stats: Match statistics
+            match_metadata: Optional match metadata
+            p1: Optional path to player 1 model (if not provided, uses current_match)
+            p2: Optional path to player 2 model (if not provided, uses current_match)
+        """
+        # For concurrent execution, p1 and p2 are passed directly
+        if p1 and p2:
+            pass  # Use provided paths
+        elif self.current_match:
+            match = self.current_match
+            p1 = match["p1"]
+            p2 = match["p2"]
+        else:
+            print("Error: finish_match called but no current match and no paths provided!")
+            return
+        
         
         # Update Stats
         self.model_stats[p1]["points_scored"] += score1
@@ -336,8 +284,6 @@ class LeagueState(BaseState):
             self.check_for_shutout(p1, score1, score2)
             
         # Consolidate Analyzer Stats
-        stats = self.analyzer.get_stats()
-        
         self.model_stats[p1]["hits"] += stats["left"]["hits"]
         self.model_stats[p2]["hits"] += stats["right"]["hits"]
         
@@ -351,18 +297,140 @@ class LeagueState(BaseState):
         self.model_stats[p2]["reaction_count"] += stats["right"]["reaction_count"]
         
         # Save Match Recording and index it
-        match_metadata = self.recorder.save()
         if match_metadata:
             # Add post-match ELO to metadata
             match_metadata["p1_elo_after"] = self.model_stats[p1]["elo"]
             match_metadata["p2_elo_after"] = self.model_stats[p2]["elo"]
             match_database.index_match(match_metadata)
         
-        # Clean up engine
-        match["game"].stop()
+        # Don't stop the engine - we'll reuse it for the next match
+        # Only stop it when the tournament is complete
         
         self.completed_matches += 1
-        self.start_next_match()
+        print(f"Match {self.completed_matches}/{self.total_matches} completed: {os.path.basename(p1)} vs {os.path.basename(p2)} - {score1}-{score2}")
+        
+        # Only start next match if we're in sequential mode (not concurrent)
+        # For concurrent mode, matches are processed in batches
+        if not self.concurrent_executor:
+            # Check if tournament is complete
+            if self.completed_matches >= self.total_matches:
+                print("All matches completed!")
+                self.finish_tournament()
+            else:
+                try:
+                    self.start_next_match()
+                except Exception as e:
+                    print(f"Error starting next match: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Try to continue anyway
+                    if self.match_queue:
+                        self.start_next_match()
+                    else:
+                        self.finish_tournament()
+
+    def process_matches_concurrently(self):
+        """Process matches in batches using concurrent execution."""
+        if not self.concurrent_executor:
+            return
+        
+        local_dir = os.path.dirname(os.path.dirname(__file__))
+        config_path = os.path.join(local_dir, 'neat_config.txt')
+        
+        # Process matches in batches
+        batch_num = 0
+        while self.match_queue:
+            # Get next batch
+            batch = self.match_queue[:self.batch_size]
+            self.match_queue = self.match_queue[self.batch_size:]
+            
+            if not batch:
+                break
+            
+            batch_num += 1
+            print(f"Processing batch {batch_num} ({len(batch)} matches)...")
+            
+            # Prepare match configs
+            match_configs = []
+            for p1_path, p2_path in batch:
+                # Skip if either model is deleted
+                if p1_path in self.deleted_models or p2_path in self.deleted_models:
+                    self.completed_matches += 1
+                    continue
+                
+                if not os.path.exists(p1_path) or not os.path.exists(p2_path):
+                    self.completed_matches += 1
+                    continue
+                
+                match_config = {
+                    "p1_path": p1_path,
+                    "p2_path": p2_path,
+                    "neat_config_path": config_path,
+                    "record_match": self.record_matches
+                }
+                
+                if self.record_matches:
+                    match_config["metadata"] = {
+                        "p1_fitness": self.model_stats[p1_path]["fitness"],
+                        "p2_fitness": self.model_stats[p2_path]["fitness"],
+                        "p1_elo_before": self.model_stats[p1_path]["elo"],
+                        "p2_elo_before": self.model_stats[p2_path]["elo"]
+                    }
+                
+                match_configs.append(match_config)
+            
+            if not match_configs:
+                continue
+            
+            # Execute batch concurrently
+            results = self.concurrent_executor.execute_matches(match_configs)
+            
+            # Process results
+            for i, result in enumerate(results):
+                if i >= len(batch):
+                    break
+                
+                p1_path, p2_path = batch[i]
+                
+                # Handle errors
+                if result.get("error"):
+                    print(f"Match error: {result['error']} - skipping {os.path.basename(p1_path)} vs {os.path.basename(p2_path)}")
+                    self.completed_matches += 1
+                    continue
+                
+                # Finish match - pass p1 and p2 directly for concurrent execution
+                self.finish_match(
+                    result.get("score_left", 0),
+                    result.get("score_right", 0),
+                    result.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, 
+                                        "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}),
+                    result.get("match_metadata"),
+                    p1=p1_path,
+                    p2=p2_path
+                )
+        
+        # Clean up
+        if self.concurrent_executor:
+            self.concurrent_executor.close()
+            self.concurrent_executor = None
+        
+        # Tournament complete
+        print(f"All {self.completed_matches} matches processed!")
+        self.finish_tournament()
+        self.finish_tournament()
+
+    def remove_matches_with_model(self, model_path):
+        """Remove all matches from the queue that involve a deleted model."""
+        initial_count = len(self.match_queue)
+        self.match_queue = [
+            match for match in self.match_queue 
+            if match[0] != model_path and match[1] != model_path
+        ]
+        removed = initial_count - len(self.match_queue)
+        if removed > 0:
+            print(f"Removed {removed} matches involving deleted model {os.path.basename(model_path)}")
+            # Update total_matches to reflect the removed matches
+            self.total_matches = len(self.match_queue) + self.completed_matches
 
     def prune_similar_models(self):
         """Prunes models that are too similar in fitness."""
@@ -388,8 +456,107 @@ class LeagueState(BaseState):
                     delete_models([m])
                     elo_manager.remove_elo(os.path.basename(m))
 
+    def start_next_match(self):
+        """Starts the next match in the queue."""
+        # Remove completed match from queue (if any)
+        if self.match_queue:
+            self.match_queue.pop(0)
+        
+        # Skip matches with deleted models and find a valid match
+        while self.match_queue:
+            p1_path = self.match_queue[0][0]
+            p2_path = self.match_queue[0][1]
+            
+            # Check if either model has been deleted or doesn't exist
+            if p1_path in self.deleted_models or p2_path in self.deleted_models:
+                print(f"Skipping match: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)} (model deleted)")
+                self.match_queue.pop(0)
+                self.completed_matches += 1  # Count skipped matches as completed
+                continue
+            
+            # Check if files actually exist
+            if not os.path.exists(p1_path) or not os.path.exists(p2_path):
+                missing = []
+                if not os.path.exists(p1_path):
+                    missing.append(os.path.basename(p1_path))
+                if not os.path.exists(p2_path):
+                    missing.append(os.path.basename(p2_path))
+                print(f"Skipping match: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)} (file(s) missing: {', '.join(missing)})")
+                # Mark as deleted if not already
+                if not os.path.exists(p1_path) and p1_path not in self.deleted_models:
+                    self.deleted_models.append(p1_path)
+                    self.deletion_reasons[p1_path] = "File not found"
+                if not os.path.exists(p2_path) and p2_path not in self.deleted_models:
+                    self.deleted_models.append(p2_path)
+                    self.deletion_reasons[p2_path] = "File not found"
+                self.match_queue.pop(0)
+                self.completed_matches += 1  # Count skipped matches as completed
+                continue
+            
+            # Found a valid match
+            break
+        
+        if not self.match_queue:
+            self.finish_tournament()
+            return
+        
+        # Reuse the same engine for efficiency
+        if self.current_match and self.current_match.get("game"):
+            game_instance = self.current_match["game"]
+            # Make sure the engine process is still alive
+            if game_instance.process and not game_instance.process.is_alive():
+                print("Engine process died, restarting...")
+                game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+                game_instance.start()
+        else:
+            game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+            game_instance.start()
+        
+        # Setup next match (p1_path and p2_path are already set from the loop above)
+        
+        self.current_match = {
+            "p1": p1_path,
+            "p2": p2_path,
+            "game": game_instance,
+            "is_visual": False,
+            "waiting_for_result": True
+        }
+        
+        # Send match command to parallel engine
+        local_dir = os.path.dirname(os.path.dirname(__file__))
+        config_path = os.path.join(local_dir, 'neat_config.txt')
+        
+        match_config = {
+            "p1_path": p1_path,
+            "p2_path": p2_path,
+            "neat_config_path": config_path
+        }
+        
+        # Add metadata if recording
+        if self.record_matches:
+            match_config["metadata"] = {
+                "p1_fitness": self.model_stats[p1_path]["fitness"],
+                "p2_fitness": self.model_stats[p2_path]["fitness"],
+                "p1_elo_before": self.model_stats[p1_path]["elo"],
+                "p2_elo_before": self.model_stats[p2_path]["elo"]
+            }
+        
+        print(f"Starting match {self.completed_matches + 1}/{self.total_matches}: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)}")
+        game_instance.input_queue.put({
+            "type": "PLAY_MATCH", 
+            "config": match_config,
+            "record_match": self.record_matches
+        })
+
     def finish_tournament(self):
         self.mode = "RESULTS"
+        
+        # Clean up engine only when tournament is complete
+        if self.current_match and self.current_match.get("game"):
+            self.current_match["game"].stop()
+            self.current_match = None
+        
+        print(f"Tournament complete! {self.completed_matches} matches played.")
         self.prune_similar_models()
         
         # Final Ranking
@@ -447,19 +614,16 @@ class LeagueState(BaseState):
                 if toggle_rect.collidepoint(event.pos):
                     self.show_visuals = not self.show_visuals
             
-            # Speed up if visuals off
-            if not self.show_visuals:
-                # Parallel engine handles speed, but we can call update multiple times per frame if we want even faster?
-                # Actually, the parallel engine loop runs as fast as possible if target_fps=0.
-                # But we need to pump events here.
-                # Let's just call update once per frame here, and let the parallel engine handle the physics loop?
-                # Wait, if we only call update once here, we only get one state update per frame.
-                # If the parallel engine is running freely, it might be producing states faster than we consume.
-                # But our update() logic sends commands. If we don't send commands, the AI doesn't move.
-                # So we need to run this loop fast.
-                for _ in range(10):
-                    if self.current_match:
-                        self.update(0)
+            # Toggle Recording
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    self.record_matches = not self.record_matches
+
+            # Fast mode - check for results more frequently
+            if self.current_match and self.current_match.get("waiting_for_result"):
+                # Check multiple times per frame to process results faster
+                for _ in range(5):
+                    self.update(0)
 
         elif self.mode == "RESULTS":
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -472,50 +636,84 @@ class LeagueState(BaseState):
         if self.mode == "RUNNING":
             if self.current_match:
                 game = self.current_match["game"]
-                net1 = self.current_match["net1"]
-                net2 = self.current_match["net2"]
                 
-                state = game.get_state()
-                
-                # Update Analyzer
-                self.analyzer.update(state)
-                self.recorder.record_frame(state)
-                
-                # AI 1 (Left)
-                inputs1 = (
-                    state["paddle_left_y"] / config.SCREEN_HEIGHT,
-                    state["ball_x"] / config.SCREEN_WIDTH,
-                    state["ball_y"] / config.SCREEN_HEIGHT,
-                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                    (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] < 0 else 0.0,
-                    state["paddle_right_y"] / config.SCREEN_HEIGHT
-                )
-                out1 = net1.activate(inputs1)
-                act1 = out1.index(max(out1))
-                left_move = "UP" if act1 == 0 else "DOWN" if act1 == 1 else None
-                
-                # AI 2 (Right)
-                inputs2 = (
-                    state["paddle_right_y"] / config.SCREEN_HEIGHT,
-                    state["ball_x"] / config.SCREEN_WIDTH,
-                    state["ball_y"] / config.SCREEN_HEIGHT,
-                    state["ball_vel_x"] / config.BALL_MAX_SPEED,
-                    state["ball_vel_y"] / config.BALL_MAX_SPEED,
-                    (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] > 0 else 0.0,
-                    state["paddle_left_y"] / config.SCREEN_HEIGHT
-                )
-                out2 = net2.activate(inputs2)
-                act2 = out2.index(max(out2))
-                right_move = "UP" if act2 == 0 else "DOWN" if act2 == 1 else None
-                
-                game.update(left_move, right_move)
-                
-                target_score = config.VISUAL_MAX_SCORE if self.show_visuals else config.MAX_SCORE
-                if game.score_left >= target_score or game.score_right >= target_score:
-                    self.finish_match()
+                # Check for fast match result
+                if self.current_match.get("waiting_for_result"):
+                    # Check for match result using the dedicated method
+                    match_result = game.check_match_result()
+                    if match_result:
+                        print(f"Match result received via check_match_result()")
+                        try:
+                            data = match_result["data"]
+                            if not data:
+                                print("Error: Match result data is None!")
+                                return
+                            # Check if match had an error
+                            if data.get("error"):
+                                print(f"Match error: {data['error']} - skipping match")
+                                self.completed_matches += 1
+                                if self.completed_matches >= self.total_matches:
+                                    self.finish_tournament()
+                                else:
+                                    self.start_next_match()
+                                return
+                            self.finish_match(
+                                data.get("score_left", 0), 
+                                data.get("score_right", 0), 
+                                data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
+                                data.get("match_metadata")
+                            )
+                        except Exception as e:
+                            print(f"Error processing match result: {e}")
+                            import traceback
+                            traceback.print_exc()
+                        return
+                    
+                    # Also check queue directly as fallback
+                    try:
+                        while not game.output_queue.empty():
+                            msg = game.output_queue.get_nowait()
+                            if msg.get("type") == "MATCH_RESULT":
+                                print(f"Match result received via queue")
+                                try:
+                                    data = msg["data"]
+                                    if not data:
+                                        print("Error: Match result data is None!")
+                                        continue
+                                    # Check if match had an error
+                                    if data.get("error"):
+                                        print(f"Match error: {data['error']} - skipping match")
+                                        self.completed_matches += 1
+                                        if self.completed_matches >= self.total_matches:
+                                            self.finish_tournament()
+                                        else:
+                                            self.start_next_match()
+                                        return
+                                    self.finish_match(
+                                        data.get("score_left", 0), 
+                                        data.get("score_right", 0), 
+                                        data.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}), 
+                                        data.get("match_metadata")
+                                    )
+                                except Exception as e:
+                                    print(f"Error processing match result from queue: {e}")
+                                    import traceback
+                                    traceback.print_exc()
+                                return
+                            elif msg.get("type") == "READY":
+                                continue
+                            else:
+                                # Regular state update, ignore it
+                                pass
+                    except Exception as e:
+                        print(f"Error checking match result queue: {e}")
+                        import traceback
+                        traceback.print_exc()
+                    return
+
+                # Fast mode only - visual mode is disabled for tournaments
+                # The match result will come through the queue
+                pass
             else:
                 self.start_next_match()
 
@@ -562,22 +760,33 @@ class LeagueState(BaseState):
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
 
     def draw_running(self, screen):
-        if self.show_visuals:
-            if self.current_match:
-                # Only draw if it's a visual game instance
-                if self.current_match.get("is_visual", True):
-                    self.current_match["game"].draw(screen)
-                else:
-                    screen.fill(config.BLACK)
-                    text = self.font.render("Fast Mode (Visuals Disabled for this Match)", True, config.WHITE)
-                    screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
-        else:
-            screen.fill(config.BLACK)
-            text = self.font.render("Tournament Running (Fast Mode)...", True, config.WHITE)
-            screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
+        screen.fill(config.BLACK)
+        
+        # Progress info
+        progress_pct = (self.completed_matches / self.total_matches * 100) if self.total_matches > 0 else 0
+        text = self.font.render(f"Tournament Running (Fast Mode)...", True, config.WHITE)
+        screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2 - 50))
+        
+        # Progress bar
+        bar_width = config.SCREEN_WIDTH - 200
+        bar_height = 20
+        bar_x = 100
+        bar_y = config.SCREEN_HEIGHT//2 + 20
+        pygame.draw.rect(screen, config.GRAY, (bar_x, bar_y, bar_width, bar_height))
+        pygame.draw.rect(screen, config.GREEN, (bar_x, bar_y, int(bar_width * progress_pct / 100), bar_height))
+        
+        # Current match info
+        if self.current_match:
+            p1_name = os.path.basename(self.current_match["p1"])[:20]
+            p2_name = os.path.basename(self.current_match["p2"])[:20]
+            match_text = self.small_font.render(f"{p1_name} vs {p2_name}", True, config.GRAY)
+            screen.blit(match_text, (config.SCREEN_WIDTH//2 - match_text.get_width()//2, bar_y + 40))
         
         # Overlay Info
-        info = f"Match {self.completed_matches + 1} / {self.total_matches}"
+        if self.total_matches > 0:
+            info = f"Match {self.completed_matches + 1} / {self.total_matches}"
+        else:
+            info = f"Match {self.completed_matches + 1} / ?"
         info_surf = self.small_font.render(info, True, config.WHITE)
         screen.blit(info_surf, (10, 10))
         
@@ -592,6 +801,11 @@ class LeagueState(BaseState):
         pygame.draw.rect(screen, color, toggle_rect)
         toggle_text = self.small_font.render("Visuals: " + ("ON" if self.show_visuals else "OFF"), True, config.WHITE)
         screen.blit(toggle_text, (toggle_rect.centerx - toggle_text.get_width()//2, toggle_rect.centery - toggle_text.get_height()//2))
+
+        # Recording Status
+        rec_text = f"Recording: {'ON' if self.record_matches else 'OFF'} (Press R)"
+        rec_surf = self.small_font.render(rec_text, True, config.RED if self.record_matches else config.GRAY)
+        screen.blit(rec_surf, (config.SCREEN_WIDTH - 250, 60))
 
     def draw_results(self, screen):
         screen.fill(config.BLACK)
@@ -640,6 +854,17 @@ class LeagueState(BaseState):
         back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
         back_text = self.small_font.render("< Back", True, config.WHITE)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+    
+    def draw_dashboard(self, screen):
+        """Dashboard view (placeholder for now)."""
+        screen.fill(config.BLACK)
+        title = self.font.render("Analytics Dashboard", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, config.SCREEN_HEIGHT//2))
+        
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
+        back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
     
     def draw_dashboard_replay(self, screen):

@@ -5,9 +5,9 @@ against opponents and recording match statistics.
 """
 
 import neat
-import config
-import game_engine
-from opponents import get_rule_based_move
+from core import config
+from core import engine as game_engine
+from ai.opponents import get_rule_based_move
 
 
 def validate_genome(genome, config_neat, generation=0, record_matches=True):
@@ -28,8 +28,8 @@ def validate_genome(genome, config_neat, generation=0, record_matches=True):
             - avg_rally: Average hits per game across all validation games.
             - win_rate: Fraction of games won (0.0 to 1.0).
     """
-    from match_recorder import MatchRecorder
-    import match_database
+    from match.recorder import MatchRecorder
+    from match import database as match_database
     
     net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
     

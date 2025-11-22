@@ -1,6 +1,6 @@
 import pygame
 import sys
-import config
+from core import config
 from states.base import BaseState
 
 class MenuState(BaseState):

@@ -1,18 +1,21 @@
 import patch_neat
-import pygame
-import config
-from states.manager import StateManager
-from states.menu import MenuState
-from states.game import GameState
-from states.lobby import LobbyState
-from states.train import TrainState
-from states.models import ModelState
-from states.analytics import AnalyticsState
-from states.league import LeagueState
-from states.replay import ReplayState
-from states.settings import SettingsState
 
 def main():
+    # Import pygame and other modules only when actually running main
+    # This prevents issues when main.py is imported by multiprocessing workers
+    import pygame
+    from core import config
+    from states.manager import StateManager
+    from states.menu import MenuState
+    from states.game import GameState
+    from states.lobby import LobbyState
+    from states.train import TrainState
+    from states.models import ModelState
+    from states.analytics import AnalyticsState
+    from states.league import LeagueState
+    from states.replay import ReplayState
+    from states.settings import SettingsState
+    
     pygame.init()
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption("Project PaddleMind")
