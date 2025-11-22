@@ -130,10 +130,15 @@ class LeagueState(BaseState):
         for i in range(len(self.models)):
             for j in range(i + 1, len(self.models)):
                 self.match_queue.append((self.models[i], self.models[j]))
-
-        # Choose engine based on visuals setting
-        target_fps = 60 if self.show_visuals else 0
-        game_instance = ParallelGameEngine(visual_mode=self.show_visuals, target_fps=target_fps)
+        
+        self.total_matches = len(self.match_queue)
+        print(f"Tournament: {self.total_matches} matches scheduled for {len(self.models)} models")
+        
+        # Force fast mode for tournaments (visual mode is too slow for round-robin)
+        # Visual mode can be used for individual matches, but tournaments need speed
+        self.show_visuals = False
+        target_fps = 0
+        game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
         game_instance.start()
 
         self.current_match = {
@@ -165,33 +170,33 @@ class LeagueState(BaseState):
                 metadata=metadata
             )
         
-        if not self.show_visuals:
-            # FAST MODE: Send command to run full match in background
-            local_dir = os.path.dirname(os.path.dirname(__file__))
-            config_path = os.path.join(local_dir, 'neat_config.txt')
-            
-            match_config = {
-                "p1_path": self.match_queue[0][0],
-                "p2_path": self.match_queue[0][1],
-                "neat_config_path": config_path
+        # FAST MODE: Send command to run full match in background
+        local_dir = os.path.dirname(os.path.dirname(__file__))
+        config_path = os.path.join(local_dir, 'neat_config.txt')
+        
+        p1_path = self.match_queue[0][0]
+        p2_path = self.match_queue[0][1]
+        
+        match_config = {
+            "p1_path": p1_path,
+            "p2_path": p2_path,
+            "neat_config_path": config_path
+        }
+        
+        # Add metadata if recording
+        if self.record_matches:
+            match_config["metadata"] = {
+                "p1_fitness": self.model_stats[p1_path]["fitness"],
+                "p2_fitness": self.model_stats[p2_path]["fitness"],
+                "p1_elo_before": self.model_stats[p1_path]["elo"],
+                "p2_elo_before": self.model_stats[p2_path]["elo"]
             }
-            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
-            return
-
-        # VISUAL MODE: Load Genomes locally
-        try:
-            # We need the neat_config path. It's usually in the root.
-            neat_config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "neat_config.txt")
-            
-            agent1 = AgentFactory.create_agent(self.match_queue[0][0], neat_config_path)
-            agent2 = AgentFactory.create_agent(self.match_queue[0][1], neat_config_path)
-            
-            self.current_match["agent1"] = agent1
-            self.current_match["agent2"] = agent2
-            
-        except Exception as e:
-            print(f"Error loading models: {e}")
-            self.start_next_match()
+        
+        game_instance.input_queue.put({
+            "type": "PLAY_MATCH", 
+            "config": match_config,
+            "record_match": self.record_matches
+        })
 
     def calculate_elo_change(self, rating_a, rating_b, score_a, score_b):
         """Calculates ELO change based on match outcome."""
@@ -281,7 +286,12 @@ class LeagueState(BaseState):
             match["game"].stop()
         
         self.completed_matches += 1
-        self.start_next_match()
+        
+        # Check if tournament is complete
+        if self.completed_matches >= self.total_matches:
+            self.finish_tournament()
+        else:
+            self.start_next_match()
 
     def prune_similar_models(self):
         """Prunes models that are too similar in fitness."""
@@ -307,8 +317,88 @@ class LeagueState(BaseState):
                     delete_models([m])
                     elo_manager.remove_elo(os.path.basename(m))
 
+    def start_next_match(self):
+        """Starts the next match in the queue."""
+        if not self.match_queue:
+            self.finish_tournament()
+            return
+        
+        # Remove completed match from queue
+        if self.match_queue:
+            self.match_queue.pop(0)
+        
+        if not self.match_queue:
+            self.finish_tournament()
+            return
+        
+        # Reuse the same engine for efficiency
+        if self.current_match and self.current_match.get("game"):
+            game_instance = self.current_match["game"]
+        else:
+            game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+            game_instance.start()
+        
+        # Setup next match
+        p1_path = self.match_queue[0][0]
+        p2_path = self.match_queue[0][1]
+        
+        self.current_match = {
+            "p1": p1_path,
+            "p2": p2_path,
+            "game": game_instance,
+            "is_visual": False,
+            "waiting_for_result": True
+        }
+        
+        # Initialize Match Recorder with metadata
+        self.recorder = None
+        if self.record_matches:
+            metadata = {
+                "p1_fitness": self.model_stats[p1_path]["fitness"],
+                "p2_fitness": self.model_stats[p2_path]["fitness"],
+                "p1_elo_before": self.model_stats[p1_path]["elo"],
+                "p2_elo_before": self.model_stats[p2_path]["elo"]
+            }
+            self.recorder = MatchRecorder(
+                os.path.basename(p1_path), 
+                os.path.basename(p2_path),
+                match_type="tournament",
+                metadata=metadata
+            )
+        
+        # Send match command to parallel engine
+        local_dir = os.path.dirname(os.path.dirname(__file__))
+        config_path = os.path.join(local_dir, 'neat_config.txt')
+        
+        match_config = {
+            "p1_path": p1_path,
+            "p2_path": p2_path,
+            "neat_config_path": config_path
+        }
+        
+        # Add metadata if recording
+        if self.record_matches and self.recorder:
+            match_config["metadata"] = {
+                "p1_fitness": self.model_stats[p1_path]["fitness"],
+                "p2_fitness": self.model_stats[p2_path]["fitness"],
+                "p1_elo_before": self.model_stats[p1_path]["elo"],
+                "p2_elo_before": self.model_stats[p2_path]["elo"]
+            }
+        
+        game_instance.input_queue.put({
+            "type": "PLAY_MATCH", 
+            "config": match_config,
+            "record_match": self.record_matches
+        })
+
     def finish_tournament(self):
         self.mode = "RESULTS"
+        
+        # Clean up engine
+        if self.current_match and self.current_match.get("game"):
+            self.current_match["game"].stop()
+            self.current_match = None
+        
         self.prune_similar_models()
         
         # Final Ranking
@@ -371,19 +461,11 @@ class LeagueState(BaseState):
                 if event.key == pygame.K_r:
                     self.record_matches = not self.record_matches
 
-            # Speed up if visuals off
-            if not self.show_visuals:
-                # Parallel engine handles speed, but we can call update multiple times per frame if we want even faster?
-                # Actually, the parallel engine loop runs as fast as possible if target_fps=0.
-                # But we need to pump events here.
-                # Let's just call update once per frame here, and let the parallel engine handle the physics loop?
-                # Wait, if we only call update once here, we only get one state update per frame.
-                # If the parallel engine is running freely, it might be producing states faster than we consume.
-                # But our update() logic sends commands. If we don't send commands, the AI doesn't move.
-                # So we need to run this loop fast.
-                for _ in range(10):
-                    if self.current_match:
-                        self.update(0)
+            # Fast mode - check for results more frequently
+            if self.current_match and self.current_match.get("waiting_for_result"):
+                # Check multiple times per frame to process results faster
+                for _ in range(5):
+                    self.update(0)
 
         elif self.mode == "RESULTS":
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -415,33 +497,9 @@ class LeagueState(BaseState):
                         pass
                     return
 
-                # VISUAL MODE UPDATE
-                agent1 = self.current_match["agent1"]
-                agent2 = self.current_match["agent2"]
-                
-                state = game.get_state()
-                
-                # Update Analyzer
-                self.analyzer.update(state)
-                if self.recorder:
-                    self.recorder.record_frame(state)
-                
-                # AI 1 (Left)
-                left_move = agent1.get_move(state, "left")
-                
-                # AI 2 (Right)
-                right_move = agent2.get_move(state, "right")
-                
-                game.update(left_move, right_move)
-                
-                target_score = config.VISUAL_MAX_SCORE if self.show_visuals else config.MAX_SCORE
-                if game.score_left >= target_score or game.score_right >= target_score:
-                    self.finish_match(
-                        game.score_left, 
-                        game.score_right, 
-                        self.analyzer.get_stats(), 
-                        self.recorder.save() if self.recorder else None
-                    )
+                # Fast mode only - visual mode is disabled for tournaments
+                # The match result will come through the queue
+                pass
             else:
                 self.start_next_match()
 
@@ -488,19 +546,27 @@ class LeagueState(BaseState):
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
 
     def draw_running(self, screen):
-        if self.show_visuals:
-            if self.current_match:
-                # Only draw if it's a visual game instance
-                if self.current_match.get("is_visual", True):
-                    self.current_match["game"].draw(screen)
-                else:
-                    screen.fill(config.BLACK)
-                    text = self.font.render("Fast Mode (Visuals Disabled for this Match)", True, config.WHITE)
-                    screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
-        else:
-            screen.fill(config.BLACK)
-            text = self.font.render("Tournament Running (Fast Mode)...", True, config.WHITE)
-            screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2))
+        screen.fill(config.BLACK)
+        
+        # Progress info
+        progress_pct = (self.completed_matches / self.total_matches * 100) if self.total_matches > 0 else 0
+        text = self.font.render(f"Tournament Running (Fast Mode)...", True, config.WHITE)
+        screen.blit(text, (config.SCREEN_WIDTH//2 - text.get_width()//2, config.SCREEN_HEIGHT//2 - 50))
+        
+        # Progress bar
+        bar_width = config.SCREEN_WIDTH - 200
+        bar_height = 20
+        bar_x = 100
+        bar_y = config.SCREEN_HEIGHT//2 + 20
+        pygame.draw.rect(screen, config.GRAY, (bar_x, bar_y, bar_width, bar_height))
+        pygame.draw.rect(screen, config.GREEN, (bar_x, bar_y, int(bar_width * progress_pct / 100), bar_height))
+        
+        # Current match info
+        if self.current_match:
+            p1_name = os.path.basename(self.current_match["p1"])[:20]
+            p2_name = os.path.basename(self.current_match["p2"])[:20]
+            match_text = self.small_font.render(f"{p1_name} vs {p2_name}", True, config.GRAY)
+            screen.blit(match_text, (config.SCREEN_WIDTH//2 - match_text.get_width()//2, bar_y + 40))
         
         # Overlay Info
         info = f"Match {self.completed_matches + 1} / {self.total_matches}"
