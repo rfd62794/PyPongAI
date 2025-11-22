@@ -12,9 +12,9 @@ from model_manager import get_fitness_from_filename, delete_models
 import elo_manager
 from match_recorder import MatchRecorder
 import match_database
-from parallel_engine import ParallelGameEngine
-
-from match_analyzer import MatchAnalyzer
+from match.parallel_engine import ParallelGameEngine
+from match.analyzer import MatchAnalyzer
+from match import database as match_database
 from agent_factory import AgentFactory
 
 class LeagueState(BaseState):
