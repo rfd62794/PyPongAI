@@ -1,7 +1,7 @@
 import os
 import shutil
 import argparse
-import config
+from core import config
 from utils import elo_manager
 import pickle
 
