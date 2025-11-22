@@ -66,9 +66,6 @@ class TestParallelOptimization(unittest.TestCase):
             "metadata": {"test": True}
         }
         
-        print(f"Checking file existence (ON): {match_config['p1_path']}")
-        print(f"Exists: {os.path.exists(match_config['p1_path'])}")
-        
         start_time = time.time()
         result = self.engine.play_match(match_config, record_match=True)
         end_time = time.time()
