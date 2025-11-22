@@ -1,6 +1,6 @@
 import pygame
 import sys
-import config
+from core import config
 
 class StateManager:
     def __init__(self, screen):

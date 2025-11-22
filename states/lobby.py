@@ -1,6 +1,6 @@
 import pygame
 import os
-import config
+from core import config
 from states.base import BaseState
 from human_rival import HumanRival
 

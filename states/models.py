@@ -1,6 +1,6 @@
 import pygame
 import os
-import config
+from core import config
 from ai import model_manager
 from utils import elo_manager
 from states.base import BaseState

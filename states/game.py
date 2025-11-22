@@ -2,7 +2,7 @@ import pygame
 import neat
 import pickle
 import os
-import config
+from core import config
 from states.base import BaseState
 from match.parallel_engine import ParallelGameEngine
 from game_recorder import GameRecorder

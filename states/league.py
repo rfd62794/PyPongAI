@@ -2,9 +2,9 @@ import pygame
 import neat
 import os
 import pickle
-import config
-import game_engine
-import game_simulator
+from core import config
+from core import engine as game_engine
+from core import simulator as game_simulator
 import sys
 import math
 from states.base import BaseState

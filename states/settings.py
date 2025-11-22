@@ -6,7 +6,7 @@ Allows users to view and modify configurable parameters with a clean UI.
 import pygame
 import json
 import os
-import config
+from core import config
 from states.base import BaseState
 
 

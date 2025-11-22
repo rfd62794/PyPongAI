@@ -3,9 +3,9 @@ import neat
 import os
 import pickle
 import datetime
-import config
+from core import config
 from ai import ai_module
-import game_engine
+from core import engine as game_engine
 import sys
 import itertools
 from states.base import BaseState
