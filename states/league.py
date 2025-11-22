@@ -151,25 +151,6 @@ class LeagueState(BaseState):
             "waiting_for_result": not self.show_visuals
         }
         
-        # Initialize Match Analyzer
-        self.analyzer = MatchAnalyzer()
-        
-        # Initialize Match Recorder with metadata
-        self.recorder = None
-        if self.record_matches:
-            metadata = {
-                "p1_fitness": self.model_stats[self.match_queue[0][0]]["fitness"],
-                "p2_fitness": self.model_stats[self.match_queue[0][1]]["fitness"],
-                "p1_elo_before": self.model_stats[self.match_queue[0][0]]["elo"],
-                "p2_elo_before": self.model_stats[self.match_queue[0][1]]["elo"]
-            }
-            self.recorder = MatchRecorder(
-                os.path.basename(self.match_queue[0][0]), 
-                os.path.basename(self.match_queue[0][1]),
-                match_type="tournament",
-                metadata=metadata
-            )
-        
         # FAST MODE: Send command to run full match in background
         local_dir = os.path.dirname(os.path.dirname(__file__))
         config_path = os.path.join(local_dir, 'neat_config.txt')
@@ -349,22 +330,6 @@ class LeagueState(BaseState):
             "is_visual": False,
             "waiting_for_result": True
         }
-        
-        # Initialize Match Recorder with metadata
-        self.recorder = None
-        if self.record_matches:
-            metadata = {
-                "p1_fitness": self.model_stats[p1_path]["fitness"],
-                "p2_fitness": self.model_stats[p2_path]["fitness"],
-                "p1_elo_before": self.model_stats[p1_path]["elo"],
-                "p2_elo_before": self.model_stats[p2_path]["elo"]
-            }
-            self.recorder = MatchRecorder(
-                os.path.basename(p1_path), 
-                os.path.basename(p2_path),
-                match_type="tournament",
-                metadata=metadata
-            )
         
         # Send match command to parallel engine
         local_dir = os.path.dirname(os.path.dirname(__file__))
@@ -637,6 +602,17 @@ class LeagueState(BaseState):
         back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
         back_text = self.small_font.render("< Back", True, config.WHITE)
+        screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
+    
+    def draw_dashboard(self, screen):
+        """Dashboard view (placeholder for now)."""
+        screen.fill(config.BLACK)
+        title = self.font.render("Analytics Dashboard", True, config.WHITE)
+        screen.blit(title, (config.SCREEN_WIDTH//2 - title.get_width()//2, config.SCREEN_HEIGHT//2))
+        
+        # Back Button
+        pygame.draw.rect(screen, (100, 0, 0), self.back_button)
+        back_text = self.small_font.render("Back", True, config.WHITE)
         screen.blit(back_text, (self.back_button.centerx - back_text.get_width()//2, self.back_button.centery - back_text.get_height()//2))
     
     def draw_dashboard_replay(self, screen):
