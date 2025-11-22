@@ -72,5 +72,5 @@ class GameRunner:
                 # One player needs 1 more point and we're past halfway
                 break
         
-        return self.game.score_left, self.game.score_right
+        return (self.game.score_left, self.game.score_right)
 
