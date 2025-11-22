@@ -19,6 +19,20 @@ from novelty_search import NoveltyArchive, calculate_bc_from_contacts
 NOVELTY_ARCHIVE = NoveltyArchive(max_size=500, k_nearest=config.NOVELTY_K_NEAREST)
 
 
+_curriculum_ball_speed = None
+
+
+def set_curriculum_ball_speed(speed):
+    """Sets the shared curriculum ball speed used during training."""
+    global _curriculum_ball_speed
+    _curriculum_ball_speed = speed
+
+
+def get_curriculum_ball_speed():
+    """Returns the current curriculum ball speed (or None for default)."""
+    return _curriculum_ball_speed
+
+
 def eval_genomes(genomes, config_neat, ball_speed=None):
     """Evaluates genomes by playing against a rule-based opponent.
     
@@ -35,7 +49,7 @@ def eval_genomes(genomes, config_neat, ball_speed=None):
         net.reset()  # Reset RNN state
         genome.fitness = 0
         
-        game = game_simulator.GameSimulator(ball_speed=ball_speed)
+        game = game_simulator.GameSimulator(ball_speed=ball_speed or get_curriculum_ball_speed())
         
         # Genome plays as Left Paddle
         # Rule-based plays as Right Paddle
@@ -177,7 +191,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
             net_right.reset()  # Reset RNN state
             
             # Play a match
-            game = game_simulator.GameSimulator(ball_speed=ball_speed)
+            game = game_simulator.GameSimulator(ball_speed=ball_speed or get_curriculum_ball_speed())
             run = True
             frame_count = 0
             max_frames = 3000  # Prevent infinite games
