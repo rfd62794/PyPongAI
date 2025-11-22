@@ -3,6 +3,7 @@ import os
 import time
 import config
 import uuid
+from . import database as match_database
 
 class MatchRecorder:
     def __init__(self, p1_name, p2_name, match_type="tournament", metadata=None):
