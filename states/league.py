@@ -228,14 +228,27 @@ class LeagueState(BaseState):
             # Remove all matches involving this deleted model from the queue
             self.remove_matches_with_model(loser_path)
 
-    def finish_match(self, score1, score2, stats, match_metadata):
-        if not self.current_match:
-            print("Error: finish_match called but no current match!")
-            return
+    def finish_match(self, score1, score2, stats, match_metadata, p1=None, p2=None):
+        """Finish processing a match result.
         
-        match = self.current_match
-        p1 = match["p1"]
-        p2 = match["p2"]
+        Args:
+            score1: Score for player 1
+            score2: Score for player 2
+            stats: Match statistics
+            match_metadata: Optional match metadata
+            p1: Optional path to player 1 model (if not provided, uses current_match)
+            p2: Optional path to player 2 model (if not provided, uses current_match)
+        """
+        # For concurrent execution, p1 and p2 are passed directly
+        if p1 and p2:
+            pass  # Use provided paths
+        elif self.current_match:
+            match = self.current_match
+            p1 = match["p1"]
+            p2 = match["p2"]
+        else:
+            print("Error: finish_match called but no current match and no paths provided!")
+            return
         
         
         # Update Stats
@@ -296,22 +309,25 @@ class LeagueState(BaseState):
         self.completed_matches += 1
         print(f"Match {self.completed_matches}/{self.total_matches} completed: {os.path.basename(p1)} vs {os.path.basename(p2)} - {score1}-{score2}")
         
-        # Check if tournament is complete
-        if self.completed_matches >= self.total_matches:
-            print("All matches completed!")
-            self.finish_tournament()
-        else:
-            try:
-                self.start_next_match()
-            except Exception as e:
-                print(f"Error starting next match: {e}")
-                import traceback
-                traceback.print_exc()
-                # Try to continue anyway
-                if self.match_queue:
+        # Only start next match if we're in sequential mode (not concurrent)
+        # For concurrent mode, matches are processed in batches
+        if not self.concurrent_executor:
+            # Check if tournament is complete
+            if self.completed_matches >= self.total_matches:
+                print("All matches completed!")
+                self.finish_tournament()
+            else:
+                try:
                     self.start_next_match()
-                else:
-                    self.finish_tournament()
+                except Exception as e:
+                    print(f"Error starting next match: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Try to continue anyway
+                    if self.match_queue:
+                        self.start_next_match()
+                    else:
+                        self.finish_tournament()
 
     def process_matches_concurrently(self):
         """Process matches in batches using concurrent execution."""
@@ -378,17 +394,19 @@ class LeagueState(BaseState):
                 
                 # Handle errors
                 if result.get("error"):
-                    print(f"Match error: {result['error']} - skipping")
+                    print(f"Match error: {result['error']} - skipping {os.path.basename(p1_path)} vs {os.path.basename(p2_path)}")
                     self.completed_matches += 1
                     continue
                 
-                # Finish match
+                # Finish match - pass p1 and p2 directly for concurrent execution
                 self.finish_match(
                     result.get("score_left", 0),
                     result.get("score_right", 0),
                     result.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, 
                                         "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}),
-                    result.get("match_metadata")
+                    result.get("match_metadata"),
+                    p1=p1_path,
+                    p2=p2_path
                 )
         
         # Clean up
@@ -397,6 +415,8 @@ class LeagueState(BaseState):
             self.concurrent_executor = None
         
         # Tournament complete
+        print(f"All {self.completed_matches} matches processed!")
+        self.finish_tournament()
         self.finish_tournament()
 
     def remove_matches_with_model(self, model_path):
