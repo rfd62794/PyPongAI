@@ -15,8 +15,8 @@ BALL_SPEED_X = 3
 BALL_SPEED_Y = 3
 BALL_SPEED_INCREMENT = 1.05
 BALL_MAX_SPEED = 1500
-MAX_SCORE = 20
-VISUAL_MAX_SCORE = 5
+MAX_SCORE = 99  # Training/AI match cap (effectively no hard limit during normal play)
+VISUAL_MAX_SCORE = 5  # Human-facing matches end at 5 points
 PADDLE_MAX_SPEED = 1500
 
 # Curriculum Learning Settings
