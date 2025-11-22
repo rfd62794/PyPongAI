@@ -446,6 +446,19 @@ class LeagueState(BaseState):
                 
                 # Check for fast match result
                 if self.current_match.get("waiting_for_result"):
+                    # Check for match result using the dedicated method
+                    match_result = game.check_match_result()
+                    if match_result:
+                        data = match_result["data"]
+                        self.finish_match(
+                            data["score_left"], 
+                            data["score_right"], 
+                            data["stats"], 
+                            data.get("match_metadata")
+                        )
+                        return
+                    
+                    # Also check queue directly as fallback
                     try:
                         while not game.output_queue.empty():
                             msg = game.output_queue.get_nowait()
@@ -455,11 +468,11 @@ class LeagueState(BaseState):
                                     data["score_left"], 
                                     data["score_right"], 
                                     data["stats"], 
-                                    data["match_metadata"]
+                                    data.get("match_metadata")
                                 )
                                 return
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        print(f"Error checking match result: {e}")
                     return
 
                 # Fast mode only - visual mode is disabled for tournaments

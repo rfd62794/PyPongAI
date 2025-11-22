@@ -119,6 +119,7 @@ class ParallelGameEngine:
         self.output_queue = multiprocessing.Queue(maxsize=1) # Keep only latest state
         self.process = None
         self.latest_state = None
+        self.pending_match_result = None  # Store MATCH_RESULT separately
         
         # Mimic Game attributes for compatibility where possible
         self.score_left = 0
@@ -172,7 +173,8 @@ class ParallelGameEngine:
                 if item.get("type") == "READY":
                     continue
                 if item.get("type") == "MATCH_RESULT":
-                    # This shouldn't happen in normal update loop, but just in case
+                    # Store MATCH_RESULT separately so it doesn't get lost
+                    self.pending_match_result = item
                     continue 
                 new_state = item
         except multiprocessing.queues.Empty:
@@ -203,6 +205,18 @@ class ParallelGameEngine:
             "score_right": 0,
             "game_over": False
         }
+    
+    def check_match_result(self):
+        """
+        Check if there's a pending MATCH_RESULT message.
+        Returns the result data if available, None otherwise.
+        This consumes the message (removes it after reading).
+        """
+        if self.pending_match_result:
+            result = self.pending_match_result
+            self.pending_match_result = None
+            return result
+        return None
         
     def play_match(self, match_config, record_match=False):
         """
