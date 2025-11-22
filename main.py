@@ -1,6 +1,6 @@
 import patch_neat
 import pygame
-import config
+from core import config
 from states.manager import StateManager
 from states.menu import MenuState
 from states.game import GameState

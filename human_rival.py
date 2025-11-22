@@ -1,6 +1,6 @@
 import os
 import json
-import config
+from core import config
 from ai import model_manager
 
 STATS_FILE = os.path.join(config.DATA_DIR, "human_stats.json")
