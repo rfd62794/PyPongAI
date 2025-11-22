@@ -174,9 +174,10 @@ class LeagueState(BaseState):
                 "p1_path": self.match_queue[0][0],
                 "p2_path": self.match_queue[0][1],
                 "neat_config_path": config_path,
-                "metadata": metadata
+                "show_visuals": self.show_visuals,
+                "record_match": self.record_matches
             }
-            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config, "record_match": self.record_matches})
+            game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
             return
 
         # VISUAL MODE: Load Genomes locally
