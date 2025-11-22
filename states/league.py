@@ -14,7 +14,6 @@ from match.recorder import MatchRecorder
 from match import database as match_database
 from match.parallel_engine import ParallelGameEngine
 from match.analyzer import MatchAnalyzer
-from match import database as match_database
 from agent_factory import AgentFactory
 
 class LeagueState(BaseState):
