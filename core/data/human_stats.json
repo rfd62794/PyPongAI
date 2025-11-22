@@ -1,5 +1,5 @@
 {
     "best_score": 0,
-    "rival_model": "c:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\core\\data\\models\\visual_winner.pkl",
-    "rival_fitness": 100
+    "rival_model": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\November_2025\\PyPongAI\\core\\data\\models\\visual_winner.pkl",
+    "rival_fitness": 80
 }
