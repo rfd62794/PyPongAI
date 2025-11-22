@@ -122,20 +122,6 @@ class LeagueState(BaseState):
             print("Not enough models for a tournament!")
             return
 
-        self.mode = "RUNNING"
-        self.completed_matches = 0
-        self.match_queue = []
-        
-        # Create Round Robin Schedule
-        for i in range(len(self.models)):
-            for j in range(i + 1, len(self.models)):
-                self.match_queue.append((self.models[i], self.models[j]))
-        if p1_path in self.deleted_models or p2_path in self.deleted_models:
-            self.start_next_match()
-            return
-
-        # Choose engine based on visuals setting
-        target_fps = 60 if self.show_visuals else 0
         game_instance = ParallelGameEngine(visual_mode=self.show_visuals, target_fps=target_fps)
         game_instance.start()
 
