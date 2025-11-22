@@ -8,13 +8,13 @@ import game_simulator
 import sys
 import math
 from states.base import BaseState
-from model_manager import get_fitness_from_filename, delete_models
+from ai.model_manager import get_fitness_from_filename, delete_models
 from utils import elo_manager
 from match.recorder import MatchRecorder
 from match import database as match_database
 from match.parallel_engine import ParallelGameEngine
 from match.analyzer import MatchAnalyzer
-from agent_factory import AgentFactory
+from ai.agent_factory import AgentFactory
 
 class LeagueState(BaseState):
     def __init__(self, manager):
