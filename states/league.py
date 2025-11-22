@@ -173,9 +173,7 @@ class LeagueState(BaseState):
             match_config = {
                 "p1_path": self.match_queue[0][0],
                 "p2_path": self.match_queue[0][1],
-                "neat_config_path": config_path,
-                "show_visuals": self.show_visuals,
-                "record_match": self.record_matches
+                "neat_config_path": config_path
             }
             game_instance.input_queue.put({"type": "PLAY_MATCH", "config": match_config})
             return

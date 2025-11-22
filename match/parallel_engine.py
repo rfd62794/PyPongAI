@@ -23,7 +23,6 @@ def _run_fast_match(match_config, record_match=False):
     p1_path = match_config["p1_path"]
     p2_path = match_config["p2_path"]
     neat_config_path = match_config["neat_config_path"]
-    metadata = match_config["metadata"]
     
     # Load Agents using Factory
     agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
@@ -35,8 +34,7 @@ def _run_fast_match(match_config, record_match=False):
         agent2, 
         p1_name=os.path.basename(p1_path), 
         p2_name=os.path.basename(p2_path),
-        record_match=record_match,
-        metadata=metadata
+        record_match=record_match
     )
     
     return simulator.run()
