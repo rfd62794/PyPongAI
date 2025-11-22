@@ -9,10 +9,10 @@ from core import engine as game_engine
 import sys
 import itertools
 from states.base import BaseState
-from core.model_manager import get_best_model, get_fitness_from_filename
-from opponents import get_rule_based_move
+from states.manager import get_best_model, get_fitness_from_filename
+from states.opponents import get_rule_based_move
 import training_logger
-from match.parallel_engine import ParallelGameEngine
+from states.match.parallel_engine import ParallelGameEngine
 
 class UIProgressReporter(neat.reporting.BaseReporter):
     def __init__(self, screen, logger=None):
