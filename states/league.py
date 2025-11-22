@@ -206,6 +206,10 @@ class LeagueState(BaseState):
             elo_manager.remove_elo(os.path.basename(loser_path))
 
     def finish_match(self, score1, score2, stats, match_metadata):
+        if not self.current_match:
+            print("Error: finish_match called but no current match!")
+            return
+        
         match = self.current_match
         p1 = match["p1"]
         p2 = match["p2"]
@@ -270,9 +274,20 @@ class LeagueState(BaseState):
         
         # Check if tournament is complete
         if self.completed_matches >= self.total_matches:
+            print("All matches completed!")
             self.finish_tournament()
         else:
-            self.start_next_match()
+            try:
+                self.start_next_match()
+            except Exception as e:
+                print(f"Error starting next match: {e}")
+                import traceback
+                traceback.print_exc()
+                # Try to continue anyway
+                if self.match_queue:
+                    self.start_next_match()
+                else:
+                    self.finish_tournament()
 
     def prune_similar_models(self):
         """Prunes models that are too similar in fitness."""
