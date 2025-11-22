@@ -1,5 +1,5 @@
-import config
-import game_simulator
+from core import config
+from core import simulator as game_simulator
 from .analyzer import MatchAnalyzer
 from .recorder import MatchRecorder
 import os

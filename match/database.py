@@ -1,6 +1,6 @@
 import json
 import os
-import config
+from core import config
 from typing import List, Dict, Optional
 
 MATCH_INDEX_FILE = os.path.join(config.DATA_DIR, "match_index.json")

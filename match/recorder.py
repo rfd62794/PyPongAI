@@ -1,7 +1,7 @@
 import json
 import os
 import time
-import config
+from core import config
 import uuid
 from . import database as match_database
 
