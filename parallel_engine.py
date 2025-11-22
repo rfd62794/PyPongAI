@@ -9,6 +9,7 @@ import os
 from match_analyzer import MatchAnalyzer
 from match_recorder import MatchRecorder
 from agent_factory import AgentFactory
+from match_simulator import MatchSimulator
 
 def _run_fast_match(match_config, record_match=False):
     """
@@ -23,59 +24,17 @@ def _run_fast_match(match_config, record_match=False):
     agent1 = AgentFactory.create_agent(p1_path, neat_config_path)
     agent2 = AgentFactory.create_agent(p2_path, neat_config_path)
     
-    # Initialize Game Components
-    game = game_simulator.GameSimulator()
-    analyzer = MatchAnalyzer()
-    recorder = None
-    if record_match:
-        recorder = MatchRecorder(
-            os.path.basename(p1_path), 
-            os.path.basename(p2_path),
-            match_type="tournament",
-            metadata=metadata
-        )
+    # Run Match using Simulator
+    simulator = MatchSimulator(
+        agent1, 
+        agent2, 
+        p1_name=os.path.basename(p1_path), 
+        p2_name=os.path.basename(p2_path),
+        record_match=record_match,
+        metadata=metadata
+    )
     
-    # Run Match Loop
-    target_score = config.MAX_SCORE
-    running = True
-    
-    while running:
-        state = game.get_state()
-        
-        # Update Analyzer & Recorder
-        analyzer.update(state)
-        if recorder:
-            recorder.record_frame(state)
-        
-        # AI 1 (Left)
-        left_move = agent1.get_move(state, "left")
-        
-        # AI 2 (Right)
-        right_move = agent2.get_move(state, "right")
-        
-        # Update Game
-        game.update(left_move, right_move)
-        
-        # Check End Condition
-        if game.score_left >= target_score or game.score_right >= target_score:
-            running = False
-            
-    # Compile Results
-    stats = analyzer.get_stats()
-    match_metadata = None
-    if recorder:
-        match_metadata = recorder.save()
-    
-    # We don't index here because the main process handles ELO updates and then re-indexes if needed.
-    # Actually, the main process expects to handle ELO updates.
-    # But we can return the match_metadata so the main process can index it properly after ELO updates.
-    
-    return {
-        "score_left": game.score_left,
-        "score_right": game.score_right,
-        "stats": stats,
-        "match_metadata": match_metadata
-    }
+    return simulator.run()
 
 def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     """
