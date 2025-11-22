@@ -131,29 +131,6 @@ class LeagueState(BaseState):
         for i in range(len(self.models)):
             for j in range(i + 1, len(self.models)):
                 self.match_queue.append((self.models[i], self.models[j]))
-        
-        import random
-        random.shuffle(self.match_queue)
-        
-        self.total_matches = len(self.match_queue)
-        
-        # Setup NEAT config
-        local_dir = os.path.dirname(os.path.dirname(__file__))
-        config_path = os.path.join(local_dir, 'neat_config.txt')
-        self.config_neat = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                                  neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                                  config_path)
-                                  
-        self.start_next_match()
-
-    def start_next_match(self):
-        if not self.match_queue:
-            self.finish_tournament()
-            return
-            
-        p1_path, p2_path = self.match_queue.pop(0)
-        
-        # Check if models still exist (might have been deleted)
         if p1_path in self.deleted_models or p2_path in self.deleted_models:
             self.start_next_match()
             return
