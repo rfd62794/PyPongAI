@@ -33,6 +33,16 @@ def get_curriculum_ball_speed():
     return _curriculum_ball_speed
 
 
+def _create_network(genome, config_neat):
+    """Creates a neural network for the given genome, preferring recurrent nets."""
+    try:
+        net = neat.nn.RecurrentNetwork.create(genome, config_neat)
+        net.reset()
+    except Exception:
+        net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
+    return net
+
+
 def eval_genomes(genomes, config_neat, ball_speed=None):
     """Evaluates genomes by playing against a rule-based opponent.
     
@@ -45,8 +55,7 @@ def eval_genomes(genomes, config_neat, ball_speed=None):
         config_neat: NEAT configuration object.
     """
     for genome_id, genome in genomes:
-        net = neat.nn.RecurrentNetwork.create(genome, config_neat)
-        net.reset()  # Reset RNN state
+        net = _create_network(genome, config_neat)
         genome.fitness = 0
         
         game = game_simulator.GameSimulator(ball_speed=ball_speed or get_curriculum_ball_speed())
