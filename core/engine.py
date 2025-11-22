@@ -121,7 +121,8 @@ class Game:
             self.ball.reset()
             
         # Check for Game Over
-        if self.score_left >= config.MAX_SCORE or self.score_right >= config.MAX_SCORE:
+        if (self.score_left >= config.VISUAL_MAX_SCORE or
+                self.score_right >= config.VISUAL_MAX_SCORE):
             if score_data is None:
                  score_data = self.get_state()
             score_data["game_over"] = True
