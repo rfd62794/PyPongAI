@@ -1,17 +1,22 @@
 """Training reporters providing UI feedback during NEAT evolution."""
 
+import copy
+import csv
 import datetime
 import os
 import pickle
+import statistics
 import sys
 from typing import Optional
 
 import neat
 import pygame
 
-from core import config
+from ai import ai_module
 from ai.opponents import get_rule_based_move
+from core import config
 from match.parallel_engine import ParallelGameEngine
+from validation import validate_genome
 
 
 class UIProgressReporter(neat.reporting.BaseReporter):
@@ -218,3 +223,75 @@ class VisualReporter(neat.reporting.BaseReporter):
                 running = False
 
         game.stop()
+
+
+class ValidationReporter(neat.reporting.BaseReporter):
+    """Reporter that validates top genomes against rule-based opponents."""
+
+    def __init__(self):
+        self.generation = 0
+
+    def start_generation(self, generation: int) -> None:
+        self.generation = generation
+
+    def end_generation(self, config_neat, population, species_set) -> None:
+        best_genome = None
+        best_fitness = -float("inf")
+        for genome in population.values():
+            if genome.fitness is None:
+                continue
+            if genome.fitness > best_fitness:
+                best_fitness = genome.fitness
+                best_genome = genome
+
+        if not best_genome:
+            return
+
+        avg_rally, win_rate = validate_genome(best_genome, config_neat, generation=self.generation)
+        print(
+            f"   [Validation] Best Genome vs Rule-Based: Avg Rally={avg_rally:.2f}, "
+            f"Win Rate={win_rate:.2f}"
+        )
+
+        if self.generation % 5 == 0:
+            ai_module.HALL_OF_FAME.append(copy.deepcopy(best_genome))
+            print(f"   [HOF] Added Best Genome to Hall of Fame. Size: {len(ai_module.HALL_OF_FAME)}")
+
+
+class CSVReporter(neat.reporting.BaseReporter):
+    """Reporter that logs generation statistics to CSV."""
+
+    def __init__(self, csv_path: str):
+        self.csv_path = csv_path
+        self.generation = 0
+
+    def start_generation(self, generation: int) -> None:
+        self.generation = generation
+
+    def end_generation(self, config_neat, population, species_set) -> None:
+        fitnesses = [g.fitness for g in population.values() if g.fitness is not None]
+        max_f = max(fitnesses) if fitnesses else 0
+        avg_f = sum(fitnesses) / len(fitnesses) if fitnesses else 0
+        std = statistics.stdev(fitnesses) if len(fitnesses) > 1 else 0
+
+        best_genome = None
+        best_fitness = -float("inf")
+        for genome in population.values():
+            if genome.fitness is None:
+                continue
+            if genome.fitness > best_fitness:
+                best_fitness = genome.fitness
+                best_genome = genome
+
+        val_rally = 0
+        val_win = 0
+        if best_genome:
+            val_rally, val_win = validate_genome(best_genome, config_neat, generation=self.generation)
+            print(
+                f"   [Validation] Best Genome vs Rule-Based: Avg Rally={val_rally:.2f}, "
+                f"Win Rate={val_win:.2f}"
+            )
+
+        with open(self.csv_path, "a", newline="") as fh:
+            writer = csv.writer(fh)
+            writer.writerow([self.generation, max_f, avg_f, std, val_rally, val_win])
