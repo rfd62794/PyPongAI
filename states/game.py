@@ -5,7 +5,7 @@ import os
 from core import config
 from states.base import BaseState
 from match.parallel_engine import ParallelGameEngine
-from game_recorder import GameRecorder
+from core.recorder import GameRecorder
 from human_rival import HumanRival
 
 class GameState(BaseState):

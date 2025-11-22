@@ -9,7 +9,7 @@ from core import engine as game_engine
 import sys
 import itertools
 from states.base import BaseState
-from model_manager import get_best_model, get_fitness_from_filename
+from core.model_manager import get_best_model, get_fitness_from_filename
 from opponents import get_rule_based_move
 import training_logger
 from match.parallel_engine import ParallelGameEngine
