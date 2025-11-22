@@ -10,7 +10,7 @@ import sys
 import itertools
 from states.base import BaseState
 from ai.model_manager import get_best_model, get_fitness_from_filename
-from states.opponents import get_rule_based_move
+from ai.opponents import get_rule_based_move
 import training_logger
 from states.match.parallel_engine import ParallelGameEngine
 
