@@ -9,11 +9,24 @@ import sys
 import os
 from functools import partial
 
-# Add root to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Prevent importing main.py in worker processes
+if __name__ == "__main__" or "__mp_main__" in sys.modules:
+    # This is a worker process - don't import pygame-dependent modules
+    pass
 
-from core import config
-from core import simulator as game_simulator
+# Add root to path
+_root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _root_dir not in sys.path:
+    sys.path.insert(0, _root_dir)
+
+# Import only what we need - avoid importing main.py
+try:
+    from core import config
+    from core import simulator as game_simulator
+except ImportError:
+    # Will import in worker function if needed
+    config = None
+    game_simulator = None
 
 
 def _run_training_match(match_data):
@@ -29,8 +42,21 @@ def _run_training_match(match_data):
     Returns:
         Dict with match results and contact metrics
     """
+    # Import here to avoid issues in worker processes
     import pickle
     import neat
+    
+    try:
+        from core import config
+        from core import simulator as game_simulator
+    except ImportError:
+        return {
+            "match_result": 0.5,
+            "contact_metrics": [],
+            "score_left": 0,
+            "score_right": 0,
+            "error": "Failed to import required modules in worker process"
+        }
     
     genome_left_pickle = match_data["genome_left_pickle"]
     genome_right_pickle = match_data["genome_right_pickle"]
@@ -158,8 +184,15 @@ class ConcurrentTrainingExecutor:
         """
         self.config_path = config_path
         self.max_workers = max_workers or max(1, multiprocessing.cpu_count() - 1)
-        if sys.platform == 'win32':
-            multiprocessing.set_start_method('spawn', force=True)
+        # Only set start method if not already set
+        try:
+            if sys.platform == 'win32':
+                current_method = multiprocessing.get_start_method(allow_none=True)
+                if current_method != 'spawn':
+                    multiprocessing.set_start_method('spawn', force=True)
+        except RuntimeError:
+            # Start method already set, ignore
+            pass
         self.pool = multiprocessing.Pool(processes=self.max_workers)
     
     def execute_matches(self, genome_pairs, config_path=None):

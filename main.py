@@ -1,18 +1,26 @@
-import patch_neat
-import pygame
-from core import config
-from states.manager import StateManager
-from states.menu import MenuState
-from states.game import GameState
-from states.lobby import LobbyState
-from states.train import TrainState
-from states.models import ModelState
-from states.analytics import AnalyticsState
-from states.league import LeagueState
-from states.replay import ReplayState
-from states.settings import SettingsState
+# Guard to prevent execution when imported by multiprocessing worker processes
+if __name__ == "__main__" or (hasattr(__import__("sys"), "argv") and len(__import__("sys").argv) > 0 and not __import__("sys").argv[0].endswith("spawn_main")):
+    import patch_neat
+    import pygame
+    from core import config
+    from states.manager import StateManager
+    from states.menu import MenuState
+    from states.game import GameState
+    from states.lobby import LobbyState
+    from states.train import TrainState
+    from states.models import ModelState
+    from states.analytics import AnalyticsState
+    from states.league import LeagueState
+    from states.replay import ReplayState
+    from states.settings import SettingsState
 
 def main():
+    # Only initialize pygame if we're actually running the main program
+    # This prevents issues when main.py is imported by multiprocessing workers
+    import sys
+    if len(sys.argv) > 0 and sys.argv[0].endswith("spawn_main"):
+        return  # Don't run if we're a worker process
+    
     pygame.init()
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption("Project PaddleMind")
