@@ -14,6 +14,7 @@ from match.recorder import MatchRecorder
 from match import database as match_database
 from match.parallel_engine import ParallelGameEngine
 from match.analyzer import MatchAnalyzer
+from match.concurrent_executor import ConcurrentMatchExecutor
 from ai.agent_factory import AgentFactory
 
 class LeagueState(BaseState):
@@ -41,6 +42,11 @@ class LeagueState(BaseState):
         self.deleted_models = []
         self.deletion_reasons = {} # {path: reason}
         self.shutout_deletions = 0
+        
+        # Concurrent execution
+        self.use_concurrent = True  # Use concurrent execution when visual mode is off
+        self.concurrent_executor = None
+        self.batch_size = 10  # Process matches in batches
         
         # Dashboard Button
         self.dashboard_button = pygame.Rect(config.SCREEN_WIDTH - 220, config.SCREEN_HEIGHT - 60, 200, 40)
@@ -135,49 +141,57 @@ class LeagueState(BaseState):
         print(f"Tournament: {self.total_matches} matches scheduled for {len(self.models)} models")
         
         # Force fast mode for tournaments (visual mode is too slow for round-robin)
-        # Visual mode can be used for individual matches, but tournaments need speed
         self.show_visuals = False
-        target_fps = 0
-        game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
-        game_instance.start()
+        
+        # Initialize concurrent executor if enabled
+        if self.use_concurrent and not self.show_visuals:
+            self.concurrent_executor = ConcurrentMatchExecutor(visual_mode=False)
+            print(f"Using concurrent execution with {self.concurrent_executor.max_workers} workers")
+            # Process matches in batches concurrently
+            self.process_matches_concurrently()
+        else:
+            # Sequential execution (fallback or visual mode)
+            target_fps = 0
+            game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+            game_instance.start()
 
-        self.current_match = {
-            "p1": self.match_queue[0][0],
-            "p2": self.match_queue[0][1],
-            "game": game_instance,
-            "net1": None,
-            "net2": None,
-            "is_visual": self.show_visuals,
-            "waiting_for_result": not self.show_visuals
-        }
-        
-        # FAST MODE: Send command to run full match in background
-        local_dir = os.path.dirname(os.path.dirname(__file__))
-        config_path = os.path.join(local_dir, 'neat_config.txt')
-        
-        p1_path = self.match_queue[0][0]
-        p2_path = self.match_queue[0][1]
-        
-        match_config = {
-            "p1_path": p1_path,
-            "p2_path": p2_path,
-            "neat_config_path": config_path
-        }
-        
-        # Add metadata if recording
-        if self.record_matches:
-            match_config["metadata"] = {
-                "p1_fitness": self.model_stats[p1_path]["fitness"],
-                "p2_fitness": self.model_stats[p2_path]["fitness"],
-                "p1_elo_before": self.model_stats[p1_path]["elo"],
-                "p2_elo_before": self.model_stats[p2_path]["elo"]
+            self.current_match = {
+                "p1": self.match_queue[0][0],
+                "p2": self.match_queue[0][1],
+                "game": game_instance,
+                "net1": None,
+                "net2": None,
+                "is_visual": self.show_visuals,
+                "waiting_for_result": not self.show_visuals
             }
-        
-        game_instance.input_queue.put({
-            "type": "PLAY_MATCH", 
-            "config": match_config,
-            "record_match": self.record_matches
-        })
+            
+            # FAST MODE: Send command to run full match in background
+            local_dir = os.path.dirname(os.path.dirname(__file__))
+            config_path = os.path.join(local_dir, 'neat_config.txt')
+            
+            p1_path = self.match_queue[0][0]
+            p2_path = self.match_queue[0][1]
+            
+            match_config = {
+                "p1_path": p1_path,
+                "p2_path": p2_path,
+                "neat_config_path": config_path
+            }
+            
+            # Add metadata if recording
+            if self.record_matches:
+                match_config["metadata"] = {
+                    "p1_fitness": self.model_stats[p1_path]["fitness"],
+                    "p2_fitness": self.model_stats[p2_path]["fitness"],
+                    "p1_elo_before": self.model_stats[p1_path]["elo"],
+                    "p2_elo_before": self.model_stats[p2_path]["elo"]
+                }
+            
+            game_instance.input_queue.put({
+                "type": "PLAY_MATCH", 
+                "config": match_config,
+                "record_match": self.record_matches
+            })
 
     def calculate_elo_change(self, rating_a, rating_b, score_a, score_b):
         """Calculates ELO change based on match outcome."""
@@ -292,6 +306,92 @@ class LeagueState(BaseState):
                     self.start_next_match()
                 else:
                     self.finish_tournament()
+
+    def process_matches_concurrently(self):
+        """Process matches in batches using concurrent execution."""
+        if not self.concurrent_executor:
+            return
+        
+        local_dir = os.path.dirname(os.path.dirname(__file__))
+        config_path = os.path.join(local_dir, 'neat_config.txt')
+        
+        # Process matches in batches
+        batch_num = 0
+        while self.match_queue:
+            # Get next batch
+            batch = self.match_queue[:self.batch_size]
+            self.match_queue = self.match_queue[self.batch_size:]
+            
+            if not batch:
+                break
+            
+            batch_num += 1
+            print(f"Processing batch {batch_num} ({len(batch)} matches)...")
+            
+            # Prepare match configs
+            match_configs = []
+            for p1_path, p2_path in batch:
+                # Skip if either model is deleted
+                if p1_path in self.deleted_models or p2_path in self.deleted_models:
+                    self.completed_matches += 1
+                    continue
+                
+                if not os.path.exists(p1_path) or not os.path.exists(p2_path):
+                    self.completed_matches += 1
+                    continue
+                
+                match_config = {
+                    "p1_path": p1_path,
+                    "p2_path": p2_path,
+                    "neat_config_path": config_path,
+                    "record_match": self.record_matches
+                }
+                
+                if self.record_matches:
+                    match_config["metadata"] = {
+                        "p1_fitness": self.model_stats[p1_path]["fitness"],
+                        "p2_fitness": self.model_stats[p2_path]["fitness"],
+                        "p1_elo_before": self.model_stats[p1_path]["elo"],
+                        "p2_elo_before": self.model_stats[p2_path]["elo"]
+                    }
+                
+                match_configs.append(match_config)
+            
+            if not match_configs:
+                continue
+            
+            # Execute batch concurrently
+            results = self.concurrent_executor.execute_matches(match_configs)
+            
+            # Process results
+            for i, result in enumerate(results):
+                if i >= len(batch):
+                    break
+                
+                p1_path, p2_path = batch[i]
+                
+                # Handle errors
+                if result.get("error"):
+                    print(f"Match error: {result['error']} - skipping")
+                    self.completed_matches += 1
+                    continue
+                
+                # Finish match
+                self.finish_match(
+                    result.get("score_left", 0),
+                    result.get("score_right", 0),
+                    result.get("stats", {"left": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}, 
+                                        "right": {"hits": 0, "distance": 0, "reaction_sum": 0, "reaction_count": 0}}),
+                    result.get("match_metadata")
+                )
+        
+        # Clean up
+        if self.concurrent_executor:
+            self.concurrent_executor.close()
+            self.concurrent_executor = None
+        
+        # Tournament complete
+        self.finish_tournament()
 
     def remove_matches_with_model(self, model_path):
         """Remove all matches from the queue that involve a deleted model."""
