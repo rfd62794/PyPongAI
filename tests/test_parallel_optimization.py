@@ -2,6 +2,11 @@ import unittest
 import multiprocessing
 import time
 import os
+import sys
+
+# Add parent directory to path so we can import project modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import neat
 import pickle
 from core import config
@@ -10,7 +15,7 @@ from match.parallel_engine import ParallelGameEngine
 class TestParallelOptimization(unittest.TestCase):
     def setUp(self):
         # Setup paths
-        self.config_path = os.path.join(os.path.dirname(__file__), 'neat_config.txt')
+        self.config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'neat_config.txt')
         self.p1_path = "test_p1.pkl"
         self.p2_path = "test_p2.pkl"
         
