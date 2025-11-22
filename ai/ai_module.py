@@ -7,11 +7,11 @@ competitive ELO-based evaluation and self-play.
 
 import neat
 import pygame
-import config
-import game_engine
-import game_simulator
+from core import config
+from core import engine as game_engine
+from core import simulator as game_simulator
 import random
-from opponents import get_rule_based_move
+from .opponents import get_rule_based_move
 from novelty_search import NoveltyArchive, calculate_bc_from_contacts
 
 
@@ -285,8 +285,8 @@ def validate_genome(genome, config_neat, generation=0, record_matches=True):
     Validates a genome by playing a match against the Rule-Based AI.
     Returns: (avg_rally_length, win_rate)
     """
-    from match_recorder import MatchRecorder
-    import match_database
+    from match.recorder import MatchRecorder
+    from match import database as match_database
     
     net = neat.nn.FeedForwardNetwork.create(genome, config_neat)
     

@@ -4,7 +4,7 @@ This module provides simple rule-based opponent implementations that can be used
 for training and testing NEAT-evolved AI agents.
 """
 
-import config
+from core import config
 
 
 def get_rule_based_move(game_state, paddle="right"):
