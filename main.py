@@ -1,6 +1,8 @@
-# Guard to prevent execution when imported by multiprocessing worker processes
-if __name__ == "__main__" or (hasattr(__import__("sys"), "argv") and len(__import__("sys").argv) > 0 and not __import__("sys").argv[0].endswith("spawn_main")):
-    import patch_neat
+import patch_neat
+
+def main():
+    # Import pygame and other modules only when actually running main
+    # This prevents issues when main.py is imported by multiprocessing workers
     import pygame
     from core import config
     from states.manager import StateManager
@@ -13,13 +15,6 @@ if __name__ == "__main__" or (hasattr(__import__("sys"), "argv") and len(__impor
     from states.league import LeagueState
     from states.replay import ReplayState
     from states.settings import SettingsState
-
-def main():
-    # Only initialize pygame if we're actually running the main program
-    # This prevents issues when main.py is imported by multiprocessing workers
-    import sys
-    if len(sys.argv) > 0 and sys.argv[0].endswith("spawn_main"):
-        return  # Don't run if we're a worker process
     
     pygame.init()
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
