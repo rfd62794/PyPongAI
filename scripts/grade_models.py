@@ -2,7 +2,7 @@ import os
 import pickle
 import neat
 from core import config
-from game_engine import Game
+from core.engine import Game
 import sys
 
 def load_genome(path):

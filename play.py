@@ -4,7 +4,7 @@ import neat
 import os
 import pickle
 from core import config
-from game_engine import Game
+from core.engine import Game
 from human_rival import HumanRival
 import sys
 
@@ -168,7 +168,7 @@ def play_game():
     game_over = False
     
     # Initialize Recorder
-    from game_recorder import GameRecorder
+    from core.recorder import GameRecorder
     recorder = GameRecorder()
     
     print("\n[!] Starting Match vs AI...")
