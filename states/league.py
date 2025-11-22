@@ -262,11 +262,11 @@ class LeagueState(BaseState):
             match_metadata["p2_elo_after"] = self.model_stats[p2]["elo"]
             match_database.index_match(match_metadata)
         
-        # Clean up engine
-        if match["game"]:
-            match["game"].stop()
+        # Don't stop the engine - we'll reuse it for the next match
+        # Only stop it when the tournament is complete
         
         self.completed_matches += 1
+        print(f"Match {self.completed_matches}/{self.total_matches} completed: {os.path.basename(p1)} vs {os.path.basename(p2)} - {score1}-{score2}")
         
         # Check if tournament is complete
         if self.completed_matches >= self.total_matches:
@@ -300,11 +300,7 @@ class LeagueState(BaseState):
 
     def start_next_match(self):
         """Starts the next match in the queue."""
-        if not self.match_queue:
-            self.finish_tournament()
-            return
-        
-        # Remove completed match from queue
+        # Remove completed match from queue (if any)
         if self.match_queue:
             self.match_queue.pop(0)
         
@@ -315,6 +311,11 @@ class LeagueState(BaseState):
         # Reuse the same engine for efficiency
         if self.current_match and self.current_match.get("game"):
             game_instance = self.current_match["game"]
+            # Make sure the engine process is still alive
+            if game_instance.process and not game_instance.process.is_alive():
+                print("Engine process died, restarting...")
+                game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
+                game_instance.start()
         else:
             game_instance = ParallelGameEngine(visual_mode=False, target_fps=0)
             game_instance.start()
@@ -342,7 +343,7 @@ class LeagueState(BaseState):
         }
         
         # Add metadata if recording
-        if self.record_matches and self.recorder:
+        if self.record_matches:
             match_config["metadata"] = {
                 "p1_fitness": self.model_stats[p1_path]["fitness"],
                 "p2_fitness": self.model_stats[p2_path]["fitness"],
@@ -350,6 +351,7 @@ class LeagueState(BaseState):
                 "p2_elo_before": self.model_stats[p2_path]["elo"]
             }
         
+        print(f"Starting match {self.completed_matches + 1}/{self.total_matches}: {os.path.basename(p1_path)} vs {os.path.basename(p2_path)}")
         game_instance.input_queue.put({
             "type": "PLAY_MATCH", 
             "config": match_config,
@@ -359,11 +361,12 @@ class LeagueState(BaseState):
     def finish_tournament(self):
         self.mode = "RESULTS"
         
-        # Clean up engine
+        # Clean up engine only when tournament is complete
         if self.current_match and self.current_match.get("game"):
             self.current_match["game"].stop()
             self.current_match = None
         
+        print(f"Tournament complete! {self.completed_matches} matches played.")
         self.prune_similar_models()
         
         # Final Ranking
