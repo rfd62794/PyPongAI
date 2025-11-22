@@ -2,7 +2,7 @@
 import patch_neat
 import neat
 import os
-import ai_module
+from ai import ai_module
 import config
 
 def test_training():

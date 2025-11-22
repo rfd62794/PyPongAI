@@ -3,13 +3,13 @@ import patch_neat
 import os
 import neat
 import pickle
-import ai_module
+from ai import ai_module
 # train.py
 import patch_neat
 import os
 import neat
 import pickle
-import ai_module
+from ai import ai_module
 import config
 import datetime
 from validation import validate_genome

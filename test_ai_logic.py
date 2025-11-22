@@ -241,14 +241,14 @@ class TestHallOfFame(unittest.TestCase):
     
     def test_hof_initialization(self):
         """Test Hall of Fame starts empty."""
-        import ai_module
+        from ai import ai_module
         
         # HOF should be a list
         self.assertIsInstance(ai_module.HALL_OF_FAME, list)
     
     def test_hof_storage(self):
         """Test genomes can be added to Hall of Fame."""
-        import ai_module
+        from ai import ai_module
         
         initial_len = len(ai_module.HALL_OF_FAME)
         mock_genome = Mock()

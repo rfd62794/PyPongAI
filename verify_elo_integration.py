@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-import ai_module
+from ai import ai_module
 import config
 
 class MockGenome:
