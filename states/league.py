@@ -10,8 +10,8 @@ import math
 from states.base import BaseState
 from model_manager import get_fitness_from_filename, delete_models
 import elo_manager
-from match_recorder import MatchRecorder
-import match_database
+from match.recorder import MatchRecorder
+from match import database as match_database
 from match.parallel_engine import ParallelGameEngine
 from match.analyzer import MatchAnalyzer
 from match import database as match_database
