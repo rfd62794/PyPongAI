@@ -5,7 +5,6 @@ import pickle
 import datetime
 from core import config
 from ai import ai_module
-import sys
 import itertools
 from states.base import BaseState
 from ai.model_manager import get_best_model, get_fitness_from_filename
