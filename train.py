@@ -32,11 +32,11 @@ def main():
     # Select eval function based on mode
     if args.mode == "research":
         eval_func = ai_module.eval_genomes_competitive
-        print("🔬 RESEARCH MODE: ELO + Novelty Search")
+        print("RESEARCH MODE: ELO + Novelty Search")
     else:
         # Assuming eval_genomes is the baseline ELO-only or simple evaluator
         eval_func = ai_module.eval_genomes 
-        print("📊 BASELINE MODE: ELO only")
+        print("BASELINE MODE: ELO only")
     
     # Run training
     print(f"Starting {args.generations}-generation training run...")
@@ -59,7 +59,7 @@ def main():
     with open(os.path.join(config.MODEL_DIR, "best_genome.pkl"), "wb") as f:
         pickle.dump(winner, f)
         
-    print(f"✅ Training complete. Best genome saved to {save_path}")
+    print(f"Training complete. Best genome saved to {save_path}")
     print(f"   Final Fitness: {winner.fitness:.2f}")
 
 if __name__ == "__main__":
