@@ -25,6 +25,7 @@ class AnalyticsState(BaseState):
         # UI Elements
         self.back_button = pygame.Rect(config.SCREEN_WIDTH - 110, 10, 100, 40)
         self.history_button = pygame.Rect(config.SCREEN_WIDTH - 230, 10, 110, 40)
+        self.compare_button = pygame.Rect(config.SCREEN_WIDTH - 350, 10, 110, 40)
 
     def enter(self, **kwargs):
         self.view = "OVERVIEW"
@@ -110,6 +111,10 @@ class AnalyticsState(BaseState):
             # History button (only in overview)
             if self.view == "OVERVIEW" and self.history_button.collidepoint(event.pos):
                 self.view = "MATCH_HISTORY"
+                return
+                
+            if self.view == "OVERVIEW" and self.compare_button.collidepoint(event.pos):
+                self.manager.change_state("compare")
                 return
             
             # View-specific handling
@@ -198,6 +203,10 @@ class AnalyticsState(BaseState):
         pygame.draw.rect(screen, (0, 0, 100), self.history_button)
         hist_text = self.small_font.render("History", True, config.WHITE)
         screen.blit(hist_text, (self.history_button.centerx - hist_text.get_width()//2, self.history_button.centery - hist_text.get_height()//2))
+        
+        pygame.draw.rect(screen, (0, 100, 100), self.compare_button)
+        comp_text = self.small_font.render("Compare", True, config.WHITE)
+        screen.blit(comp_text, (self.compare_button.centerx - comp_text.get_width()//2, self.compare_button.centery - comp_text.get_height()//2))
 
     def draw_model_detail(self, screen):
         screen.fill(config.BLACK)

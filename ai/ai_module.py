@@ -153,27 +153,27 @@ def calculate_new_rating(rating, expected_score, actual_score, k_factor=32):
 
 
 def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
-    """Evaluates genomes using competitive ELO-based matchmaking.
+    """Evaluates genomes using competitive ELO-based matchmaking with Novelty Search.
     
-    Each genome plays multiple matches against randomly selected opponents from
-    the population. Fitness is determined by final ELO rating after all matches.
-    This method encourages competitive evolution and provides more stable
-    fitness assessments than single-opponent evaluation.
-    
-    Args:
-        genomes: List of (genome_id, genome) tuples from NEAT population.
-        config_neat: NEAT configuration object.
+    Fitness = ELO_Rating + (NOVELTY_WEIGHT × Novelty_Score)
     """
+    import statistics
+    
     # Convert to list for easier indexing
     genome_list = list(genomes)
+    
+    # Track metrics for logging
+    generation_metrics = {
+        "elo_ratings": [],
+        "novelty_scores": [],
+        "behavioral_characteristics": [],
+        "fitness_values": [],
+    }
     
     # Initialize ELO ratings if not present
     for _, genome in genome_list:
         if not hasattr(genome, 'elo_rating'):
             genome.elo_rating = config.ELO_INITIAL_RATING
-        # We don't reset fitness to 0 here because we want to track ELO over time.
-        # However, NEAT expects fitness to be set for the current generation.
-        # We will set genome.fitness = genome.elo_rating at the end.
     
     # Number of matches per genome
     matches_per_genome = min(5, len(genome_list) - 1)
@@ -183,11 +183,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
     
     # Each genome plays multiple matches
     for idx, (genome_id, genome) in enumerate(genome_list):
-        # Create network for this genome
-        net_left = neat.nn.RecurrentNetwork.create(genome, config_neat)
-        net_left.reset()  # Reset RNN state
-        
-        # Track contact metrics for novelty search
+        net_left = _create_network(genome, config_neat)
         genome_contact_metrics[genome_id] = []
         
         # Select random opponents
@@ -196,23 +192,20 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
         
         for opp_idx in selected_opponents:
             opp_id, opp_genome = genome_list[opp_idx]
-            net_right = neat.nn.RecurrentNetwork.create(opp_genome, config_neat)
-            net_right.reset()  # Reset RNN state
+            net_right = _create_network(opp_genome, config_neat)
             
             # Play a match
             game = game_simulator.GameSimulator(ball_speed=ball_speed or get_curriculum_ball_speed())
             run = True
             frame_count = 0
-            max_frames = 3000  # Prevent infinite games
-            
-            # Match result: 1 for Left Win, 0 for Right Win, 0.5 for Draw
+            max_frames = 3000
             match_result = 0.5 
             
             while run and frame_count < max_frames:
                 frame_count += 1
                 state = game.get_state()
                 
-                # Left paddle (genome being evaluated)
+                # Left paddle
                 inputs_left = (
                     state["paddle_left_y"] / config.SCREEN_HEIGHT,
                     state["ball_x"] / config.SCREEN_WIDTH,
@@ -225,14 +218,9 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
                 )
                 output_left = net_left.activate(inputs_left)
                 action_idx_left = output_left.index(max(output_left))
+                left_move = "UP" if action_idx_left == 0 else "DOWN" if action_idx_left == 1 else None
                 
-                left_move = None
-                if action_idx_left == 0:
-                    left_move = "UP"
-                elif action_idx_left == 1:
-                    left_move = "DOWN"
-                
-                # Right paddle (opponent)
+                # Right paddle
                 inputs_right = (
                     state["paddle_right_y"] / config.SCREEN_HEIGHT,
                     state["ball_x"] / config.SCREEN_WIDTH,
@@ -240,68 +228,58 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
                     state["ball_vel_x"] / config.BALL_MAX_SPEED,
                     state["ball_vel_y"] / config.BALL_MAX_SPEED,
                     (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
-                    1.0 if state["ball_vel_x"] > 0 else 0.0,  # Incoming from right perspective
+                    1.0 if state["ball_vel_x"] > 0 else 0.0,
                     state["paddle_left_y"] / config.SCREEN_HEIGHT
                 )
                 output_right = net_right.activate(inputs_right)
                 action_idx_right = output_right.index(max(output_right))
+                right_move = "UP" if action_idx_right == 0 else "DOWN" if action_idx_right == 1 else None
                 
-                right_move = None
-                if action_idx_right == 0:
-                    right_move = "UP"
-                elif action_idx_right == 1:
-                    right_move = "DOWN"
-                
-                # Update game
                 score_data = game.update(left_move, right_move)
                 
-                # Collect contact metrics for novelty search
                 if score_data and (score_data.get("hit_left") or score_data.get("hit_right")):
                     genome_contact_metrics[genome_id].append(score_data)
                 
-                # Check for scoring
-                if score_data:
-                    if score_data.get("scored") == "left":
-                        match_result = 1.0 # Left Wins
-                        run = False
-                    elif score_data.get("scored") == "right":
-                        match_result = 0.0 # Right Wins (Left Loses)
-                        run = False
+                if score_data and score_data.get("scored"):
+                    match_result = 1.0 if score_data.get("scored") == "left" else 0.0
+                    run = False
             
-            # Calculate ELO updates
-            # Left Genome (genome) vs Right Genome (opp_genome)
-            rating_a = genome.elo_rating
-            rating_b = opp_genome.elo_rating
-            
-            expected_a = calculate_expected_score(rating_a, rating_b)
-            expected_b = calculate_expected_score(rating_b, rating_a)
-            
-            # Actual scores
+            # ELO Update
+            expected_a = calculate_expected_score(genome.elo_rating, opp_genome.elo_rating)
             actual_a = match_result
-            actual_b = 1.0 - match_result
+            genome.elo_rating = calculate_new_rating(genome.elo_rating, expected_a, actual_a, config.ELO_K_FACTOR)
+            opp_genome.elo_rating = calculate_new_rating(opp_genome.elo_rating, 1.0 - expected_a, 1.0 - actual_a, config.ELO_K_FACTOR)
             
-            # Update ratings
-            new_rating_a = calculate_new_rating(rating_a, expected_a, actual_a, config.ELO_K_FACTOR)
-            new_rating_b = calculate_new_rating(rating_b, expected_b, actual_b, config.ELO_K_FACTOR)
-            
-            genome.elo_rating = new_rating_a
-            opp_genome.elo_rating = new_rating_b
-            
-    # Set fitness to ELO rating + Novelty Score
+    # Apply Novelty Search and set final fitness
     for genome_id, genome in genome_list:
-        # Calculate behavioral characteristic from contact data
         bc = calculate_bc_from_contacts(genome_contact_metrics.get(genome_id, []))
         
         if bc is not None:
-            # Calculate novelty score
             novelty_score = NOVELTY_ARCHIVE.calculate_novelty(bc)
-            # Add to archive for future comparisons
             NOVELTY_ARCHIVE.add_bc(bc)
-            # Final fitness = ELO + weighted novelty
+            
             genome.fitness = max(0, genome.elo_rating + (config.NOVELTY_WEIGHT * novelty_score))
+            
+            generation_metrics["behavioral_characteristics"].append(bc)
+            generation_metrics["novelty_scores"].append(novelty_score)
         else:
-            # No contacts, just use ELO
             genome.fitness = max(0, genome.elo_rating)
+            generation_metrics["novelty_scores"].append(0)
+            
+        generation_metrics["elo_ratings"].append(genome.elo_rating)
+        generation_metrics["fitness_values"].append(genome.fitness)
+
+    # Log generation statistics
+    avg_elo = statistics.mean(generation_metrics["elo_ratings"])
+    avg_novelty = statistics.mean(generation_metrics["novelty_scores"])
+    
+    # Calculate diversity if enough data points exist
+    valid_bcs = [b for b in generation_metrics["behavioral_characteristics"] if b is not None]
+    bc_diversity = statistics.stdev(valid_bcs) if len(valid_bcs) > 1 else 0
+    
+    print(f"\n[GEN] Avg ELO: {avg_elo:.1f} | Avg Novelty: {avg_novelty:.1f} | BC Diversity: {bc_diversity:.2f}")
+    
+    return generation_metrics
 
 def validate_genome(genome, config_neat, generation=0, record_matches=True):
     """
