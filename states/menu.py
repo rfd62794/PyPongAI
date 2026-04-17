@@ -4,38 +4,41 @@ from core import config
 from states.base import BaseState
 
 class MenuState(BaseState):
-    """Modern main menu with clean grid layout."""
+    """Modern main menu with clean grid layout and premium aesthetics."""
     
     def __init__(self, manager):
         super().__init__(manager)
-        self.font_title = pygame.font.Font(None, 72)
-        self.font_button = pygame.font.Font(None, 36)
-        self.font_subtitle = pygame.font.Font(None, 24)
+        self.font_title = pygame.font.Font(None, config.FONT_TITLE_SIZE)
+        self.font_button = pygame.font.Font(None, config.FONT_BODY_SIZE)
+        self.font_subtitle = pygame.font.Font(None, config.FONT_SMALL_SIZE)
         
-        # Theme colors
-        self.bg_color = (15, 15, 25)
-        self.accent_color = (100, 200, 255)
-        self.button_color = (40, 40, 60)
-        self.button_hover = (60, 60, 90)
+        # UI Metrics
+        BUTTON_WIDTH = 280
+        BUTTON_HEIGHT = 60
+        GRID_SPACING = 30
         
-        # Button layout (clean 2x3 grid)
-        btn_width = 280
-        btn_height = 70
         center_x = config.SCREEN_WIDTH // 2
-        start_y = 200
-        spacing = 90
+        center_y = config.SCREEN_HEIGHT // 2 + 50 # Offset down to make room for title
+        
+        # Button layout (2 columns, 3 rows, centered)
+        left_x = center_x - BUTTON_WIDTH - GRID_SPACING // 2
+        right_x = center_x + GRID_SPACING // 2
+        
+        row1_y = center_y - (BUTTON_HEIGHT * 1.5 + GRID_SPACING)
+        row2_y = center_y - (BUTTON_HEIGHT * 0.5)
+        row3_y = center_y + (BUTTON_HEIGHT * 0.5 + GRID_SPACING)
         
         self.buttons = {
-            "play": pygame.Rect(center_x - btn_width - 20, start_y, btn_width, btn_height),
-            "train": pygame.Rect(center_x + 20, start_y, btn_width, btn_height),
-            "league": pygame.Rect(center_x - btn_width - 20, start_y + spacing, btn_width, btn_height),
-            "models": pygame.Rect(center_x + 20, start_y + spacing, btn_width, btn_height),
-            "analytics": pygame.Rect(center_x - btn_width - 20, start_y + spacing * 2, btn_width, btn_height),
-            "settings": pygame.Rect(center_x + 20, start_y + spacing * 2, btn_width, btn_height)
+            "play": pygame.Rect(left_x, row1_y, BUTTON_WIDTH, BUTTON_HEIGHT),
+            "train": pygame.Rect(right_x, row1_y, BUTTON_WIDTH, BUTTON_HEIGHT),
+            "league": pygame.Rect(left_x, row2_y, BUTTON_WIDTH, BUTTON_HEIGHT),
+            "models": pygame.Rect(right_x, row2_y, BUTTON_WIDTH, BUTTON_HEIGHT),
+            "analytics": pygame.Rect(left_x, row3_y, BUTTON_WIDTH, BUTTON_HEIGHT),
+            "settings": pygame.Rect(right_x, row3_y, BUTTON_WIDTH, BUTTON_HEIGHT)
         }
         
         # Bottom row
-        self.btn_quit = pygame.Rect(center_x - 100, config.SCREEN_HEIGHT - 80, 200, 50)
+        self.btn_quit = pygame.Rect(center_x - 100, config.SCREEN_HEIGHT - 70, 200, 45)
     
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -55,21 +58,40 @@ class MenuState(BaseState):
                 self.manager.change_state("settings")
             elif self.btn_quit.collidepoint((mx, my)):
                 pygame.quit()
-                exit()
+                sys.exit()
     
-    def draw(self, screen):
-        screen.fill(self.bg_color)
+    def _draw_button(self, screen, rect, text, is_hovered):
+        """Draws a themed button with hover effects and rounded corners."""
+        color = config.COLOR_BUTTON_HOVER if is_hovered else config.COLOR_BUTTON_DEFAULT
+        # Border
+        border_color = config.COLOR_ACCENT if is_hovered else (80, 80, 100)
         
-        # Title with glow effect
-        title = self.font_title.render("PyPongAI", True, self.accent_color)
-        title_shadow = self.font_title.render("PyPongAI", True, (50, 100, 150))
-        title_rect = title.get_rect(center=(config.SCREEN_WIDTH // 2, 80))
-        screen.blit(title_shadow, (title_rect.x + 3, title_rect.y + 3))
-        screen.blit(title, title_rect)
+        pygame.draw.rect(screen, color, rect, border_radius=12)
+        pygame.draw.rect(screen, border_color, rect, width=2, border_radius=12)
+        
+        # Text
+        text_color = config.COLOR_TEXT_PRIMARY if is_hovered else config.COLOR_TEXT_SECONDARY
+        text_surf = self.font_button.render(text, True, text_color)
+        text_rect = text_surf.get_rect(center=rect.center)
+        screen.blit(text_surf, text_rect)
+
+    def draw(self, screen):
+        screen.fill(config.COLOR_BACKGROUND)
+        
+        center_x = config.SCREEN_WIDTH // 2
+        
+        # Title with shadow effect
+        title_text = config.BRAND_NAME
+        title_surf = self.font_title.render(title_text, True, config.COLOR_ACCENT)
+        shadow_surf = self.font_title.render(title_text, True, (0, 0, 0))
+        
+        title_rect = title_surf.get_rect(center=(center_x, 80))
+        screen.blit(shadow_surf, (title_rect.x + 3, title_rect.y + 3))
+        screen.blit(title_surf, title_rect)
         
         # Subtitle
-        subtitle = self.font_subtitle.render("Advanced Neural Network Pong Training Platform", True, (150, 150, 150))
-        sub_rect = subtitle.get_rect(center=(config.SCREEN_WIDTH // 2, 130))
+        subtitle = self.font_subtitle.render(config.BRAND_SUBTITLE, True, config.COLOR_TEXT_SECONDARY)
+        sub_rect = subtitle.get_rect(center=(center_x, 135))
         screen.blit(subtitle, sub_rect)
         
         # Draw buttons
@@ -85,23 +107,14 @@ class MenuState(BaseState):
         }
         
         for key, rect in self.buttons.items():
-            # Button background
-            is_hover = rect.collidepoint((mx, my))
-            color = self.button_hover if is_hover else self.button_color
-            pygame.draw.rect(screen, color, rect, border_radius=10)
-            pygame.draw.rect(screen, self.accent_color if is_hover else (80, 80, 100), rect, 2, border_radius=10)
-            
-            # Button text
-            text = self.font_button.render(button_labels[key], True, (255, 255, 255) if is_hover else (200, 200, 200))
-            text_rect = text.get_rect(center=rect.center)
-            screen.blit(text, text_rect)
+            self._draw_button(screen, rect, button_labels[key], rect.collidepoint((mx, my)))
         
-        # Quit button
+        # Quit button (smaller, red-themed)
         is_hover_quit = self.btn_quit.collidepoint((mx, my))
-        quit_color = (120, 50, 50) if is_hover_quit else (80, 40, 40)
-        pygame.draw.rect(screen, quit_color, self.btn_quit, border_radius=8)
-        pygame.draw.rect(screen, (255, 100, 100) if is_hover_quit else (150, 70, 70), self.btn_quit, 2, border_radius=8)
+        quit_bg = (120, 50, 50) if is_hover_quit else (80, 40, 40)
+        pygame.draw.rect(screen, quit_bg, self.btn_quit, border_radius=10)
+        pygame.draw.rect(screen, config.COLOR_FAILURE if is_hover_quit else (150, 70, 70), self.btn_quit, 2, border_radius=10)
         
-        quit_text = self.font_button.render("Quit", True, (255, 200, 200))
-        quit_rect = quit_text.get_rect(center=self.btn_quit.center)
-        screen.blit(quit_text, quit_rect)
+        quit_surf = self.font_button.render("Quit", True, (255, 200, 200))
+        quit_rect = quit_surf.get_rect(center=self.btn_quit.center)
+        screen.blit(quit_surf, quit_rect)
