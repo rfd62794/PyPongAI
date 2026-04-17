@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core import config
-from game_simulator import GameSimulator, Paddle, Ball, Rect
+from core.simulator import GameSimulator, Paddle, Ball, Rect
 
 
 class TestRect(unittest.TestCase):
