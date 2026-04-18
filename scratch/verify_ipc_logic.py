@@ -2,32 +2,47 @@ import subprocess
 import json
 import time
 import os
+import sys
+from unittest.mock import MagicMock
+
+# Add project root to sys.path
+PRJ_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PRJ_ROOT not in sys.path:
+    sys.path.insert(0, PRJ_ROOT)
 
 def test_ipc_emission():
-    print("Testing IPC emission from PyPongAI...")
-    # Launch main.py as a subprocess
-    # We'll use a model that exists to ensure it can start a match
-    model_dir = "c:\\Github\\PyPongAI\\data\\models"
-    models = [f for f in os.listdir(model_dir) if f.endswith(".pkl")]
-    if not models:
-        print("No models found to test with.")
-        return
+    print(f"Testing IPC emission from PyPongAI (Root: {PRJ_ROOT})...")
     
-    model_path = os.path.join(model_dir, models[0])
-    print(f"Using model: {models[0]}")
-
-    # We need to simulate key presses to start the match
-    # Since we can't easily do that in a background test, 
-    # we'll just check if the code compiles and if we can see the 'RESEARCH MODE' etc.
-    # Actually, I'll try to use a mock or just verify the code logic.
-    
-    # Let's just run a quick check on the states/game.py code for syntax errors.
     try:
         import pygame
+        # Initialize pygame in headless mode for testing
+        os.environ['SDL_VIDEODRIVER'] = 'dummy'
+        pygame.init()
+        
         from states.game import GameState
-        print("GameState imported successfully.")
+        from core import config
+        
+        # Setup mock manager and state
+        mock_manager = MagicMock()
+        state = GameState(mock_manager)
+        
+        # Mock game object to avoid starting real threads/windows
+        state.game = MagicMock()
+        state.game.score_left = 5
+        state.game.score_right = 3
+        state.match_start_time = pygame.time.get_ticks() - 30000 # 30s ago
+        
+        print("Instantiated GameState, triggering IPC event...")
+        
+        # Call the actual emission method
+        state.emit_match_complete_event()
+        
+        print("\nTest completed. If you see a JSON object above, the IPC logic is working.")
+        
     except Exception as e:
-        print(f"Error importing GameState: {e}")
+        print(f"Error during IPC logic test: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     test_ipc_emission()
