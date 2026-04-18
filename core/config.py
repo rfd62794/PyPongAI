@@ -99,23 +99,26 @@ for d in [DATA_DIR, MODEL_DIR, LOG_DIR, LOGS_TRAINING_DIR, LOGS_MATCHES_DIR, LOG
 def apply_automation_overrides():
     """Apply devlog-optimized settings when running in automation mode."""
     global VISUAL_MAX_SCORE, BALL_SPEED_X, BALL_SPEED_Y, BALL_SPEED_INCREMENT
-    global PADDLE_SPEED, PADDLE_WIDTH, SPEED_INCREASE_PER_GEN, MAX_CURRICULUM_SPEED, BALL_MAX_SPEED
+    global PADDLE_SPEED, PADDLE_WIDTH, SPEED_INCREASE_PER_GEN, MAX_CURRICULUM_SPEED 
+    global BALL_MAX_SPEED, PADDLE_MAX_SPEED, FPS
     
     if os.getenv("PYPONGAI_AUTOMATION") != "true":
         return  # No overrides needed
     
-    # Override settings for devlog clip recording (Hyper-Fast Mode)
+    # Override settings for devlog clip recording (Ludicrous Speed Mode)
     VISUAL_MAX_SCORE = 3
-    BALL_SPEED_X = 8                # Significantly faster start
-    BALL_SPEED_Y = 8
+    FPS = 120                       # Double the frame rate for faster action
+    BALL_SPEED_X = 10               # Fast initial launch
+    BALL_SPEED_Y = 10
     BALL_SPEED_INCREMENT = 1.15     # Aggressive acceleration
-    BALL_MAX_SPEED = 25             # High cap for intense rallies
-    PADDLE_SPEED = 15               # Max paddle speed for fast tracking
+    BALL_MAX_SPEED = 40             # High cap for extreme rallies
+    PADDLE_MAX_SPEED = 40           # Allow paddles to move much faster
+    PADDLE_SPEED = 30               # Ultra-responsive paddles
     PADDLE_WIDTH = 25
     SPEED_INCREASE_PER_GEN = 0
     MAX_CURRICULUM_SPEED = BALL_SPEED_X
     
-    print("[DEVLOG MODE] Automation settings applied: 3-point matches, Hyper-Fast ball (8.0 base), max paddles")
+    print("[DEVLOG MODE] Automation settings applied: Ludicrous Speed (120 FPS), 3-point matches, ultra paddles")
 
 # Apply overrides on module load
 apply_automation_overrides()
