@@ -24,9 +24,8 @@ def benchmark():
                               neat.DefaultSpeciesSet, neat.DefaultStagnation,
                               config_path)
     
-    # Create a small population of 10 genomes for benchmarking
-    # (Matches current training defaults for quick tests)
-    pop_size = 10
+    # Create a larger population of 50 genomes for benchmarking
+    pop_size = 50
     p = neat.Population(config_neat)
     genomes = list(p.population.items())[:pop_size]
     
@@ -44,22 +43,28 @@ def benchmark():
     print(f"Serial Time: {serial_time:.2f} seconds")
     
     # Test 2: Parallel Evaluation
-    print("\nRunning PARALLEL Evaluation...")
+    print("\nRunning PARALLEL Evaluation (Run 1 - Pool Creation Overhead)...")
     os.environ["PYPONGAI_PARALLEL_EVAL"] = "true"
     num_cpus = mp.cpu_count()
     print(f"CPUs Detected: {num_cpus}")
     
-    start_parallel = time.time()
+    start_parallel1 = time.time()
     ai_module.eval_genomes_competitive(genomes, config_neat)
-    end_parallel = time.time()
-    parallel_time = end_parallel - start_parallel
+    end_parallel1 = time.time()
+    parallel_time1 = end_parallel1 - start_parallel1
+    print(f"Parallel Time (Run 1): {parallel_time1:.2f} seconds")
+
+    print("\nRunning PARALLEL Evaluation (Run 2 - Pooled / Persistent)...")
+    start_parallel2 = time.time()
+    ai_module.eval_genomes_competitive(genomes, config_neat)
+    end_parallel2 = time.time()
+    parallel_time2 = end_parallel2 - start_parallel2
+    print(f"Parallel Time (Run 2): {parallel_time2:.2f} seconds")
     
-    print(f"Parallel Time: {parallel_time:.2f} seconds")
-    
-    # Comparison
-    speedup = serial_time / parallel_time if parallel_time > 0 else 0
+    # Comparison using the faster run
+    speedup = serial_time / parallel_time2 if parallel_time2 > 0 else 0
     print("-" * 50)
-    print(f"TOTAL SPEEDUP: {speedup:.2f}x")
+    print(f"BEST SPEEDUP (Persistent): {speedup:.2f}x")
     print("=" * 50)
 
 if __name__ == "__main__":
