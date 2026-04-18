@@ -14,6 +14,17 @@ import pygame
 
 logger = logging.getLogger(__name__)
 
+# Permanent log file for debugging IPC
+BRIDGE_LOG = "logs/automation_bridge.log"
+import os
+os.makedirs("logs", exist_ok=True)
+with open(BRIDGE_LOG, "w") as f:
+    f.write("--- Automation Bridge Lifecycle Start ---\n")
+
+def log_to_file(msg):
+    with open(BRIDGE_LOG, "a") as f:
+        f.write(f"{msg}\n")
+
 
 class AutomationBridge:
     """
@@ -60,9 +71,11 @@ class AutomationBridge:
             return
         
         self.running = True
+        log_to_file("Starting listener thread...")
         self.thread = threading.Thread(target=self._listen_loop, daemon=True)
         self.thread.start()
         logger.info("Automation bridge started (listening on stdin)")
+        log_to_file("Listener thread started.")
     
     def stop(self):
         """Stop the automation bridge."""
@@ -78,11 +91,14 @@ class AutomationBridge:
             # We don't use 'for line in sys.stdin' because it's heavily buffered.
             # Reading line by line manually.
             while self.running:
+                log_to_file("Waiting for stdin line...")
                 line = sys.stdin.readline()
                 if not line:
+                    log_to_file("Received EOF on stdin")
                     break
                 
                 line = line.strip()
+                log_to_file(f"Received line: {line}")
                 if not line:
                     continue
                 
