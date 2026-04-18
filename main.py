@@ -1,11 +1,11 @@
 import patch_neat
 import os
+import pygame
 from core.automation_bridge import AutomationBridge
 
 def main():
     # Import pygame and other modules only when actually running main
     # This prevents issues when main.py is imported by multiprocessing workers
-    import pygame
     from core import config
     from states.manager import StateManager
     from states.menu import MenuState
