@@ -66,10 +66,22 @@ def main():
 if __name__ == "__main__":
     import logging
     import sys
+    import multiprocessing
+    
+    # Required for Windows multiprocessing support
+    multiprocessing.freeze_support()
+    
     logging.basicConfig(
         level=logging.INFO, 
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         handlers=[logging.StreamHandler(sys.stdout)]
     )
     
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        # Catch it here if it's not caught in main()
+        pass
+    finally:
+        # Final safety exit to prevent atexit tracebacks
+        sys.exit(0)
