@@ -27,6 +27,15 @@ _curriculum_ball_speed = None
 _EVAL_POOL = None # Persistent pool for parallel evaluation
 
 
+def cleanup_eval_pool():
+    """Closes the persistent evaluation pool if it exists."""
+    global _EVAL_POOL
+    if _EVAL_POOL is not None:
+        _EVAL_POOL.close()
+        _EVAL_POOL.join()
+        _EVAL_POOL = None
+
+
 def set_curriculum_ball_speed(speed):
     """Sets the shared curriculum ball speed used during training."""
     global _curriculum_ball_speed
