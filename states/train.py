@@ -23,6 +23,11 @@ class TrainState(BaseState):
         self.mode = "SELECTION" # SELECTION or TRAINING
         self.visual_mode = True # Default to visual
         self.use_best_seed = True # Default to using best model as seed
+        
+        # New: Throughput Controls
+        self.parallel_eval = True
+        self.viz_speed = 2.0  # 1.0x, 2.0x, 4.0x, 8.0x
+        self.viz_freq = 5    # 1, 5, 10
 
     def enter(self, **kwargs):
         self.mode = "SELECTION"
@@ -104,8 +109,17 @@ class TrainState(BaseState):
         p.add_reporter(neat.StdOutReporter(True))
         p.add_reporter(neat.StatisticsReporter())
         
+        # Set environment variable for parallel evaluation
+        os.environ["PYPONGAI_PARALLEL_EVAL"] = "true" if self.parallel_eval else "false"
+        
         if self.visual_mode:
-            p.add_reporter(VisualReporter(config_neat, self.manager.screen, logger=logger))
+            p.add_reporter(VisualReporter(
+                config_neat, 
+                self.manager.screen, 
+                logger=logger,
+                visualization_speed=self.viz_speed,
+                viz_frequency=self.viz_freq
+            ))
         else:
             p.add_reporter(UIProgressReporter(self.manager.screen, logger=logger))
         
@@ -138,6 +152,28 @@ class TrainState(BaseState):
                 seed_toggle_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 110, 240, 40)
                 if seed_toggle_rect.collidepoint((mx, my)):
                     self.use_best_seed = not self.use_best_seed
+                    return
+                
+                # Parallel Eval Toggle
+                parallel_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 160, 240, 40)
+                if parallel_rect.collidepoint((mx, my)):
+                    self.parallel_eval = not self.parallel_eval
+                    return
+                
+                # Viz Speed Toggle
+                speed_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 210, 240, 40)
+                if speed_rect.collidepoint((mx, my)):
+                    speeds = [1.0, 2.0, 4.0, 8.0]
+                    curr_idx = speeds.index(self.viz_speed)
+                    self.viz_speed = speeds[(curr_idx + 1) % len(speeds)]
+                    return
+                
+                # Viz Frequency Toggle
+                freq_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 260, 240, 40)
+                if freq_rect.collidepoint((mx, my)):
+                    freqs = [1, 5, 10]
+                    curr_idx = freqs.index(self.viz_freq)
+                    self.viz_freq = freqs[(curr_idx + 1) % len(freqs)]
                     return
                     
                 # START Button
@@ -212,6 +248,31 @@ class TrainState(BaseState):
             seed_text_surf = self.small_font.render(seed_toggle_text, True, config.WHITE)
             seed_text_rect = seed_text_surf.get_rect(center=seed_toggle_rect.center)
             screen.blit(seed_text_surf, seed_text_rect)
+            
+            # Parallel Eval Toggle
+            parallel_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 160, 240, 40)
+            p_color = (50, 150, 50) if self.parallel_eval else (150, 50, 50)
+            pygame.draw.rect(screen, p_color, parallel_rect)
+            pygame.draw.rect(screen, config.WHITE, parallel_rect, 2)
+            p_text = f"Parallel Eval: {'ON' if self.parallel_eval else 'OFF'}"
+            p_surf = self.small_font.render(p_text, True, config.WHITE)
+            screen.blit(p_surf, p_surf.get_rect(center=parallel_rect.center))
+            
+            # Viz Speed Toggle
+            speed_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 210, 240, 40)
+            pygame.draw.rect(screen, (70, 70, 150), speed_rect)
+            pygame.draw.rect(screen, config.WHITE, speed_rect, 2)
+            s_text = f"Viz Speed: {int(self.viz_speed)}x"
+            s_surf = self.small_font.render(s_text, True, config.WHITE)
+            screen.blit(s_surf, s_surf.get_rect(center=speed_rect.center))
+            
+            # Viz Freq Toggle
+            freq_rect = pygame.Rect(config.SCREEN_WIDTH - 250, 260, 240, 40)
+            pygame.draw.rect(screen, (100, 70, 150), freq_rect)
+            pygame.draw.rect(screen, config.WHITE, freq_rect, 2)
+            f_text = f"Viz Every: {self.viz_freq} Gen"
+            f_surf = self.small_font.render(f_text, True, config.WHITE)
+            screen.blit(f_surf, f_surf.get_rect(center=freq_rect.center))
             
             start_idx = self.page * self.per_page
             end_idx = min(start_idx + self.per_page, len(self.models))
