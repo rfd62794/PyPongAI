@@ -24,6 +24,7 @@ NOVELTY_ARCHIVE = NoveltyArchive(max_size=500, k_nearest=config.NOVELTY_K_NEARES
 
 
 _curriculum_ball_speed = None
+_EVAL_POOL = None # Persistent pool for parallel evaluation
 
 
 def set_curriculum_ball_speed(speed):
@@ -229,6 +230,7 @@ def eval_genomes_competitive_parallel(genomes, config_neat, ball_speed=None):
     """
     Evaluates genomes using parallel competitive simulation.
     """
+    global _EVAL_POOL
     genome_list = list(genomes)
     for _, genome in genome_list:
         if not hasattr(genome, 'elo_rating'):
@@ -243,14 +245,15 @@ def eval_genomes_competitive_parallel(genomes, config_neat, ball_speed=None):
         selected_opponents = random.sample(opponent_indices, min(matches_per_genome, len(opponent_indices)))
         for opp_idx in selected_opponents:
             g2_id, g2_genome = genome_list[opp_idx]
-            # Optimization: avoid duplicate matches if possible? 
-            # In competitive, we want roughly even matches, randomized is fine.
             match_pairings.append((g1_id, g1_genome, g2_id, g2_genome, config_neat, ball_speed or get_curriculum_ball_speed()))
 
-    # Run simulations in parallel
+    # Run simulations in parallel (Persistent Pool)
     num_workers = os.cpu_count() or 4
-    with multiprocessing.Pool(processes=num_workers) as pool:
-        results = pool.map(simulate_match_worker, match_pairings)
+    if _EVAL_POOL is None:
+        _EVAL_POOL = multiprocessing.Pool(processes=num_workers)
+    
+    # Use map on the persistent pool
+    results = _EVAL_POOL.map(simulate_match_worker, match_pairings)
 
     # Sequential Update Phase (ELO and Novelty)
     genome_map = {g_id: g for g_id, g in genome_list}
@@ -302,14 +305,17 @@ def eval_genomes_competitive_parallel(genomes, config_neat, ball_speed=None):
 
 def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
     """
-    Main evaluation entry point. Dispatches to parallel by default.
+    Main evaluation entry point. Dispatches to parallel by default if 
+    the workload justifies the IPC overhead.
     """
     use_parallel = os.getenv("PYPONGAI_PARALLEL_EVAL", "true").lower() == "true"
     
-    if use_parallel:
+    # Use parallel ONLY if we have enough matches to justify overhead (e.g. > 100 matches)
+    # 5 matches per genome, so pop_size > 20
+    if use_parallel and len(genomes) > 20:
         return eval_genomes_competitive_parallel(genomes, config_neat, ball_speed)
     else:
-        # Fallback to sequential (original implementation)
+        # Fallback to sequential
         return eval_genomes_competitive_serial(genomes, config_neat, ball_speed)
 
 def eval_genomes_competitive_serial(genomes, config_neat, ball_speed=None):
