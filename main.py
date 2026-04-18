@@ -50,21 +50,26 @@ def main():
         manager.run()
     except KeyboardInterrupt:
         logger.info("Shutdown signal received (CTRL+C)")
-        manager.stop()
     except Exception as e:
         import traceback
         traceback.print_exc()
         logger.error(f"Unexpected error: {e}")
-        manager.stop()
     finally:
-        bridge.stop()
+        logger.info("Starting shutdown cleanup...")
+        if manager:
+            manager.stop()
+        if bridge:
+            bridge.stop()
+        pygame.quit()
+        logger.info("PyPongAI exited cleanly")
 
 if __name__ == "__main__":
     import logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+    import sys
+    logging.basicConfig(
+        level=logging.INFO, 
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        handlers=[logging.StreamHandler(sys.stdout)]
+    )
     
-    try:
-        main()
-    finally:
-        pygame.quit()
-        logging.getLogger(__name__).info("PyPongAI exited cleanly")
+    main()
