@@ -83,5 +83,6 @@ if __name__ == "__main__":
         # Catch it here if it's not caught in main()
         pass
     finally:
-        # Final safety exit to prevent atexit tracebacks
-        sys.exit(0)
+        # Final safety exit to prevent atexit tracebacks from multiprocessing on Windows
+        import os
+        os._exit(0)
