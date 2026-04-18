@@ -41,12 +41,12 @@ os.environ["PYPONGAI_AUTOMATION"] = "true"
 importlib.reload(config)
 
 print(f"VISUAL_MAX_SCORE: {config.VISUAL_MAX_SCORE} (expected: 3)")
-print(f"BALL_SPEED_X: {config.BALL_SPEED_X} (expected: 5)")
-print(f"PADDLE_SPEED: {config.PADDLE_SPEED} (expected: 12)")
+print(f"BALL_SPEED_X: {config.BALL_SPEED_X} (expected: 8)")
+print(f"PADDLE_SPEED: {config.PADDLE_SPEED} (expected: 15)")
 
 assert config.VISUAL_MAX_SCORE == 3, f"Devlog mode should use 3-point matches, got {config.VISUAL_MAX_SCORE}"
-assert config.BALL_SPEED_X == 5, f"Devlog mode should use ball speed 5, got {config.BALL_SPEED_X}"
-assert config.PADDLE_SPEED == 12, f"Devlog mode should use paddle speed 12, got {config.PADDLE_SPEED}"
+assert config.BALL_SPEED_X == 8, f"Devlog mode should use ball speed 8, got {config.BALL_SPEED_X}"
+assert config.PADDLE_SPEED == 15, f"Devlog mode should use paddle speed 15, got {config.PADDLE_SPEED}"
 
 print("[OK] Devlog mode settings correct\n")
 
