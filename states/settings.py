@@ -153,6 +153,9 @@ class SettingsState(BaseState):
                     # Only allow valid characters
                     if event.unicode in "0123456789.-":
                         self.input_text += event.unicode
+            else:
+                # Route keyboard events to BaseState if no setting is being edited
+                super().handle_input(event)
     
     def _apply_input(self):
         """Applies the current input text to the selected setting."""

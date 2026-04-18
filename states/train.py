@@ -175,6 +175,9 @@ class TrainState(BaseState):
                 elif event.key == pygame.K_LEFT:
                     if self.page > 0:
                         self.page -= 1
+                else:
+                    # Route other keys (ESC, P, etc.) to BaseState
+                    super().handle_input(event)
 
     def draw(self, screen):
         if self.mode == "SELECTION":

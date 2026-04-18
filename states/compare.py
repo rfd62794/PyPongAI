@@ -120,6 +120,9 @@ class CompareState(BaseState):
                     self.is_playing = False
                 else:
                     self.manager.change_state("menu")
+            else:
+                # Route other keys (P, S, etc.) to BaseState
+                super().handle_input(event)
 
     def update(self, dt):
         if self.mode == "PLAYBACK" and self.is_playing:

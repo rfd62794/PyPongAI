@@ -64,6 +64,9 @@ class ReplayState(BaseState):
                 self.current_frame_idx = min(len(self.frames) - 1, self.current_frame_idx + 60) # Fwd 1s
             elif event.key == pygame.K_ESCAPE:
                 self.manager.change_state("analytics")
+            else:
+                # Route other keys (P, S, etc.) to BaseState
+                super().handle_input(event)
 
     def update(self, dt):
         if self.playing and self.frames:
