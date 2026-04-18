@@ -36,7 +36,7 @@ class BaseState:
         if cmd == "back_to_menu":
             self.manager.change_state("menu")
         elif cmd == "go_play":
-            self.manager.change_state("game")
+            self.manager.change_state("lobby")
         elif cmd == "go_train":
             self.manager.change_state("train")
         elif cmd == "go_league":
