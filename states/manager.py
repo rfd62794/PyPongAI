@@ -27,11 +27,14 @@ class StateManager:
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False
-                    sys.exit(0)
+                    self.stop()
+                    return # Exit immediately from the run loop
                 
                 if self.active_state:
                     self.active_state.handle_input(event)
+
+            if not self.running:
+                break
 
             if self.active_state:
                 self.active_state.update(dt)
@@ -39,4 +42,16 @@ class StateManager:
             
             pygame.display.flip()
         
+        # Cleanup
+        if self.active_state:
+            self.active_state.exit()
         pygame.quit()
+
+    def stop(self):
+        """Gracefully stop the application and clean up current state."""
+        self.running = False
+        if self.active_state:
+            try:
+                self.active_state.exit()
+            except Exception as e:
+                print(f"Error during state exit: {e}")

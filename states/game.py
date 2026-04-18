@@ -66,14 +66,17 @@ class GameState(BaseState):
                     # Rematch
                     self.enter(model_path=self.model_path)
                 elif event.key == pygame.K_m:
-                    self.game.stop()
                     self.manager.change_state("menu")
                 elif event.key == pygame.K_q:
-                    self.game.stop()
-                    self.manager.running = False
+                    self.manager.stop()
         else:
             # Route to BaseState for universal navigation keys (P, ESC, etc.)
             super().handle_input(event)
+
+    def exit(self):
+        """Clean up game engine on state exit."""
+        if self.game and hasattr(self.game, "stop"):
+            self.game.stop()
 
     def on_start_action(self):
         """Handle 'S' key as a rematch command if game is over."""

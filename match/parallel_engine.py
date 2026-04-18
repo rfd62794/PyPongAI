@@ -8,6 +8,7 @@ import neat
 import pickle
 import os
 import sys
+import logging
 
 # Add root directory to path so we can import modules from root
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -125,71 +126,77 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     running = True
     just_finished_match = False
     
-    while running:
-        # Process all available commands
-        left_move = None
-        right_move = None
-        just_finished_match = False
-        
-        while not input_queue.empty():
-            try:
-                cmd = input_queue.get_nowait()
-                if cmd["type"] == "STOP":
-                    running = False
+    try:
+        while running:
+            # Process all available commands
+            left_move = None
+            right_move = None
+            just_finished_match = False
+            
+            while not input_queue.empty():
+                try:
+                    cmd = input_queue.get_nowait()
+                    if cmd["type"] == "STOP":
+                        running = False
+                        break
+                    elif cmd["type"] == "MOVE":
+                        if cmd["paddle"] == "left":
+                            left_move = cmd["action"]
+                        elif cmd["paddle"] == "right":
+                            right_move = cmd["action"]
+                    elif cmd["type"] == "PLAY_MATCH":
+                        # Run a full match and return result
+                        result = _run_fast_match(cmd["config"], record_match=cmd.get("record_match", False))
+                        output_queue.put({"type": "MATCH_RESULT", "data": result})
+                        just_finished_match = True
+                        # Skip regular update loop after match to preserve MATCH_RESULT in queue
+                        break
+                        
+                except multiprocessing.queues.Empty:
                     break
-                elif cmd["type"] == "MOVE":
-                    if cmd["paddle"] == "left":
-                        left_move = cmd["action"]
-                    elif cmd["paddle"] == "right":
-                        right_move = cmd["action"]
-                elif cmd["type"] == "PLAY_MATCH":
-                    # Run a full match and return result
-                    result = _run_fast_match(cmd["config"], record_match=cmd.get("record_match", False))
-                    output_queue.put({"type": "MATCH_RESULT", "data": result})
-                    just_finished_match = True
-                    # Skip regular update loop after match to preserve MATCH_RESULT in queue
-                    break
-                    
-            except multiprocessing.queues.Empty:
+            
+            if not running:
                 break
-        
-        if not running:
-            break
 
-        # Skip regular game loop if we just finished a match (to preserve MATCH_RESULT in queue)
-        if just_finished_match:
-            continue
+            # Skip regular game loop if we just finished a match (to preserve MATCH_RESULT in queue)
+            if just_finished_match:
+                continue
 
-        # Only update the continuous game loop if in visual mode or if we have moves to process
-        # In fast mode (non-visual), we only process PLAY_MATCH commands, no regular game loop
-        if not visual_mode and not left_move and not right_move:
-            # In fast mode with no moves, just wait a bit to avoid busy-waiting
-            time.sleep(0.001)
-            continue
+            # Only update the continuous game loop if in visual mode or if we have moves to process
+            # In fast mode (non-visual), we only process PLAY_MATCH commands, no regular game loop
+            if not visual_mode and not left_move and not right_move:
+                # In fast mode with no moves, just wait a bit to avoid busy-waiting
+                time.sleep(0.001)
+                continue
 
-        # Update Game (only in visual mode or when processing moves)
-        score_data = game.update(left_move, right_move)
-        
-        # Get State
-        state = game.get_state()
-        
-        # Add event data if any
-        if score_data:
-            state.update(score_data)
+            # Update Game (only in visual mode or when processing moves)
+            score_data = game.update(left_move, right_move)
             
-        # Send state back to main process (only in visual mode)
-        # In fast mode, we don't send regular state updates - only MATCH_RESULT
-        if visual_mode and not output_queue.full():
-            try:
-                output_queue.put(state)
-            except:
-                pass
+            # Get State
+            state = game.get_state()
             
-        # Frame Rate Control
-        if visual_mode and target_fps > 0:
-            clock.tick(target_fps)
-        elif not visual_mode and target_fps > 0:
-            time.sleep(1.0 / target_fps)
+            # Add event data if any
+            if score_data:
+                state.update(score_data)
+                
+            # Send state back to main process (only in visual mode)
+            # In fast mode, we don't send regular state updates - only MATCH_RESULT
+            if visual_mode and not output_queue.full():
+                try:
+                    output_queue.put(state)
+                except:
+                    pass
+                
+            # Frame Rate Control
+            if visual_mode and target_fps > 0:
+                clock.tick(target_fps)
+            elif not visual_mode and target_fps > 0:
+                time.sleep(1.0 / target_fps)
+    except KeyboardInterrupt:
+        # Silent exit on CTRL+C (parent handles cleanup)
+        pass
+    except Exception as e:
+        logging.error(f"Parallel game loop error: {e}")
 
 class ParallelGameEngine:
     def __init__(self, visual_mode=True, target_fps=60):
@@ -230,11 +237,23 @@ class ParallelGameEngine:
 
     def stop(self):
         if self.process:
-            self.input_queue.put({"type": "STOP"})
-            self.process.join(timeout=1.0)
-            if self.process.is_alive():
-                self.process.terminate()
-            self.process = None
+            try:
+                # Attempt graceful stop via queue
+                try:
+                    self.input_queue.put({"type": "STOP"})
+                except:
+                    pass
+                
+                self.process.join(timeout=0.5)
+                if self.process.is_alive():
+                    self.process.terminate()
+                    self.process.join(timeout=0.5)
+                    if self.process.is_alive():
+                        self.process.kill()
+            except Exception as e:
+                 logging.debug(f"Error stopping process: {e}")
+            finally:
+                self.process = None
 
     def update(self, left_move=None, right_move=None):
         """
