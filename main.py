@@ -62,20 +62,9 @@ def main():
 if __name__ == "__main__":
     import logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
-    logger = logging.getLogger(__name__)
-
-    manager = None
+    
     try:
         main()
-    except KeyboardInterrupt:
-        logger.info("Shutdown signal received (CTRL+C)")
-        # We need access to the manager here. 
-        # I'll modify main() to return the manager or handle it differently.
-        pass
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        logger.error(f"Unexpected error: {e}")
     finally:
         pygame.quit()
-        logger.info("PyPongAI exited cleanly")
+        logging.getLogger(__name__).info("PyPongAI exited cleanly")
