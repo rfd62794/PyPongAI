@@ -1,4 +1,6 @@
 import patch_neat
+import os
+from core.automation_bridge import AutomationBridge
 
 def main():
     # Import pygame and other modules only when actually running main
@@ -20,6 +22,11 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption(config.WINDOW_TITLE)
+    
+    # Start Automation Bridge if requested
+    automation_enabled = os.getenv("PYPONGAI_AUTOMATION", "false").lower() == "true"
+    bridge = AutomationBridge(enabled=automation_enabled)
+    bridge.start()
     
     manager = StateManager(screen)
     
