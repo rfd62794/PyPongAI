@@ -91,3 +91,30 @@ NOVELTY_K_NEAREST = 15
 # Create directories if they don't exist
 for d in [DATA_DIR, MODEL_DIR, LOG_DIR, LOGS_TRAINING_DIR, LOGS_MATCHES_DIR, LOGS_HUMAN_DIR]:
     os.makedirs(d, exist_ok=True)
+
+# ============================================================================
+# AUTOMATION MODE CONFIGURATION
+# ============================================================================
+
+def apply_automation_overrides():
+    """Apply devlog-optimized settings when running in automation mode."""
+    global VISUAL_MAX_SCORE, BALL_SPEED_X, BALL_SPEED_Y, BALL_SPEED_INCREMENT
+    global PADDLE_SPEED, PADDLE_WIDTH, SPEED_INCREASE_PER_GEN, MAX_CURRICULUM_SPEED
+    
+    if os.getenv("PYPONGAI_AUTOMATION") != "true":
+        return  # No overrides needed
+    
+    # Override settings for devlog clip recording
+    VISUAL_MAX_SCORE = 3
+    BALL_SPEED_X = 4
+    BALL_SPEED_Y = 4
+    BALL_SPEED_INCREMENT = 1.1
+    PADDLE_SPEED = 10
+    PADDLE_WIDTH = 25
+    SPEED_INCREASE_PER_GEN = 0
+    MAX_CURRICULUM_SPEED = BALL_SPEED_X
+    
+    print("[DEVLOG MODE] Automation settings applied: 3-point matches, 33% faster ball, responsive paddles")
+
+# Apply overrides on module load
+apply_automation_overrides()
