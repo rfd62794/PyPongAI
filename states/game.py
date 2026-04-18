@@ -25,8 +25,17 @@ class GameState(BaseState):
 
     def enter(self, model_path=None, **kwargs):
         self.model_path = model_path
-        self.game = ParallelGameEngine(visual_mode=True, target_fps=config.FPS)
-        self.game.start()
+        
+        # Use single-process engine in automation mode to avoid pipe inheritance deadlocks
+        automation_mode = os.getenv("PYPONGAI_AUTOMATION", "false").lower() == "true"
+        if automation_mode:
+            from core.engine import Game
+            self.game = Game()
+            logger.info("Using stable single-process engine for automation.")
+        else:
+            self.game = ParallelGameEngine(visual_mode=True, target_fps=config.FPS)
+            self.game.start()
+            
         self.recorder = GameRecorder()
         self.game_over = False
         self.match_start_time = pygame.time.get_ticks()
@@ -105,12 +114,16 @@ class GameState(BaseState):
             else:
                 left_move = None
 
-        # Update Game
-        score_data = self.game.update(left_move, right_move)
+        # Update Game (Logic for both single-proc and parallel-proc engines)
+        if hasattr(self.game, "update"):
+            score_data = self.game.update(left_move, right_move)
         
         # Check Game Over
-        if (self.game.score_left >= config.VISUAL_MAX_SCORE or
-                self.game.score_right >= config.VISUAL_MAX_SCORE):
+        score_left = self.game.score_left
+        score_right = self.game.score_right
+        
+        if (score_left >= config.VISUAL_MAX_SCORE or
+                score_right >= config.VISUAL_MAX_SCORE):
             self.game_over = True
             self.handle_game_over()
 
@@ -125,7 +138,10 @@ class GameState(BaseState):
         self.rival_sys.update_match_result(final_score_human, final_score_ai, won)
         self.recorder.save_recording()
         self.emit_match_complete_event()
-        self.game.stop()
+        
+        # Only call stop if it's the parallel engine
+        if hasattr(self.game, "stop"):
+            self.game.stop()
 
     def emit_match_complete_event(self):
         """Emit a JSON event to stdout for IPC with ContentEngine."""

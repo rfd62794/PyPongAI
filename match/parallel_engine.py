@@ -105,15 +105,22 @@ def _game_loop(input_queue, output_queue, visual_mode, target_fps):
     The main loop for the separate game process.
     """
     # Initialize the appropriate game engine
-    if visual_mode:
-        game = game_engine.Game()
-        clock = game_engine.pygame.time.Clock()
-    else:
-        game = game_simulator.GameSimulator()
-        clock = None
+    try:
+        if visual_mode:
+            game = game_engine.Game()
+            clock = game_engine.pygame.time.Clock()
+        else:
+            game = game_simulator.GameSimulator()
+            clock = None
+    except Exception as e:
+        print(f"CRITICAL: Failed to initialize Game object in child process: {e}")
+        return
 
     # Signal that we are ready
-    output_queue.put({"type": "READY"})
+    try:
+        output_queue.put({"type": "READY"})
+    except Exception as e:
+        print(f"CRITICAL: Failed to signal READY to parent: {e}")
 
     running = True
     just_finished_match = False
@@ -207,16 +214,17 @@ class ParallelGameEngine:
             )
             self.process.start()
             
-            # Wait for ready signal
+            # Wait for ready signal (Increased timeout from 5s to 15s for automation stability)
             print("Waiting for engine to start...")
+            start_wait = time.time()
             while True:
                 try:
-                    msg = self.output_queue.get(timeout=5.0)
+                    msg = self.output_queue.get(timeout=15.0)
                     if msg.get("type") == "READY":
-                        print("Engine started.")
+                        print(f"Engine started safely in {time.time() - start_wait:.2f}s.")
                         break
                 except multiprocessing.queues.Empty:
-                    print("Engine start timed out.")
+                    print(f"Engine start timed out after 15 seconds. Current process status: {self.process.is_alive()}")
                     self.stop()
                     break
 
