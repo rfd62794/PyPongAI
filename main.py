@@ -56,6 +56,8 @@ def main():
         logger.error(f"Unexpected error: {e}")
     finally:
         logger.info("Starting shutdown cleanup...")
+        from ai import ai_module
+        ai_module.cleanup_eval_pool()
         if manager:
             manager.stop()
         if bridge:
