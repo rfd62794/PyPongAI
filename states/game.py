@@ -9,7 +9,10 @@ from core.recorder import GameRecorder
 from human_rival import HumanRival
 import json
 import sys
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class GameState(BaseState):
     def __init__(self, manager):
