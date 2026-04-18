@@ -103,7 +103,8 @@ class UIProgressReporter(neat.reporting.BaseReporter):
 class VisualReporter(neat.reporting.BaseReporter):
     """Reporter that pauses training to visually showcase best genomes."""
 
-    def __init__(self, config_neat, screen: pygame.Surface, logger: Optional[object] = None):
+    def __init__(self, config_neat, screen: pygame.Surface, logger: Optional[object] = None, 
+                 visualization_speed: float = 1.0, viz_frequency: int = 1):
         self.config_neat = config_neat
         self.screen = screen
         self.logger = logger
@@ -111,6 +112,10 @@ class VisualReporter(neat.reporting.BaseReporter):
         self.checkpoint_dir = os.path.join(config.MODEL_DIR, "checkpoints")
         os.makedirs(self.checkpoint_dir, exist_ok=True)
         self.font = pygame.font.Font(None, 36)
+        
+        # New: Speed and Frequency settings
+        self.visualization_speed = visualization_speed
+        self.viz_frequency = viz_frequency
 
     def start_generation(self, generation: int) -> None:
         self.generation = generation
@@ -151,7 +156,12 @@ class VisualReporter(neat.reporting.BaseReporter):
         if best_genome:
             print(f"Generation {self.generation} Best Fitness: {best_fitness}")
             self._save_checkpoint(best_genome)
-            self._visualize_best(best_genome)
+            
+            # Respect visualization frequency
+            if (self.generation + 1) % self.viz_frequency == 0:
+                self._visualize_best(best_genome)
+            else:
+                print(f"Skipping visualization (Frequency: {self.viz_frequency})")
 
         if self.logger:
             self.logger.log_generation(
@@ -170,17 +180,23 @@ class VisualReporter(neat.reporting.BaseReporter):
         print(f"Saved checkpoint: {filename}")
 
     def _visualize_best(self, genome) -> None:
-        print("Visualizing best genome... (Press SPACE to skip)")
+        print(f"Visualizing best genome... ({self.visualization_speed}x speed, Press SPACE to skip)")
 
         clock = pygame.time.Clock()
-        game = ParallelGameEngine(visual_mode=True, target_fps=config.FPS)
+        # Ensure we use an engine that supports higher FPS
+        game = ParallelGameEngine(visual_mode=True, target_fps=int(config.FPS * self.visualization_speed))
         game.start()
 
         net = neat.nn.FeedForwardNetwork.create(genome, self.config_neat)
 
+        # Reduced duration for faster visualization cycling
+        max_duration_seconds = 10 / self.visualization_speed
+        start_time = pygame.time.get_ticks()
+
         running = True
         while running:
-            clock.tick(config.FPS)
+            # Control rendering speed
+            clock.tick(int(config.FPS * self.visualization_speed))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -210,15 +226,17 @@ class VisualReporter(neat.reporting.BaseReporter):
             game.draw(self.screen)
 
             info_text = self.font.render(
-                f"Gen {self.generation} Best - Press SPACE to Resume", True, config.WHITE
+                f"Gen {self.generation} Best ({self.visualization_speed}x) - Press SPACE to Resume", True, config.WHITE
             )
             self.screen.blit(info_text, (10, config.SCREEN_HEIGHT - 40))
 
             pygame.display.flip()
 
+            # Timeout or point scored
             if (
                 game.score_left >= config.VISUAL_MAX_SCORE
                 or game.score_right >= config.VISUAL_MAX_SCORE
+                or (pygame.time.get_ticks() - start_time) / 1000 > max_duration_seconds
             ):
                 running = False
 

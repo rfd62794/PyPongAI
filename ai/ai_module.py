@@ -11,6 +11,10 @@ from core import config
 from core import engine as game_engine
 from core import simulator as game_simulator
 import random
+import os
+import multiprocessing
+import statistics
+import logging
 from .opponents import get_rule_based_move
 from novelty_search import NoveltyArchive, calculate_bc_from_contacts
 
@@ -152,10 +156,165 @@ def calculate_new_rating(rating, expected_score, actual_score, k_factor=32):
     return rating + k_factor * (actual_score - expected_score)
 
 
-def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
-    """Evaluates genomes using competitive ELO-based matchmaking with Novelty Search.
+def simulate_match_worker(args):
+    """
+    Worker function for parallel match simulation.
+    Arguments: (genome_a_data, genome_b_data, config_neat, ball_speed)
+    Returns: (match_result, frame_count, genome_a_id, genome_b_id, contact_metrics_a)
+    """
+    g1_id, g1_genome, g2_id, g2_genome, config_neat, ball_speed = args
     
-    Fitness = ELO_Rating + (NOVELTY_WEIGHT × Novelty_Score)
+    # Create networks in the worker process
+    net_left = _create_network(g1_genome, config_neat)
+    net_right = _create_network(g2_genome, config_neat)
+    
+    game = game_simulator.GameSimulator(ball_speed=ball_speed)
+    run = True
+    frame_count = 0
+    max_frames = 3000
+    match_result = 0.5 
+    contact_metrics = []
+    
+    while run and frame_count < max_frames:
+        frame_count += 1
+        state = game.get_state()
+        
+        # Left paddle
+        inputs_left = (
+            state["paddle_left_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_left_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] < 0 else 0.0,
+            state["paddle_right_y"] / config.SCREEN_HEIGHT
+        )
+        output_left = net_left.activate(inputs_left)
+        action_idx_left = output_left.index(max(output_left))
+        left_move = "UP" if action_idx_left == 0 else "DOWN" if action_idx_left == 1 else None
+        
+        # Right paddle
+        inputs_right = (
+            state["paddle_right_y"] / config.SCREEN_HEIGHT,
+            state["ball_x"] / config.SCREEN_WIDTH,
+            state["ball_y"] / config.SCREEN_HEIGHT,
+            state["ball_vel_x"] / config.BALL_MAX_SPEED,
+            state["ball_vel_y"] / config.BALL_MAX_SPEED,
+            (state["paddle_right_y"] - state["ball_y"]) / config.SCREEN_HEIGHT,
+            1.0 if state["ball_vel_x"] > 0 else 0.0,
+            state["paddle_left_y"] / config.SCREEN_HEIGHT
+        )
+        output_right = net_right.activate(inputs_right)
+        action_idx_right = output_right.index(max(output_right))
+        right_move = "UP" if action_idx_right == 0 else "DOWN" if action_idx_right == 1 else None
+        
+        score_data = game.update(left_move, right_move)
+        
+        if score_data and (score_data.get("hit_left") or score_data.get("hit_right")):
+            contact_metrics.append(score_data)
+        
+        if score_data and score_data.get("scored"):
+            match_result = 1.0 if score_data.get("scored") == "left" else 0.0
+            run = False
+            
+    return {
+        "match_result": match_result,
+        "g1_id": g1_id,
+        "g2_id": g2_id,
+        "contact_metrics": contact_metrics
+    }
+
+def eval_genomes_competitive_parallel(genomes, config_neat, ball_speed=None):
+    """
+    Evaluates genomes using parallel competitive simulation.
+    """
+    genome_list = list(genomes)
+    for _, genome in genome_list:
+        if not hasattr(genome, 'elo_rating'):
+            genome.elo_rating = config.ELO_INITIAL_RATING
+            
+    matches_per_genome = min(5, len(genome_list) - 1)
+    match_pairings = []
+    
+    # Prepare all match arguments
+    for idx, (g1_id, g1_genome) in enumerate(genome_list):
+        opponent_indices = [i for i in range(len(genome_list)) if i != idx]
+        selected_opponents = random.sample(opponent_indices, min(matches_per_genome, len(opponent_indices)))
+        for opp_idx in selected_opponents:
+            g2_id, g2_genome = genome_list[opp_idx]
+            # Optimization: avoid duplicate matches if possible? 
+            # In competitive, we want roughly even matches, randomized is fine.
+            match_pairings.append((g1_id, g1_genome, g2_id, g2_genome, config_neat, ball_speed or get_curriculum_ball_speed()))
+
+    # Run simulations in parallel
+    num_workers = os.cpu_count() or 4
+    with multiprocessing.Pool(processes=num_workers) as pool:
+        results = pool.map(simulate_match_worker, match_pairings)
+
+    # Sequential Update Phase (ELO and Novelty)
+    genome_map = {g_id: g for g_id, g in genome_list}
+    genome_contact_metrics = {g_id: [] for g_id, _ in genome_list}
+    
+    for res in results:
+        g1 = genome_map[res["g1_id"]]
+        g2 = genome_map[res["g2_id"]]
+        
+        # ELO Update
+        expected_a = calculate_expected_score(g1.elo_rating, g2.elo_rating)
+        actual_a = res["match_result"]
+        g1.elo_rating = calculate_new_rating(g1.elo_rating, expected_a, actual_a, config.ELO_K_FACTOR)
+        g2.elo_rating = calculate_new_rating(g2.elo_rating, 1.0 - expected_a, 1.0 - actual_a, config.ELO_K_FACTOR)
+        
+        # Save metrics for novelty
+        genome_contact_metrics[res["g1_id"]].extend(res["contact_metrics"])
+
+    # Final Fitness Calculation
+    generation_metrics = {
+        "elo_ratings": [],
+        "novelty_scores": [],
+        "behavioral_characteristics": [],
+        "fitness_values": [],
+    }
+    
+    for g_id, genome in genome_list:
+        bc = calculate_bc_from_contacts(genome_contact_metrics.get(g_id, []))
+        if bc is not None:
+            novelty_score = NOVELTY_ARCHIVE.calculate_novelty(bc)
+            NOVELTY_ARCHIVE.add_bc(bc)
+            genome.fitness = max(0, genome.elo_rating + (config.NOVELTY_WEIGHT * novelty_score))
+            generation_metrics["behavioral_characteristics"].append(bc)
+            generation_metrics["novelty_scores"].append(novelty_score)
+        else:
+            genome.fitness = max(0, genome.elo_rating)
+            generation_metrics["novelty_scores"].append(0)
+            
+        generation_metrics["elo_ratings"].append(genome.elo_rating)
+        generation_metrics["fitness_values"].append(genome.fitness)
+
+    avg_elo = statistics.mean(generation_metrics["elo_ratings"])
+    avg_novelty = statistics.mean(generation_metrics["novelty_scores"])
+    valid_bcs = [b for b in generation_metrics["behavioral_characteristics"] if b is not None]
+    bc_diversity = statistics.stdev(valid_bcs) if len(valid_bcs) > 1 else 0
+    
+    print(f"\n[GEN] Parallel Eval | Avg ELO: {avg_elo:.1f} | Avg Novelty: {avg_novelty:.1f} | BC Diversity: {bc_diversity:.2f}")
+    return generation_metrics
+
+def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
+    """
+    Main evaluation entry point. Dispatches to parallel by default.
+    """
+    use_parallel = os.getenv("PYPONGAI_PARALLEL_EVAL", "true").lower() == "true"
+    
+    if use_parallel:
+        return eval_genomes_competitive_parallel(genomes, config_neat, ball_speed)
+    else:
+        # Fallback to sequential (original implementation)
+        return eval_genomes_competitive_serial(genomes, config_neat, ball_speed)
+
+def eval_genomes_competitive_serial(genomes, config_neat, ball_speed=None):
+    """
+    Original sequential evaluation logic.
     """
     import statistics
     
@@ -277,7 +436,7 @@ def eval_genomes_competitive(genomes, config_neat, ball_speed=None):
     valid_bcs = [b for b in generation_metrics["behavioral_characteristics"] if b is not None]
     bc_diversity = statistics.stdev(valid_bcs) if len(valid_bcs) > 1 else 0
     
-    print(f"\n[GEN] Avg ELO: {avg_elo:.1f} | Avg Novelty: {avg_novelty:.1f} | BC Diversity: {bc_diversity:.2f}")
+    print(f"\n[GEN] Serial Eval | Avg ELO: {avg_elo:.1f} | Avg Novelty: {avg_novelty:.1f} | BC Diversity: {bc_diversity:.2f}")
     
     return generation_metrics
 
