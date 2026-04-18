@@ -59,6 +59,9 @@ class MenuState(BaseState):
             elif self.btn_quit.collidepoint((mx, my)):
                 pygame.quit()
                 sys.exit()
+        
+        # Route keyboard events to BaseState for universal navigation
+        super().handle_input(event)
     
     def _draw_button(self, screen, rect, text, is_hovered):
         """Draws a themed button with hover effects and rounded corners."""

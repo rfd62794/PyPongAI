@@ -135,6 +135,9 @@ class AnalyticsState(BaseState):
                 else:
                     self.view = "OVERVIEW"
                     self.selected_model = None
+            else:
+                # Route other keyboard events (P, S, etc.) to BaseState
+                super().handle_input(event)
 
     def update(self, dt):
         pass

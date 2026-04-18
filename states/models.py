@@ -63,6 +63,9 @@ class ModelState(BaseState):
                 if rect.collidepoint((mx, my)):
                     self.selected_index = i
                 list_y += 50
+        
+        # Route keyboard events to BaseState for universal navigation
+        super().handle_input(event)
 
     def draw(self, screen):
         from utils import elo_manager

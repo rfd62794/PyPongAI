@@ -631,6 +631,9 @@ class LeagueState(BaseState):
                     self.manager.change_state("menu")
                 elif self.dashboard_button.collidepoint(event.pos):
                     self.manager.change_state("analytics")
+        
+        # Route keyboard events to BaseState for universal navigation
+        super().handle_input(event)
 
     def update(self, dt):
         if self.mode == "RUNNING":
