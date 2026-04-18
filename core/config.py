@@ -106,10 +106,10 @@ def apply_automation_overrides():
     
     # Override settings for devlog clip recording
     VISUAL_MAX_SCORE = 3
-    BALL_SPEED_X = 4
-    BALL_SPEED_Y = 4
-    BALL_SPEED_INCREMENT = 1.1
-    PADDLE_SPEED = 10
+    BALL_SPEED_X = 5
+    BALL_SPEED_Y = 5
+    BALL_SPEED_INCREMENT = 1.15
+    PADDLE_SPEED = 12
     PADDLE_WIDTH = 25
     SPEED_INCREASE_PER_GEN = 0
     MAX_CURRICULUM_SPEED = BALL_SPEED_X
