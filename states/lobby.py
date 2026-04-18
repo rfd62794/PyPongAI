@@ -31,6 +31,7 @@ class LobbyState(BaseState):
         return model_manager.get_best_model_by_elo()
 
     def handle_input(self, event):
+        """Handle mouse input and fall back to keyboard commands."""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mx, my = event.pos
@@ -57,6 +58,17 @@ class LobbyState(BaseState):
                         
                 elif self.btn_back.collidepoint((mx, my)):
                     self.manager.change_state("menu")
+        
+        # Call parent to handle universal keyboard commands (ESC to go back, etc.)
+        super().handle_input(event)
+
+    def on_start_action(self):
+        """Handle 'S' key to start match with best model."""
+        best = self.get_best_model()
+        if best:
+            self.manager.change_state("game", model_path=best)
+        else:
+            print("No models found!")
 
     def draw(self, screen):
         screen.fill(config.BLACK)

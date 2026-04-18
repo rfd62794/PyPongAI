@@ -7,6 +7,9 @@ from states.base import BaseState
 from match.parallel_engine import ParallelGameEngine
 from core.recorder import GameRecorder
 from human_rival import HumanRival
+import json
+import sys
+from datetime import datetime
 
 class GameState(BaseState):
     def __init__(self, manager):
@@ -26,6 +29,7 @@ class GameState(BaseState):
         self.game.start()
         self.recorder = GameRecorder()
         self.game_over = False
+        self.match_start_time = pygame.time.get_ticks()
         
         # Load Model
         if self.model_path:
@@ -43,12 +47,11 @@ class GameState(BaseState):
             self.manager.change_state("menu")
 
     def handle_input(self, event):
+        """Override to support both game-over logic and universal keyboard commands."""
         if self.game_over:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     # Rematch
-                    # Reload rival if needed (logic from play.py)
-                    # For now, just restart with same model
                     self.enter(model_path=self.model_path)
                 elif event.key == pygame.K_m:
                     self.game.stop()
@@ -57,9 +60,13 @@ class GameState(BaseState):
                     self.game.stop()
                     self.manager.running = False
         else:
-            # In-game input is handled in update via key polling, 
-            # but we can handle specific events here if needed
-            pass
+            # Route to BaseState for universal navigation keys (P, ESC, etc.)
+            super().handle_input(event)
+
+    def on_start_action(self):
+        """Handle 'S' key as a rematch command if game is over."""
+        if self.game_over:
+            self.enter(model_path=self.model_path)
 
     def update(self, dt):
         if self.game_over:
@@ -117,7 +124,27 @@ class GameState(BaseState):
             
         self.rival_sys.update_match_result(final_score_human, final_score_ai, won)
         self.recorder.save_recording()
+        self.emit_match_complete_event()
         self.game.stop()
+
+    def emit_match_complete_event(self):
+        """Emit a JSON event to stdout for IPC with ContentEngine."""
+        event = {
+            "type": "match_complete",
+            "data": {
+                "winner": "ai" if self.game.score_left > self.game.score_right else "human",
+                "ai_score": self.game.score_left,
+                "human_score": self.game.score_right,
+                "duration_seconds": (pygame.time.get_ticks() - self.match_start_time) // 1000,
+            },
+            "timestamp": datetime.now().isoformat(),
+        }
+        try:
+            # Using a prefix to make filtering easier for the parent process
+            print(json.dumps({"event": event}), flush=True)
+            sys.stdout.flush()
+        except Exception:
+            pass
 
     def draw(self, screen):
         # Draw game elements using state from ParallelGameEngine
